@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credentials | Ibnu - Certifications & Professional Development</title>
+    <meta name="description" content="Professional certifications from Harvard, Stanford, Cambridge, McKinsey, Google, IBM, and more">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        /* Page-specific styles */
+        .creds-hero {
+            min-height: 50vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            padding: 120px 20px 60px;
+        }
+        
+        .creds-hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            margin-bottom: 1rem;
+        }
+        
+        .creds-hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .creds-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .creds-stat {
+            text-align: center;
+        }
+        
+        .creds-stat .number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .creds-stat .label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        /* Filter Section */
+        .filter-section {
+            padding: 40px 0;
+            background: var(--glass-bg);
+            border-top: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 70px;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+        }
+        
+        .filter-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-tab {
+            padding: 8px 16px;
+            border-radius: 50px;
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+        }
+        
+        .filter-tab:hover,
+        .filter-tab.active {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: var(--bg-primary);
+        }
+        
+        .filter-search {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: var(--bg-secondary);
+            border-radius: 50px;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .filter-search input {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-family: var(--font-body);
+            width: 200px;
+        }
+        
+        .filter-search input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        /* Credentials Grid */
+        .creds-section {
+            padding: 60px 0;
+        }
+        
+        .creds-category {
+            margin-bottom: 60px;
+        }
+        
+        .category-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .category-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .category-icon.elite { background: linear-gradient(135deg, #FFD700, #FFA500); }
+        .category-icon.tech { background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); }
+        .category-icon.consulting { background: linear-gradient(135deg, #4CAF50, #2196F3); }
+        .category-icon.finance { background: linear-gradient(135deg, #9C27B0, #E91E63); }
+        .category-icon.cloud { background: linear-gradient(135deg, #FF5722, #FF9800); }
+        .category-icon.security { background: linear-gradient(135deg, var(--accent-tertiary), #00BCD4); }
+        
+        .category-title h2 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .category-title p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        .creds-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        
+        .cred-card {
+            padding: 24px;
+            background: var(--glass-bg);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+            display: flex;
+            gap: 16px;
+        }
+        
+        .cred-card:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.1);
+        }
+        
+        .cred-logo {
+            width: 60px;
+            height: 60px;
+            min-width: 60px;
+            border-radius: 12px;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        
+        .cred-logo.harvard { background: #A51C30; color: white; }
+        .cred-logo.stanford { background: #8C1515; color: white; }
+        .cred-logo.cambridge { background: #A3C1AD; color: #000; }
+        .cred-logo.google { background: linear-gradient(135deg, #4285F4, #34A853, #FBBC05, #EA4335); color: white; }
+        .cred-logo.ibm { background: #0530AD; color: white; }
+        .cred-logo.aws { background: #FF9900; color: #232F3E; }
+        .cred-logo.microsoft { background: linear-gradient(135deg, #F25022, #7FBA00, #00A4EF, #FFB900); color: white; }
+        .cred-logo.mckinsey { background: #000; color: #00A3E0; }
+        .cred-logo.pwc { background: #DC6900; color: white; }
+        .cred-logo.deloitte { background: #86BC25; color: white; }
+        .cred-logo.ey { background: #FFE600; color: #2E2E38; }
+        .cred-logo.kpmg { background: #00338D; color: white; }
+        .cred-logo.bcg { background: #00A651; color: white; }
+        .cred-logo.insead { background: #006341; color: white; }
+        .cred-logo.accenture { background: #A100FF; color: white; }
+        .cred-logo.jpmorgan { background: #000; color: white; }
+        .cred-logo.goldman { background: #7399C6; color: white; }
+        .cred-logo.citi { background: #003B70; color: white; }
+        .cred-logo.uipath { background: #FA4616; color: white; }
+        .cred-logo.cisco { background: #049FD9; color: white; }
+        .cred-logo.meta { background: linear-gradient(135deg, #0668E1, #0082FB); color: white; }
+        .cred-logo.cfa { background: #002F6C; color: #B4975A; }
+        
+        .cred-info h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+        
+        .cred-info .issuer {
+            font-size: 0.85rem;
+            color: var(--accent-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .cred-info .year {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        .cred-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background: rgba(19, 255, 170, 0.2);
+            border-radius: 4px;
+            font-size: 0.7rem;
+            color: var(--accent-tertiary);
+            margin-left: 8px;
+            text-transform: uppercase;
+        }
+        
+        /* Organizations Section */
+        .orgs-section {
+            padding: 80px 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(139, 92, 246, 0.03) 50%, transparent 100%);
+        }
+        
+        .orgs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .org-card {
+            padding: 30px;
+            background: var(--glass-bg);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: start;
+            gap: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .org-card:hover {
+            border-color: var(--accent-secondary);
+            transform: translateY(-3px);
+        }
+        
+        .org-icon {
+            width: 60px;
+            height: 60px;
+            min-width: 60px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent-secondary), var(--accent-primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .org-info h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .org-info p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .org-info .member-id {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+        
+        /* Language Skills */
+        .languages-section {
+            padding: 80px 0;
+        }
+        
+        .languages-grid {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .language-card {
+            padding: 30px 40px;
+            background: var(--glass-bg);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            text-align: center;
+            min-width: 200px;
+        }
+        
+        .language-flag {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .language-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        
+        .language-level {
+            font-size: 0.9rem;
+            color: var(--accent-primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .language-score {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .creds-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-container {
+                flex-direction: column;
+            }
+            
+            .filter-search {
+                width: 100%;
+            }
+            
+            .filter-search input {
+                width: 100%;
+            }
+            
+            .creds-stats {
+                gap: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particle Background -->
+    <canvas id="particles"></canvas>
+    
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <span class="logo-text">Ibnu</span>
+                <span class="logo-dot"></span>
+            </a>
+            <div class="nav-menu">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="interests.html" class="nav-link">Interests</a>
+                <a href="projects.html" class="nav-link">Projects</a>
+                <a href="certifications.html" class="nav-link active">Credentials</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </div>
+            <div class="nav-actions">
+                <button class="nav-btn" id="cmdPaletteBtn" title="Command Palette (Ctrl+K)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </button>
+                <button class="nav-btn mobile-toggle" id="mobileToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Progress Bar -->
+    <div class="scroll-progress">
+        <div class="scroll-progress-bar"></div>
+    </div>
+    
+    <!-- Credentials Hero -->
+    <section class="creds-hero">
+        <div class="container">
+            <h1>Professional <span class="gradient-text">Credentials</span></h1>
+            <p>Certifications and professional development from world-class institutions and organizations.</p>
+            
+            <div class="creds-stats">
+                <div class="creds-stat">
+                    <div class="number">50+</div>
+                    <div class="label">Certifications</div>
+                </div>
+                <div class="creds-stat">
+                    <div class="number">20+</div>
+                    <div class="label">Institutions</div>
+                </div>
+                <div class="creds-stat">
+                    <div class="number">593</div>
+                    <div class="label">TOEFL ITP</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Filter Section -->
+    <section class="filter-section">
+        <div class="filter-container">
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="all">All</button>
+                <button class="filter-tab" data-filter="elite">Elite Universities</button>
+                <button class="filter-tab" data-filter="tech">Tech Giants</button>
+                <button class="filter-tab" data-filter="consulting">Consulting</button>
+                <button class="filter-tab" data-filter="finance">Finance</button>
+                <button class="filter-tab" data-filter="cloud">Cloud & Security</button>
+            </div>
+            <div class="filter-search">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input type="text" placeholder="Search credentials..." id="credSearch">
+            </div>
+        </div>
+    </section>
+    
+    <!-- Credentials Sections -->
+    <section class="creds-section">
+        <div class="container">
+            
+            <!-- Elite Universities -->
+            <div class="creds-category" data-category="elite">
+                <div class="category-header">
+                    <div class="category-icon elite">🎓</div>
+                    <div class="category-title">
+                        <h2>Elite Universities</h2>
+                        <p>Harvard, Stanford, Cambridge & More</p>
+                    </div>
+                </div>
+                <div class="creds-grid">
+                    <div class="cred-card" data-keywords="harvard leadership management">
+                        <div class="cred-logo harvard">H</div>
+                        <div class="cred-info">
+                            <h3>Leadership Certificate<span class="cred-badge">8 Weeks</span></h3>
+                            <div class="issuer">Harvard University</div>
+                            <div class="year">2022</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="cambridge finance foundations">
+                        <div class="cred-logo cambridge">C</div>
+                        <div class="cred-info">
+                            <h3>Foundations of Finance<span class="cred-badge">8 Weeks</span></h3>
+                            <div class="issuer">University of Cambridge</div>
+                            <div class="year">2022</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="stanford machine learning ai">
+                        <div class="cred-logo stanford">S</div>
+                        <div class="cred-info">
+                            <h3>Machine Learning</h3>
+                            <div class="issuer">Stanford University</div>
+                            <div class="year">2022</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="stanford game theory strategy">
+                        <div class="cred-logo stanford">S</div>
+                        <div class="cred-info">
+                            <h3>Game Theory</h3>
+                            <div class="issuer">Stanford University</div>
+                            <div class="year">2022</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="stanford ai healthcare artificial intelligence">
+                        <div class="cred-logo stanford">S</div>
+                        <div class="cred-info">
+                            <h3>AI in Healthcare Specialization</h3>
+                            <div class="issuer">Stanford University</div>
+                            <div class="year">2022</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="insead web3 blockchain">
+                        <div class="cred-logo insead">IN</div>
+                        <div class="cred-info">
+                            <h3>Web3 & Blockchain Fundamentals<span class="cred-badge">Specialization</span></h3>
+                            <div class="issuer">INSEAD</div>
+                            <div class="year">2023</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="insead blockchain financial services">
+                        <div class="cred-logo insead">IN</div>
+                        <div class="cred-info">
+                            <h3>Blockchain Revolution in Financial Services</h3>
+                            <div class="issuer">INSEAD</div>
+                            <div class="year">2023</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Tech Giants -->
+            <div class="creds-category" data-category="tech">
+                <div class="category-header">
+                    <div class="category-icon tech">💻</div>
+                    <div class="category-title">
+                        <h2>Tech Giants</h2>
+                        <p>Google, IBM, Microsoft, Meta</p>
+                    </div>
+                </div>
+                <div class="creds-grid">
+                    <div class="cred-card" data-keywords="google project management professional">
+                        <div class="cred-logo google">G</div>
+                        <div class="cred-info">
+                            <h3>Project Management Professional</h3>
+                            <div class="issuer">Google</div>
+                            <div class="year">2024</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="google business intelligence bi analytics">
+                        <div class="cred-logo google">G</div>
+                        <div class="cred-info">
+                            <h3>Business Intelligence Professional</h3>
+                            <div class="issuer">Google</div>
+                            <div class="year">2024</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="google cybersecurity security specialization">
+                        <div class="cred-logo google">G</div>
+                        <div class="cred-info">
+                            <h3>Cybersecurity Specialization</h3>
+                            <div class="issuer">Google</div>
+                            <div class="year">2024</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="google llm ai fundamentals">
+                        <div class="cred-logo google">G</div>
+                        <div class="cred-info">
+                            <h3>LLM Fundamentals</h3>
+                            <div class="issuer">Google</div>
+                            <div class="year">2024</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="google digital marketing ecommerce">
+                        <div class="cred-logo google">G</div>
+                        <div class="cred-info">
+                            <h3>Digital Marketing & E-commerce</h3>
+                            <div class="issuer">Google</div>
+                            <div class="year">2024</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="google data analytics">
+                        <div class="cred-logo google">G</div>
+                        <div class="cred-info">
+                            <h3>Data Analytics</h3>
+                            <div class="issuer">Google</div>
+                            <div class="year">2024</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="ibm data engineering specialization">
+                        <div class="cred-logo ibm">IBM</div>
+                        <div class="cred-info">
+                            <h3>Data Engineering Specialization</h3>
+                            <div class="issuer">IBM</div>
+                            <div class="year">2024</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="ibm ai engineering artificial intelligence">
+                        <div class="cred-logo ibm">IBM</div>
+                        <div class="cred-info">
+                            <h3>AI Engineering Specialization</h3>
+                            <div class="issuer">IBM</div>
+                            <div class="year">2024</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="ibm cybersecurity analyst security">
+                        <div class="cred-logo ibm">IBM</div>
+                        <div class="cred-info">
+                            <h3>Cybersecurity Analyst Professional</h3>
+                            <div class="issuer">IBM</div>
+                            <div class="year">2024</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="ibm data science">
+                        <div class="cred-logo ibm">IBM</div>
+                        <div class="cred-info">
+                            <h3>Data Science</h3>
+                            <div class="issuer">IBM</div>
+                            <div class="year">2024</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="microsoft cybersecurity analyst">
+                        <div class="cred-logo microsoft">MS</div>
+                        <div class="cred-info">
+                            <h3>Cybersecurity Analyst</h3>
+                            <div class="issuer">Microsoft</div>
+                            <div class="year">2023</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="microsoft azure ai fundamentals">
+                        <div class="cred-logo microsoft">MS</div>
+                        <div class="cred-info">
+                            <h3>Azure AI Fundamentals</h3>
+                            <div class="issuer">Microsoft</div>
+                            <div class="year">2023</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="microsoft power bi analytics">
+                        <div class="cred-logo microsoft">MS</div>
+                        <div class="cred-info">
+                            <h3>Power BI</h3>
+                            <div class="issuer">Microsoft</div>
+                            <div class="year">2023</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="meta metaverse vr ar">
+                        <div class="cred-logo meta">M</div>
+                        <div class="cred-info">
+                            <h3>Metaverse</h3>
+                            <div class="issuer">Meta</div>
+                            <div class="year">2023</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="meta social media marketing">
+                        <div class="cred-logo meta">M</div>
+                        <div class="cred-info">
+                            <h3>Social Media Marketing</h3>
+                            <div class="issuer">Meta</div>
+                            <div class="year">2023</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Consulting Firms -->
+            <div class="creds-category" data-category="consulting">
+                <div class="category-header">
+                    <div class="category-icon consulting">📊</div>
+                    <div class="category-title">
+                        <h2>Consulting & Big 4</h2>
+                        <p>McKinsey, BCG, Deloitte, PwC, EY, KPMG, Accenture</p>
+                    </div>
+                </div>
+                <div class="creds-grid">
+                    <div class="cred-card" data-keywords="mckinsey forward program leadership">
+                        <div class="cred-logo mckinsey">Mc</div>
+                        <div class="cred-info">
+                            <h3>Forward Program</h3>
+                            <div class="issuer">McKinsey & Company</div>
+                            <div class="year">2022</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="bcg cost economics pricing strategy">
+                        <div class="cred-logo bcg">BCG</div>
+                        <div class="cred-info">
+                            <h3>Cost and Economics Pricing Strategy</h3>
+                            <div class="issuer">Boston Consulting Group</div>
+                            <div class="year">2023</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="bcg strategy consulting">
+                        <div class="cred-logo bcg">BCG</div>
+                        <div class="cred-info">
+                            <h3>Strategy Consulting</h3>
+                            <div class="issuer">Boston Consulting Group</div>
+                            <div class="year">2023</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="deloitte technology consulting">
+                        <div class="cred-logo deloitte">D</div>
+                        <div class="cred-info">
+                            <h3>Technology Consulting</h3>
+                            <div class="issuer">Deloitte</div>
+                            <div class="year">2022</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="pwc data analysis presentation">
+                        <div class="cred-logo pwc">PwC</div>
+                        <div class="cred-info">
+                            <h3>Data Analysis & Presentation Skills<span class="cred-badge">Specialization</span></h3>
+                            <div class="issuer">PwC</div>
+                            <div class="year">2022</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="pwc cyber security consulting">
+                        <div class="cred-logo pwc">PwC</div>
+                        <div class="cred-info">
+                            <h3>Cyber Security Consulting</h3>
+                            <div class="issuer">PwC</div>
+                            <div class="year">2022</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="ey climate change sustainability">
+                        <div class="cred-logo ey">EY</div>
+                        <div class="cred-info">
+                            <h3>Climate Change & Sustainability</h3>
+                            <div class="issuer">Ernst & Young</div>
+                            <div class="year">2022</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="kpmg audit assurance">
+                        <div class="cred-logo kpmg">K</div>
+                        <div class="cred-info">
+                            <h3>Audit & Assurance</h3>
+                            <div class="issuer">KPMG</div>
+                            <div class="year">2022</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="kpmg data analytics consulting">
+                        <div class="cred-logo kpmg">K</div>
+                        <div class="cred-info">
+                            <h3>Data Analytics Consulting</h3>
+                            <div class="issuer">KPMG</div>
+                            <div class="year">2022</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="accenture strategy client research">
+                        <div class="cred-logo accenture">A</div>
+                        <div class="cred-info">
+                            <h3>Client Research & Problem Identification</h3>
+                            <div class="issuer">Accenture</div>
+                            <div class="year">2022</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="accenture strategy consulting">
+                        <div class="cred-logo accenture">A</div>
+                        <div class="cred-info">
+                            <h3>Strategy Consulting</h3>
+                            <div class="issuer">Accenture</div>
+                            <div class="year">2022</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Finance -->
+            <div class="creds-category" data-category="finance">
+                <div class="category-header">
+                    <div class="category-icon finance">💰</div>
+                    <div class="category-title">
+                        <h2>Finance & Banking</h2>
+                        <p>JP Morgan, Goldman Sachs, Bank of America, Citi</p>
+                    </div>
+                </div>
+                <div class="creds-grid">
+                    <div class="cred-card" data-keywords="jpmorgan global private bank">
+                        <div class="cred-logo jpmorgan">JP</div>
+                        <div class="cred-info">
+                            <h3>Global Private Bank</h3>
+                            <div class="issuer">JP Morgan</div>
+                            <div class="year">2022</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="jpmorgan commercial banking">
+                        <div class="cred-logo jpmorgan">JP</div>
+                        <div class="cred-info">
+                            <h3>Commercial Banking</h3>
+                            <div class="issuer">JP Morgan</div>
+                            <div class="year">2022</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="goldman sachs software engineering">
+                        <div class="cred-logo goldman">GS</div>
+                        <div class="cred-info">
+                            <h3>Software Engineering</h3>
+                            <div class="issuer">Goldman Sachs</div>
+                            <div class="year">2022</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="bank of america investment banking">
+                        <div class="cred-logo" style="background: #012169; color: white;">BoA</div>
+                        <div class="cred-info">
+                            <h3>Investment Banking</h3>
+                            <div class="issuer">Bank of America</div>
+                            <div class="year">2022</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="citi hsbc finance wealth banking">
+                        <div class="cred-logo citi">C</div>
+                        <div class="cred-info">
+                            <h3>Finance, Wealth & Personal Banking</h3>
+                            <div class="issuer">Citibank & HSBC</div>
+                            <div class="year">2022</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Cloud & Security -->
+            <div class="creds-category" data-category="cloud">
+                <div class="category-header">
+                    <div class="category-icon security">🔒</div>
+                    <div class="category-title">
+                        <h2>Cloud & Security</h2>
+                        <p>AWS, Cisco, UiPath, InfoSec</p>
+                    </div>
+                </div>
+                <div class="creds-grid">
+                    <div class="cred-card" data-keywords="aws amazon cloud fundamentals">
+                        <div class="cred-logo aws">AWS</div>
+                        <div class="cred-info">
+                            <h3>AWS Fundamentals</h3>
+                            <div class="issuer">Amazon Web Services</div>
+                            <div class="year">2022</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="cisco cybersecurity operations">
+                        <div class="cred-logo cisco">C</div>
+                        <div class="cred-info">
+                            <h3>Cybersecurity Operations</h3>
+                            <div class="issuer">Cisco</div>
+                            <div class="year">2023</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="uipath rpa robotic process automation">
+                        <div class="cred-logo uipath">U</div>
+                        <div class="cred-info">
+                            <h3>Robotic Process Automation (RPA)</h3>
+                            <div class="issuer">UiPath</div>
+                            <div class="year">2023</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="infosec owasp web security">
+                        <div class="cred-logo" style="background: #1a1a1a; color: #00ff00;">IS</div>
+                        <div class="cred-info">
+                            <h3>OWASP Web Security</h3>
+                            <div class="issuer">InfoSec</div>
+                            <div class="year">2023</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="infosec cyber incident response">
+                        <div class="cred-logo" style="background: #1a1a1a; color: #00ff00;">IS</div>
+                        <div class="cred-info">
+                            <h3>Cyber Incident Response</h3>
+                            <div class="issuer">InfoSec</div>
+                            <div class="year">2023</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="infosec computer forensics">
+                        <div class="cred-logo" style="background: #1a1a1a; color: #00ff00;">IS</div>
+                        <div class="cred-info">
+                            <h3>Computer Forensics</h3>
+                            <div class="issuer">InfoSec</div>
+                            <div class="year">2023</div>
+                        </div>
+                    </div>
+                    <div class="cred-card" data-keywords="sap technology consultant professional">
+                        <div class="cred-logo" style="background: #0FAAFF; color: white;">SAP</div>
+                        <div class="cred-info">
+                            <h3>SAP Technology Consultant Professional</h3>
+                            <div class="issuer">SAP</div>
+                            <div class="year">2022</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </section>
+    
+    <!-- Organizations Section -->
+    <section class="orgs-section">
+        <div class="container">
+            <div class="features-header" style="text-align: center; margin-bottom: 50px;">
+                <h2>Professional <span class="gradient-text">Memberships</span></h2>
+                <p style="color: var(--text-secondary);">Active member in professional organizations</p>
+            </div>
+            
+            <div class="orgs-grid">
+                <div class="org-card">
+                    <div class="org-icon">📈</div>
+                    <div class="org-info">
+                        <h3>CFA Institute</h3>
+                        <p>Global association of investment professionals</p>
+                        <div class="member-id">Member ID: 200530563</div>
+                    </div>
+                </div>
+                
+                <div class="org-card">
+                    <div class="org-icon">🎓</div>
+                    <div class="org-info">
+                        <h3>Strategic Club - MBA UGM</h3>
+                        <p>MBA Student Association, Universitas Gadjah Mada</p>
+                        <div class="member-id">2022 - 2024</div>
+                    </div>
+                </div>
+                
+                <div class="org-card">
+                    <div class="org-icon">🏢</div>
+                    <div class="org-info">
+                        <h3>KADIN Indonesia</h3>
+                        <p>Indonesian Chamber of Commerce and Industry</p>
+                        <div class="member-id">ID: 20203-2132274685</div>
+                    </div>
+                </div>
+                
+                <div class="org-card">
+                    <div class="org-icon">🚀</div>
+                    <div class="org-info">
+                        <h3>BPD HIPMI JAYA DKI Jakarta</h3>
+                        <p>Indonesian Young Entrepreneurs Association</p>
+                        <div class="member-id">Since Nov 2021</div>
+                    </div>
+                </div>
+                
+                <div class="org-card">
+                    <div class="org-icon">🏌️</div>
+                    <div class="org-info">
+                        <h3>JAYA GOLF CLUB</h3>
+                        <p>Golf enthusiast community</p>
+                        <div class="member-id">Active Member</div>
+                    </div>
+                </div>
+                
+                <div class="org-card">
+                    <div class="org-icon">🔗</div>
+                    <div class="org-info">
+                        <h3>Akademi Crypto</h3>
+                        <p>Cryptocurrency education community</p>
+                        <div class="member-id">Lifetime Member</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Language Skills -->
+    <section class="languages-section">
+        <div class="container">
+            <div class="features-header" style="text-align: center; margin-bottom: 50px;">
+                <h2>Language <span class="gradient-text">Proficiency</span></h2>
+            </div>
+            
+            <div class="languages-grid">
+                <div class="language-card">
+                    <div class="language-flag">🇮🇩</div>
+                    <div class="language-name">Indonesian</div>
+                    <div class="language-level">Native</div>
+                </div>
+                
+                <div class="language-card">
+                    <div class="language-flag">🇺🇸</div>
+                    <div class="language-name">English</div>
+                    <div class="language-level">Advanced (C1)</div>
+                    <div class="language-score">TOEFL ITP: 593</div>
+                </div>
+                
+                <div class="language-card">
+                    <div class="language-flag">🇸🇦</div>
+                    <div class="language-name">Arabic</div>
+                    <div class="language-level">Beginner</div>
+                </div>
+                
+                <div class="language-card">
+                    <div class="language-flag">🇨🇳</div>
+                    <div class="language-name">Mandarin</div>
+                    <div class="language-level">Beginner (HSK 1)</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="../index.html" class="footer-logo">Ibnu<span>.</span></a>
+                    <p>Civil Servant & Tech Enthusiast exploring the intersection of AI, Blockchain, and Cybersecurity.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Navigation</h4>
+                        <a href="../index.html">Home</a>
+                        <a href="interests.html">Interests</a>
+                        <a href="projects.html">Projects</a>
+                        <a href="about.html">About</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Resources</h4>
+                        <a href="certifications.html">Credentials</a>
+                        <a href="contact.html">Contact</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Connect</h4>
+                        <a href="https://github.com/subkhanibnuaji" target="_blank">GitHub</a>
+                        <a href="https://linkedin.com/in/subkhanibnuaji" target="_blank">LinkedIn</a>
+                        <a href="https://tiktok.com/@ibnu" target="_blank">TikTok</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Ibnu. All rights reserved.</p>
+                <p class="footer-shortcut">Press <kbd>Ctrl</kbd> + <kbd>K</kbd> for command palette</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Command Palette Modal -->
+    <div class="cmd-palette-overlay" id="cmdPalette">
+        <div class="cmd-palette">
+            <div class="cmd-search">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input type="text" placeholder="Type a command or search..." id="cmdInput">
+                <kbd>ESC</kbd>
+            </div>
+            <div class="cmd-results" id="cmdResults"></div>
+        </div>
+    </div>
+    
+    <!-- Terminal Modal -->
+    <div class="terminal-overlay" id="terminalOverlay">
+        <div class="terminal">
+            <div class="terminal-header">
+                <div class="terminal-buttons">
+                    <span class="terminal-btn close" id="terminalClose"></span>
+                    <span class="terminal-btn minimize"></span>
+                    <span class="terminal-btn maximize"></span>
+                </div>
+                <div class="terminal-title">ibnu@portfolio:~</div>
+            </div>
+            <div class="terminal-body" id="terminalBody">
+                <div class="terminal-output" id="terminalOutput"></div>
+                <div class="terminal-input-line">
+                    <span class="terminal-prompt">visitor@ibnu.dev:~$</span>
+                    <input type="text" class="terminal-input" id="terminalInput" autofocus>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- AI Chatbot Widget -->
+    <div class="chatbot-widget">
+        <button class="chatbot-trigger" id="chatbotTrigger">
+            <span class="chatbot-icon">🤖</span>
+            <span class="chatbot-pulse"></span>
+        </button>
+        
+        <div class="chatbot-window" id="chatbotWindow">
+            <div class="chatbot-header">
+                <div class="chatbot-avatar">🤖</div>
+                <div class="chatbot-info">
+                    <h4>Ask Ibnu AI</h4>
+                    <span class="chatbot-status">● Online</span>
+                </div>
+                <button class="chatbot-close" id="chatbotClose">×</button>
+            </div>
+            <div class="chatbot-messages" id="chatbotMessages">
+                <div class="chat-message bot">
+                    <div class="message-content">
+                        Hi! I'm Ibnu's AI assistant. Ask me about his credentials, certifications, or professional background!
+                    </div>
+                </div>
+            </div>
+            <div class="chatbot-suggestions" id="chatbotSuggestions">
+                <button class="suggestion-chip">Harvard certifications?</button>
+                <button class="suggestion-chip">Google credentials?</button>
+                <button class="suggestion-chip">CFA membership?</button>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" placeholder="Type your message..." id="chatInput">
+                <button class="chat-send" id="chatSend">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="../js/main.js"></script>
+    <script src="../js/chatbot.js"></script>
+    <script src="../js/terminal.js"></script>
+    <script>
+        // Filter functionality
+        const filterTabs = document.querySelectorAll('.filter-tab');
+        const credCategories = document.querySelectorAll('.creds-category');
+        const searchInput = document.getElementById('credSearch');
+        
+        filterTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                filterTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                const filter = tab.dataset.filter;
+                
+                credCategories.forEach(cat => {
+                    if (filter === 'all' || cat.dataset.category === filter) {
+                        cat.style.display = 'block';
+                        cat.style.animation = 'fadeIn 0.5s ease';
+                    } else {
+                        cat.style.display = 'none';
+                    }
+                });
+            });
+        });
+        
+        // Search functionality
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase();
+            
+            document.querySelectorAll('.cred-card').forEach(card => {
+                const keywords = card.dataset.keywords || '';
+                const title = card.querySelector('h3').textContent.toLowerCase();
+                const issuer = card.querySelector('.issuer').textContent.toLowerCase();
+                
+                if (keywords.includes(query) || title.includes(query) || issuer.includes(query)) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = query ? 'none' : 'flex';
+                }
+            });
+            
+            // Show all categories when searching
+            if (query) {
+                credCategories.forEach(cat => cat.style.display = 'block');
+                filterTabs.forEach(t => t.classList.remove('active'));
+                filterTabs[0].classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | Ibnu - Civil Servant & Tech Enthusiast</title>
+    <meta name="description" content="Learn about Ibnu - Civil servant at Ministry PKP, MBA holder, exploring AI, Blockchain, and Cybersecurity">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        /* Page-specific styles */
+        .about-hero {
+            min-height: 70vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding: 120px 20px 60px;
+        }
+        
+        .about-hero-content {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            gap: 60px;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .profile-card {
+            position: relative;
+        }
+        
+        .profile-image-wrapper {
+            position: relative;
+            padding: 20px;
+        }
+        
+        .profile-image-wrapper::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--gradient-primary);
+            border-radius: 24px;
+            transform: rotate(-3deg);
+            opacity: 0.3;
+        }
+        
+        .profile-image {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1;
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8rem;
+            overflow: hidden;
+            border: 3px solid var(--glass-border);
+        }
+        
+        .profile-status {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            padding: 8px 16px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 50px;
+            border: 1px solid var(--glass-border);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: var(--accent-tertiary);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .about-intro h1 {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+        
+        .about-intro .tagline {
+            font-size: 1.25rem;
+            color: var(--accent-primary);
+            margin-bottom: 1.5rem;
+        }
+        
+        .about-intro p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+        
+        .quick-facts {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 2rem;
+        }
+        
+        .fact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--glass-bg);
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .fact-icon {
+            font-size: 1.25rem;
+        }
+        
+        .fact-text {
+            font-size: 0.9rem;
+        }
+        
+        .fact-text span {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+        
+        /* Timeline Section */
+        .timeline-section {
+            padding: 80px 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(0, 212, 255, 0.03) 50%, transparent 100%);
+        }
+        
+        .timeline-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .timeline {
+            position: relative;
+            padding-left: 40px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 15px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary), var(--accent-tertiary));
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-bottom: 40px;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            left: -33px;
+            top: 5px;
+            width: 16px;
+            height: 16px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            border: 3px solid var(--bg-primary);
+            box-shadow: 0 0 20px var(--accent-primary);
+        }
+        
+        .timeline-dot.current {
+            background: var(--accent-tertiary);
+            box-shadow: 0 0 20px var(--accent-tertiary);
+        }
+        
+        .timeline-content {
+            padding: 25px;
+            background: var(--glass-bg);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+        
+        .timeline-content:hover {
+            border-color: var(--accent-primary);
+            transform: translateX(5px);
+        }
+        
+        .timeline-date {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 50px;
+            font-size: 0.8rem;
+            color: var(--accent-primary);
+            margin-bottom: 1rem;
+        }
+        
+        .timeline-content h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .timeline-content .organization {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+        
+        .timeline-content p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+        
+        /* Skills Section */
+        .skills-section {
+            padding: 80px 0;
+        }
+        
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .skill-category {
+            padding: 30px;
+            background: var(--glass-bg);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .skill-category-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .skill-category-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .skill-category-icon.strategy { background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); }
+        .skill-category-icon.technical { background: linear-gradient(135deg, var(--accent-tertiary), #00BCD4); }
+        .skill-category-icon.data { background: linear-gradient(135deg, #FF6B6B, #FF8E53); }
+        .skill-category-icon.business { background: linear-gradient(135deg, #A78BFA, #818CF8); }
+        
+        .skill-category h3 {
+            font-size: 1.25rem;
+        }
+        
+        .skill-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .skill-tag {
+            padding: 8px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+        
+        .skill-tag:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+        
+        /* Trading Experience */
+        .trading-section {
+            padding: 80px 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(247, 147, 26, 0.03) 50%, transparent 100%);
+        }
+        
+        .trading-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .trading-info h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .trading-info p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+        
+        .trading-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .trading-stat {
+            padding: 20px;
+            background: var(--glass-bg);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            text-align: center;
+        }
+        
+        .trading-stat .value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent-warning), #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        
+        .trading-stat .label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        
+        .trading-visual {
+            padding: 30px;
+            background: var(--glass-bg);
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .portfolio-breakdown h4 {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+        
+        .allocation-bar {
+            display: flex;
+            height: 30px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+        }
+        
+        .allocation-segment {
+            transition: all 0.3s ease;
+        }
+        
+        .allocation-segment:hover {
+            filter: brightness(1.2);
+        }
+        
+        .allocation-segment.btc { background: #F7931A; width: 70%; }
+        .allocation-segment.alt { background: #627EEA; width: 15%; }
+        .allocation-segment.meme { background: #FF6B6B; width: 10%; }
+        .allocation-segment.dex { background: var(--accent-tertiary); width: 5%; }
+        
+        .allocation-legend {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+        
+        .legend-color.btc { background: #F7931A; }
+        .legend-color.alt { background: #627EEA; }
+        .legend-color.meme { background: #FF6B6B; }
+        .legend-color.dex { background: var(--accent-tertiary); }
+        
+        /* Fun Facts */
+        .fun-facts-section {
+            padding: 80px 0;
+        }
+        
+        .fun-facts-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .fun-fact-card {
+            padding: 30px;
+            background: var(--glass-bg);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .fun-fact-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-primary);
+        }
+        
+        .fun-fact-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .fun-fact-card h4 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .fun-fact-card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            padding: 80px 0;
+            text-align: center;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .about-hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .profile-card {
+                max-width: 350px;
+                margin: 0 auto;
+            }
+            
+            .quick-facts {
+                justify-content: center;
+            }
+            
+            .skills-grid,
+            .trading-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .fun-facts-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .quick-facts {
+                grid-template-columns: 1fr;
+            }
+            
+            .fun-facts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particle Background -->
+    <canvas id="particles"></canvas>
+    
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <span class="logo-text">Ibnu</span>
+                <span class="logo-dot"></span>
+            </a>
+            <div class="nav-menu">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="interests.html" class="nav-link">Interests</a>
+                <a href="projects.html" class="nav-link">Projects</a>
+                <a href="certifications.html" class="nav-link">Credentials</a>
+                <a href="about.html" class="nav-link active">About</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </div>
+            <div class="nav-actions">
+                <button class="nav-btn" id="cmdPaletteBtn" title="Command Palette (Ctrl+K)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </button>
+                <button class="nav-btn mobile-toggle" id="mobileToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Progress Bar -->
+    <div class="scroll-progress">
+        <div class="scroll-progress-bar"></div>
+    </div>
+    
+    <!-- About Hero -->
+    <section class="about-hero">
+        <div class="about-hero-content">
+            <div class="profile-card">
+                <div class="profile-image-wrapper">
+                    <div class="profile-image">👨‍💼</div>
+                    <div class="profile-status">
+                        <span class="status-dot"></span>
+                        Open for opportunities
+                    </div>
+                </div>
+            </div>
+            
+            <div class="about-intro">
+                <h1>Hi, I'm <span class="gradient-text">Subkhan Ibnu Aji</span></h1>
+                <div class="tagline">Civil Servant • Tech Enthusiast • Lifelong Learner</div>
+                <p>
+                    I'm a civil servant (ASN) at Indonesia's Ministry of Housing and Settlement Areas (Kementerian PKP), 
+                    where I handle end-to-end IT projects including enterprise systems like SIBARU, PKP HUB, and SIMONI. 
+                    My background combines Computer Science (Telkom University) and an MBA (Universitas Gadjah Mada).
+                </p>
+                <p>
+                    Beyond my government role, I'm deeply passionate about emerging technologies—particularly 
+                    <strong>Artificial Intelligence</strong>, <strong>Blockchain/Crypto</strong>, and 
+                    <strong>Cybersecurity</strong>. I believe these three domains will fundamentally reshape 
+                    how societies function, and I'm committed to understanding and contributing to this transformation.
+                </p>
+                
+                <div class="quick-facts">
+                    <div class="fact-item">
+                        <span class="fact-icon">📍</span>
+                        <div class="fact-text">
+                            Jakarta, Indonesia
+                            <span>Currently based</span>
+                        </div>
+                    </div>
+                    <div class="fact-item">
+                        <span class="fact-icon">🎓</span>
+                        <div class="fact-text">
+                            MBA, S.Kom
+                            <span>UGM & Telkom University</span>
+                        </div>
+                    </div>
+                    <div class="fact-item">
+                        <span class="fact-icon">📧</span>
+                        <div class="fact-text">
+                            hi@heyibnu.com
+                            <span>Email me</span>
+                        </div>
+                    </div>
+                    <div class="fact-item">
+                        <span class="fact-icon">🌐</span>
+                        <div class="fact-text">
+                            TOEFL ITP 593
+                            <span>English proficiency</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Timeline Section -->
+    <section class="timeline-section">
+        <div class="container">
+            <div class="features-header" style="text-align: center; margin-bottom: 50px;">
+                <h2>Professional <span class="gradient-text">Journey</span></h2>
+                <p style="color: var(--text-secondary);">My career path and key milestones</p>
+            </div>
+            
+            <div class="timeline-container">
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-dot current"></div>
+                        <div class="timeline-content">
+                            <span class="timeline-date">Aug 2024 - Present</span>
+                            <h3>Civil Servant (ASN)</h3>
+                            <div class="organization">Ministry of Public Works & Housing (PKP), Indonesia</div>
+                            <p>Handling multiple end-to-end IT projects including SIBARU, PKP HUB clinic app, and SIMONI system. 
+                               Contributing to policy-making, supporting strategic procurement, and participating in tender 
+                               evaluations for projects valued over IDR 10 billion.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <span class="timeline-date">Jul 2021 - Jul 2024</span>
+                            <h3>Founder & CEO</h3>
+                            <div class="organization">Virtus Futura Consulting</div>
+                            <p>Led project-based consulting in strategy, operations, and digital transformation across 
+                               public, healthcare, and private sectors. Managed portfolio client value exceeding IDR 1T (~USD 71M) 
+                               with end-to-end execution from framing to implementation support.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <span class="timeline-date">2022 - 2024</span>
+                            <h3>Senior Executive MBA</h3>
+                            <div class="organization">Universitas Gadjah Mada (UGM)</div>
+                            <p>Faculty of Business & Economics. GPA: 3.60/4.00. Thesis on product differentiation strategy 
+                               evaluation using Balanced Scorecard methodology.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <span class="timeline-date">Aug 2020 - Aug 2022</span>
+                            <h3>Founder & CEO</h3>
+                            <div class="organization">CV Solusi Automasi Indonesia (Automate All)</div>
+                            <p>Grew RPA company valuation to IDR 1 billion through pre-seed funding. Delivered automation 
+                               solutions to 50+ diverse clients, enhancing operational efficiencies and reducing manual workload.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item">
+                        <div class="timeline-dot"></div>
+                        <div class="timeline-content">
+                            <span class="timeline-date">2017 - 2021</span>
+                            <h3>Bachelor in Informatics</h3>
+                            <div class="organization">Telkom University</div>
+                            <p>Computer Science. GPA: 3.34/4.00. Recognized as 2nd Best Outstanding Graduate (Innovation & 
+                               Entrepreneurship). Final project: Animo - Web-based automation for F&B SMEs.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Skills Section -->
+    <section class="skills-section">
+        <div class="container">
+            <div class="features-header" style="text-align: center; margin-bottom: 50px;">
+                <h2>Skills & <span class="gradient-text">Expertise</span></h2>
+                <p style="color: var(--text-secondary);">Core competencies across multiple domains</p>
+            </div>
+            
+            <div class="skills-grid">
+                <div class="skill-category">
+                    <div class="skill-category-header">
+                        <div class="skill-category-icon strategy">📊</div>
+                        <h3>Strategy & Management</h3>
+                    </div>
+                    <div class="skill-list">
+                        <span class="skill-tag">Digital Transformation</span>
+                        <span class="skill-tag">Strategic Planning</span>
+                        <span class="skill-tag">Change Management</span>
+                        <span class="skill-tag">Project Management</span>
+                        <span class="skill-tag">Stakeholder Management</span>
+                        <span class="skill-tag">Vendor Coordination</span>
+                        <span class="skill-tag">Agile/Scrum</span>
+                        <span class="skill-tag">KPI/OKR Tracking</span>
+                    </div>
+                </div>
+                
+                <div class="skill-category">
+                    <div class="skill-category-header">
+                        <div class="skill-category-icon technical">💻</div>
+                        <h3>Technical & Development</h3>
+                    </div>
+                    <div class="skill-list">
+                        <span class="skill-tag">Python</span>
+                        <span class="skill-tag">JavaScript</span>
+                        <span class="skill-tag">SQL</span>
+                        <span class="skill-tag">React/Next.js</span>
+                        <span class="skill-tag">Node.js</span>
+                        <span class="skill-tag">Web3/Solidity</span>
+                        <span class="skill-tag">Linux Administration</span>
+                        <span class="skill-tag">AWS</span>
+                        <span class="skill-tag">Git/GitHub</span>
+                    </div>
+                </div>
+                
+                <div class="skill-category">
+                    <div class="skill-category-header">
+                        <div class="skill-category-icon data">🤖</div>
+                        <h3>AI & Data</h3>
+                    </div>
+                    <div class="skill-list">
+                        <span class="skill-tag">LLM Workflows</span>
+                        <span class="skill-tag">Prompt Engineering</span>
+                        <span class="skill-tag">LangChain/LangGraph</span>
+                        <span class="skill-tag">Data Engineering</span>
+                        <span class="skill-tag">BI/Reporting</span>
+                        <span class="skill-tag">Machine Learning Basics</span>
+                        <span class="skill-tag">Agentic AI Patterns</span>
+                        <span class="skill-tag">n8n Automation</span>
+                    </div>
+                </div>
+                
+                <div class="skill-category">
+                    <div class="skill-category-header">
+                        <div class="skill-category-icon business">🔒</div>
+                        <h3>Security & Risk</h3>
+                    </div>
+                    <div class="skill-list">
+                        <span class="skill-tag">Cybersecurity Fundamentals</span>
+                        <span class="skill-tag">OSINT</span>
+                        <span class="skill-tag">Web Security</span>
+                        <span class="skill-tag">Risk Assessment</span>
+                        <span class="skill-tag">Incident Response</span>
+                        <span class="skill-tag">Digital Forensics Basics</span>
+                        <span class="skill-tag">OPSEC</span>
+                        <span class="skill-tag">Ethical Hacking Basics</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Trading Experience Section -->
+    <section class="trading-section">
+        <div class="trading-content">
+            <div class="trading-info">
+                <h2>Crypto Trading <span class="gradient-text">Experience</span></h2>
+                <p>
+                    Beyond my professional work, I actively manage a personal digital asset portfolio using a thesis-driven, 
+                    risk-controlled approach. This involves core-satellite allocation, documented investment theses, 
+                    disciplined position sizing, and continuous performance tracking.
+                </p>
+                <p>
+                    I execute spot and CEX/DEX derivatives strategies with disciplined risk management, maintaining a 
+                    comprehensive approach to portfolio construction and market analysis.
+                </p>
+                
+                <div class="trading-stats">
+                    <div class="trading-stat">
+                        <div class="value">$68K-100K</div>
+                        <div class="label">Cumulative Futures Volume</div>
+                    </div>
+                    <div class="trading-stat">
+                        <div class="value">Disciplined</div>
+                        <div class="label">Risk Management</div>
+                    </div>
+                    <div class="trading-stat">
+                        <div class="value">Thesis-Driven</div>
+                        <div class="label">Investment Approach</div>
+                    </div>
+                    <div class="trading-stat">
+                        <div class="value">Ongoing</div>
+                        <div class="label">Blockchain Upskilling</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="trading-visual">
+                <div class="portfolio-breakdown">
+                    <h4>Portfolio Allocation Strategy</h4>
+                    <div class="allocation-bar">
+                        <div class="allocation-segment btc" title="Bitcoin 70%"></div>
+                        <div class="allocation-segment alt" title="Strong Altcoins 15%"></div>
+                        <div class="allocation-segment meme" title="Memecoin 10%"></div>
+                        <div class="allocation-segment dex" title="DEX Coins 5%"></div>
+                    </div>
+                    <div class="allocation-legend">
+                        <div class="legend-item">
+                            <span class="legend-color btc"></span>
+                            <span>Bitcoin (70%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color alt"></span>
+                            <span>Strong Altcoins (15%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color meme"></span>
+                            <span>Memecoin (10%)</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color dex"></span>
+                            <span>DEX Coins (5%)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Fun Facts -->
+    <section class="fun-facts-section">
+        <div class="container">
+            <div class="features-header" style="text-align: center; margin-bottom: 50px;">
+                <h2>Fun <span class="gradient-text">Facts</span></h2>
+            </div>
+            
+            <div class="fun-facts-grid">
+                <div class="fun-fact-card">
+                    <div class="fun-fact-icon">📱</div>
+                    <h4>40K+ Followers</h4>
+                    <p>Educational TikTok content creator</p>
+                </div>
+                
+                <div class="fun-fact-card">
+                    <div class="fun-fact-icon">☕</div>
+                    <h4>Coffee Addict</h4>
+                    <p>Fueled by caffeine</p>
+                </div>
+                
+                <div class="fun-fact-card">
+                    <div class="fun-fact-icon">🏌️</div>
+                    <h4>Golf Enthusiast</h4>
+                    <p>JAYA GOLF CLUB member</p>
+                </div>
+                
+                <div class="fun-fact-card">
+                    <div class="fun-fact-icon">📚</div>
+                    <h4>Lifelong Learner</h4>
+                    <p>50+ certifications earned</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2 style="font-size: 2rem; margin-bottom: 1rem;">Let's <span class="gradient-text">Connect</span></h2>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+                Interested in collaboration, consulting, or just want to chat about tech?
+            </p>
+            <div class="cta-buttons">
+                <a href="contact.html" class="btn btn-primary btn-glow">
+                    Get in Touch
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+                <a href="https://linkedin.com/in/subkhanibnuaji" target="_blank" class="btn btn-secondary">
+                    LinkedIn Profile
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="../index.html" class="footer-logo">Ibnu<span>.</span></a>
+                    <p>Civil Servant & Tech Enthusiast exploring the intersection of AI, Blockchain, and Cybersecurity.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Navigation</h4>
+                        <a href="../index.html">Home</a>
+                        <a href="interests.html">Interests</a>
+                        <a href="projects.html">Projects</a>
+                        <a href="about.html">About</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Resources</h4>
+                        <a href="certifications.html">Credentials</a>
+                        <a href="contact.html">Contact</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Connect</h4>
+                        <a href="https://github.com/subkhanibnuaji" target="_blank">GitHub</a>
+                        <a href="https://linkedin.com/in/subkhanibnuaji" target="_blank">LinkedIn</a>
+                        <a href="https://tiktok.com/@ibnu" target="_blank">TikTok</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Ibnu. All rights reserved.</p>
+                <p class="footer-shortcut">Press <kbd>Ctrl</kbd> + <kbd>K</kbd> for command palette</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Command Palette Modal -->
+    <div class="cmd-palette-overlay" id="cmdPalette">
+        <div class="cmd-palette">
+            <div class="cmd-search">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input type="text" placeholder="Type a command or search..." id="cmdInput">
+                <kbd>ESC</kbd>
+            </div>
+            <div class="cmd-results" id="cmdResults"></div>
+        </div>
+    </div>
+    
+    <!-- Terminal Modal -->
+    <div class="terminal-overlay" id="terminalOverlay">
+        <div class="terminal">
+            <div class="terminal-header">
+                <div class="terminal-buttons">
+                    <span class="terminal-btn close" id="terminalClose"></span>
+                    <span class="terminal-btn minimize"></span>
+                    <span class="terminal-btn maximize"></span>
+                </div>
+                <div class="terminal-title">ibnu@portfolio:~</div>
+            </div>
+            <div class="terminal-body" id="terminalBody">
+                <div class="terminal-output" id="terminalOutput"></div>
+                <div class="terminal-input-line">
+                    <span class="terminal-prompt">visitor@ibnu.dev:~$</span>
+                    <input type="text" class="terminal-input" id="terminalInput" autofocus>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- AI Chatbot Widget -->
+    <div class="chatbot-widget">
+        <button class="chatbot-trigger" id="chatbotTrigger">
+            <span class="chatbot-icon">🤖</span>
+            <span class="chatbot-pulse"></span>
+        </button>
+        
+        <div class="chatbot-window" id="chatbotWindow">
+            <div class="chatbot-header">
+                <div class="chatbot-avatar">🤖</div>
+                <div class="chatbot-info">
+                    <h4>Ask Ibnu AI</h4>
+                    <span class="chatbot-status">● Online</span>
+                </div>
+                <button class="chatbot-close" id="chatbotClose">×</button>
+            </div>
+            <div class="chatbot-messages" id="chatbotMessages">
+                <div class="chat-message bot">
+                    <div class="message-content">
+                        Hi! Want to know more about my background, experience, or skills? Just ask!
+                    </div>
+                </div>
+            </div>
+            <div class="chatbot-suggestions" id="chatbotSuggestions">
+                <button class="suggestion-chip">Your background?</button>
+                <button class="suggestion-chip">Work experience?</button>
+                <button class="suggestion-chip">Trading experience?</button>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" placeholder="Type your message..." id="chatInput">
+                <button class="chat-send" id="chatSend">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="../js/main.js"></script>
+    <script src="../js/chatbot.js"></script>
+    <script src="../js/terminal.js"></script>
+</body>
+</html>

@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Ibnu's Portfolio</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👨‍💻</text></svg>">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="../css/styles.css">
+    
+    <style>
+        /* Admin Panel Specific Styles */
+        .admin-container {
+            min-height: 100vh;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .login-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 3rem;
+            width: 100%;
+            max-width: 420px;
+            text-align: center;
+        }
+        
+        .login-logo {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .login-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .login-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+        
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .login-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .login-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+        }
+        
+        .login-input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 1rem;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+        
+        .login-error {
+            color: #ff6b6b;
+            font-size: 0.875rem;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .login-error.show {
+            display: block;
+        }
+        
+        .login-hint {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            margin-top: 1.5rem;
+        }
+        
+        /* Admin Dashboard */
+        .admin-dashboard {
+            display: none;
+        }
+        
+        .admin-dashboard.active {
+            display: block;
+        }
+        
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .admin-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+        
+        .admin-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .logout-btn {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 107, 107, 0.2);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 8px;
+            color: #ff6b6b;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 107, 107, 0.3);
+        }
+        
+        /* Admin Navigation */
+        .admin-nav {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .admin-nav-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        
+        .admin-nav-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--text-primary);
+        }
+        
+        .admin-nav-btn.active {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+        
+        /* Content Sections */
+        .admin-section {
+            display: none;
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+        }
+        
+        .admin-section.active {
+            display: block;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .section-title span {
+            font-size: 1.5rem;
+        }
+        
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+        
+        .form-textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        
+        /* Save Button */
+        .save-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 2rem;
+            background: var(--gradient-primary);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+        }
+        
+        .save-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        
+        /* Items List */
+        .items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .item-card {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .item-card:hover {
+            border-color: var(--accent-primary);
+        }
+        
+        .item-info h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .item-info p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+        
+        .item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .item-btn {
+            padding: 0.5rem 0.75rem;
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+        
+        .item-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+        
+        .item-btn.delete:hover {
+            border-color: #ff6b6b;
+            color: #ff6b6b;
+        }
+        
+        /* Add Button */
+        .add-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(19, 255, 170, 0.1);
+            border: 1px solid rgba(19, 255, 170, 0.3);
+            border-radius: 10px;
+            color: #13FFAA;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+        
+        .add-btn:hover {
+            background: rgba(19, 255, 170, 0.2);
+        }
+        
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            padding: 2rem;
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+        }
+        
+        .modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.25rem;
+            line-height: 1;
+            transition: color 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+        
+        .modal-body {
+            padding: 1.5rem;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            padding: 1.5rem;
+            border-top: 1px solid var(--glass-border);
+        }
+        
+        .modal-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .modal-btn.cancel {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+        }
+        
+        .modal-btn.cancel:hover {
+            border-color: var(--text-primary);
+            color: var(--text-primary);
+        }
+        
+        .modal-btn.primary {
+            background: var(--gradient-primary);
+            border: none;
+            color: white;
+        }
+        
+        .modal-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            z-index: 10001;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast.success {
+            border-color: rgba(19, 255, 170, 0.5);
+        }
+        
+        .toast.error {
+            border-color: rgba(255, 107, 107, 0.5);
+        }
+        
+        .toast-icon {
+            font-size: 1.25rem;
+        }
+        
+        /* Two Column Layout */
+        .two-col {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .two-col {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-header {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .admin-nav {
+                justify-content: center;
+            }
+        }
+        
+        /* Code Editor Style */
+        .code-editor {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            padding: 1rem;
+            min-height: 200px;
+            overflow-x: auto;
+        }
+        
+        /* Preview Mode */
+        .preview-frame {
+            width: 100%;
+            height: 400px;
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            background: white;
+        }
+        
+        /* Export Section */
+        .export-options {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .export-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.5rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .export-btn:hover {
+            border-color: var(--accent-primary);
+            background: rgba(0, 212, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Particle Background -->
+    <canvas id="particles"></canvas>
+    
+    <!-- Login Screen -->
+    <div class="login-screen" id="login-screen">
+        <div class="login-card">
+            <div class="login-logo">🔐</div>
+            <h1 class="login-title">Admin Access</h1>
+            <p class="login-subtitle">Enter credentials to manage your portfolio</p>
+            
+            <form class="login-form" id="login-form">
+                <input 
+                    type="text" 
+                    class="login-input" 
+                    id="username" 
+                    placeholder="Username"
+                    autocomplete="off"
+                >
+                <input 
+                    type="password" 
+                    class="login-input" 
+                    id="password" 
+                    placeholder="Password"
+                >
+                <button type="submit" class="login-btn">Sign In</button>
+            </form>
+            
+            <p class="login-error" id="login-error">Invalid credentials. Please try again.</p>
+            <p class="login-hint">Demo: admin / admin123</p>
+        </div>
+    </div>
+    
+    <!-- Admin Dashboard -->
+    <div class="admin-container admin-dashboard" id="admin-dashboard">
+        <!-- Header -->
+        <header class="admin-header">
+            <h1 class="admin-title">📊 Portfolio Admin</h1>
+            <div class="admin-user">
+                <div class="admin-avatar">I</div>
+                <span>Ibnu</span>
+                <button class="logout-btn" id="logout-btn">Logout</button>
+            </div>
+        </header>
+        
+        <!-- Navigation -->
+        <nav class="admin-nav">
+            <button class="admin-nav-btn active" data-section="overview">📈 Overview</button>
+            <button class="admin-nav-btn" data-section="profile">👤 Profile</button>
+            <button class="admin-nav-btn" data-section="projects">🚀 Projects</button>
+            <button class="admin-nav-btn" data-section="skills">💻 Skills</button>
+            <button class="admin-nav-btn" data-section="experience">💼 Experience</button>
+            <button class="admin-nav-btn" data-section="certifications">🎓 Certifications</button>
+            <button class="admin-nav-btn" data-section="settings">⚙️ Settings</button>
+        </nav>
+        
+        <!-- Overview Section -->
+        <section class="admin-section active" id="section-overview">
+            <h2 class="section-title"><span>📈</span> Dashboard Overview</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">👁️</div>
+                    <div class="stat-value" id="stat-views">--</div>
+                    <div class="stat-label">Total Views</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🚀</div>
+                    <div class="stat-value" id="stat-projects">8</div>
+                    <div class="stat-label">Projects</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎓</div>
+                    <div class="stat-value" id="stat-certs">50+</div>
+                    <div class="stat-label">Certifications</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📧</div>
+                    <div class="stat-value" id="stat-messages">--</div>
+                    <div class="stat-label">Messages</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <h3 style="margin-bottom: 1rem;">Quick Actions</h3>
+                <div class="export-options">
+                    <button class="export-btn" onclick="window.open('../index.html', '_blank')">
+                        🌐 View Site
+                    </button>
+                    <button class="export-btn" onclick="exportContent()">
+                        📥 Export Data
+                    </button>
+                    <button class="export-btn" onclick="window.location.href='../index.html'">
+                        🏠 Back to Portfolio
+                    </button>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Profile Section -->
+        <section class="admin-section" id="section-profile">
+            <h2 class="section-title"><span>👤</span> Profile Settings</h2>
+            
+            <form id="profile-form">
+                <div class="two-col">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-input" id="profile-name" value="Subkhan Ibnu Aji">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Title / Role</label>
+                        <input type="text" class="form-input" id="profile-title" value="IT Project Handler">
+                    </div>
+                </div>
+                
+                <div class="two-col">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="profile-email" value="hi@heyibnu.com">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Location</label>
+                        <input type="text" class="form-input" id="profile-location" value="Jakarta, Indonesia">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Short Bio</label>
+                    <textarea class="form-input form-textarea" id="profile-bio">Cross-functional professional with expertise in Digital Transformation, AI/ML, Blockchain/Web3, and Cybersecurity. Currently serving at Indonesia's Ministry of Housing and Settlement Areas.</textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Tagline / Subtitle</label>
+                    <input type="text" class="form-input" id="profile-tagline" value="Government Tech • AI Research • Crypto Trading">
+                </div>
+                
+                <div class="two-col">
+                    <div class="form-group">
+                        <label class="form-label">LinkedIn URL</label>
+                        <input type="url" class="form-input" id="profile-linkedin" value="https://linkedin.com/in/subkhanibnuaji">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">GitHub URL</label>
+                        <input type="url" class="form-input" id="profile-github" value="https://github.com/subkhanibnuaji">
+                    </div>
+                </div>
+                
+                <button type="submit" class="save-btn">
+                    💾 Save Profile
+                </button>
+            </form>
+        </section>
+        
+        <!-- Projects Section -->
+        <section class="admin-section" id="section-projects">
+            <h2 class="section-title"><span>🚀</span> Manage Projects</h2>
+            
+            <button class="add-btn" onclick="openModal('add-project')">
+                ➕ Add New Project
+            </button>
+            
+            <div class="items-list" id="projects-list">
+                <div class="item-card">
+                    <div class="item-info">
+                        <h4>HUB PKP</h4>
+                        <p>Digital Housing Ecosystem • Government</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="item-btn">✏️ Edit</button>
+                        <button class="item-btn delete">🗑️ Delete</button>
+                    </div>
+                </div>
+                <div class="item-card">
+                    <div class="item-info">
+                        <h4>SIBARU</h4>
+                        <p>Subsidized Housing System • Government</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="item-btn">✏️ Edit</button>
+                        <button class="item-btn delete">🗑️ Delete</button>
+                    </div>
+                </div>
+                <div class="item-card">
+                    <div class="item-info">
+                        <h4>SIMONI</h4>
+                        <p>Construction Monitoring • Government</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="item-btn">✏️ Edit</button>
+                        <button class="item-btn delete">🗑️ Delete</button>
+                    </div>
+                </div>
+                <div class="item-card">
+                    <div class="item-info">
+                        <h4>ICP Token dApp</h4>
+                        <p>Blockchain Application • Web3</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="item-btn">✏️ Edit</button>
+                        <button class="item-btn delete">🗑️ Delete</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Skills Section -->
+        <section class="admin-section" id="section-skills">
+            <h2 class="section-title"><span>💻</span> Manage Skills</h2>
+            
+            <button class="add-btn" onclick="openModal('add-skill')">
+                ➕ Add New Skill
+            </button>
+            
+            <div class="items-list" id="skills-list">
+                <div class="item-card">
+                    <div class="item-info">
+                        <h4>Python</h4>
+                        <p>Programming Language • 90%</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="item-btn">✏️ Edit</button>
+                        <button class="item-btn delete">🗑️ Delete</button>
+                    </div>
+                </div>
+                <div class="item-card">
+                    <div class="item-info">
+                        <h4>React / Next.js</h4>
+                        <p>Frontend Framework • 85%</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="item-btn">✏️ Edit</button>
+                        <button class="item-btn delete">🗑️ Delete</button>
+                    </div>
+                </div>
+                <div class="item-card">
+                    <div class="item-info">
+                        <h4>LLM Workflows</h4>
+                        <p>AI/ML • 85%</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="item-btn">✏️ Edit</button>
+                        <button class="item-btn delete">🗑️ Delete</button>
+                    </div>
+                </div>
+                <div class="item-card">
+                    <div class="item-info">
+                        <h4>Blockchain / Web3</h4>
+                        <p>Technology • 75%</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="item-btn">✏️ Edit</button>
+                        <button class="item-btn delete">🗑️ Delete</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Experience Section -->
+        <section class="admin-section" id="section-experience">
+            <h2 class="section-title"><span>💼</span> Manage Experience</h2>
+            
+            <button class="add-btn" onclick="openModal('add-experience')">
+                ➕ Add New Experience
+            </button>
+            
+            <div class="items-list" id="experience-list">
+                <div class="item-card">
+                    <div class="item-info">
+                        <h4>Ministry of Housing (PKP)</h4>
+                        <p>IT Project Handler • Aug 2024 - Present</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="item-btn">✏️ Edit</button>
+                        <button class="item-btn delete">🗑️ Delete</button>
+                    </div>
+                </div>
+                <div class="item-card">
+                    <div class="item-info">
+                        <h4>Virtus Futura Consulting</h4>
+                        <p>Founder & CEO • Jul 2021 - Jul 2024</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="item-btn">✏️ Edit</button>
+                        <button class="item-btn delete">🗑️ Delete</button>
+                    </div>
+                </div>
+                <div class="item-card">
+                    <div class="item-info">
+                        <h4>Automate All</h4>
+                        <p>Founder & CEO • Aug 2020 - Aug 2022</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="item-btn">✏️ Edit</button>
+                        <button class="item-btn delete">🗑️ Delete</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Certifications Section -->
+        <section class="admin-section" id="section-certifications">
+            <h2 class="section-title"><span>🎓</span> Manage Certifications</h2>
+            
+            <button class="add-btn" onclick="openModal('add-cert')">
+                ➕ Add New Certification
+            </button>
+            
+            <div class="items-list" id="certs-list">
+                <div class="item-card">
+                    <div class="item-info">
+                        <h4>Leadership</h4>
+                        <p>Harvard University • 2022</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="item-btn">✏️ Edit</button>
+                        <button class="item-btn delete">🗑️ Delete</button>
+                    </div>
+                </div>
+                <div class="item-card">
+                    <div class="item-info">
+                        <h4>Machine Learning</h4>
+                        <p>Stanford University • 2022</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="item-btn">✏️ Edit</button>
+                        <button class="item-btn delete">🗑️ Delete</button>
+                    </div>
+                </div>
+                <div class="item-card">
+                    <div class="item-info">
+                        <h4>Foundations of Finance</h4>
+                        <p>Cambridge University • 2022</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="item-btn">✏️ Edit</button>
+                        <button class="item-btn delete">🗑️ Delete</button>
+                    </div>
+                </div>
+                <div class="item-card">
+                    <div class="item-info">
+                        <h4>Web3 & Blockchain Fundamentals</h4>
+                        <p>INSEAD • 2023</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="item-btn">✏️ Edit</button>
+                        <button class="item-btn delete">🗑️ Delete</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Settings Section -->
+        <section class="admin-section" id="section-settings">
+            <h2 class="section-title"><span>⚙️</span> Site Settings</h2>
+            
+            <form id="settings-form">
+                <div class="form-group">
+                    <label class="form-label">Site Title</label>
+                    <input type="text" class="form-input" id="settings-title" value="Ibnu | Government Tech • AI • Blockchain">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Meta Description</label>
+                    <textarea class="form-input form-textarea" id="settings-description">Personal portfolio of Subkhan Ibnu Aji - IT Project Handler at Ministry PKP, AI researcher, crypto trader, and content creator.</textarea>
+                </div>
+                
+                <div class="two-col">
+                    <div class="form-group">
+                        <label class="form-label">Primary Color</label>
+                        <input type="color" class="form-input" id="settings-primary-color" value="#00d4ff" style="height: 50px; cursor: pointer;">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Secondary Color</label>
+                        <input type="color" class="form-input" id="settings-secondary-color" value="#8b5cf6" style="height: 50px; cursor: pointer;">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Google Analytics ID</label>
+                    <input type="text" class="form-input" id="settings-ga" placeholder="G-XXXXXXXXXX">
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <h3 style="margin-bottom: 1rem;">Data Management</h3>
+                    <div class="export-options">
+                        <button type="button" class="export-btn" onclick="exportContent()">
+                            📥 Export All Data (JSON)
+                        </button>
+                        <button type="button" class="export-btn" onclick="document.getElementById('import-file').click()">
+                            📤 Import Data
+                        </button>
+                        <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importContent(event)">
+                        <button type="button" class="export-btn" onclick="resetContent()" style="border-color: rgba(255, 107, 107, 0.3); color: #ff6b6b;">
+                            🔄 Reset to Default
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="save-btn" style="margin-top: 2rem;">
+                    💾 Save Settings
+                </button>
+            </form>
+        </section>
+    </div>
+    
+    <!-- Add Project Modal -->
+    <div class="modal-overlay" id="modal-add-project">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New Project</h3>
+                <button class="modal-close" onclick="closeModal('add-project')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Project Name</label>
+                    <input type="text" class="form-input" placeholder="Enter project name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select class="form-input">
+                        <option>Government</option>
+                        <option>Enterprise</option>
+                        <option>Healthcare</option>
+                        <option>Web3</option>
+                        <option>AI/ML</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-input form-textarea" placeholder="Brief description of the project"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Technologies (comma separated)</label>
+                    <input type="text" class="form-input" placeholder="React, Node.js, PostgreSQL">
+                </div>
+                <div class="two-col">
+                    <div class="form-group">
+                        <label class="form-label">Live URL</label>
+                        <input type="url" class="form-input" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">GitHub URL</label>
+                        <input type="url" class="form-input" placeholder="https://github.com/...">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel" onclick="closeModal('add-project')">Cancel</button>
+                <button class="modal-btn primary" onclick="saveProject()">Add Project</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Skill Modal -->
+    <div class="modal-overlay" id="modal-add-skill">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New Skill</h3>
+                <button class="modal-close" onclick="closeModal('add-skill')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Skill Name</label>
+                    <input type="text" class="form-input" placeholder="Enter skill name">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <select class="form-input">
+                        <option>Programming Language</option>
+                        <option>Framework</option>
+                        <option>AI/ML</option>
+                        <option>Blockchain</option>
+                        <option>Cloud/DevOps</option>
+                        <option>Security</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Proficiency Level (%)</label>
+                    <input type="range" class="form-input" min="0" max="100" value="75" style="cursor: pointer;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn cancel" onclick="closeModal('add-skill')">Cancel</button>
+                <button class="modal-btn primary" onclick="saveSkill()">Add Skill</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <span class="toast-icon">✓</span>
+        <span class="toast-message">Changes saved successfully!</span>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="../js/main.js"></script>
+    <script src="../js/admin.js"></script>
+</body>
+</html>

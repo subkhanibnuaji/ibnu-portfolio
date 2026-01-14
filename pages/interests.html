@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Interests | Ibnu - AI, Blockchain & Cybersecurity</title>
+    <meta name="description" content="Exploring the three pillars of future technology: Artificial Intelligence, Blockchain/Crypto, and Cybersecurity">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        /* Page-specific styles */
+        .interest-hero {
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            padding: 120px 20px 60px;
+        }
+        
+        .interest-hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            margin-bottom: 1rem;
+        }
+        
+        .interest-hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .interest-nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .interest-nav-btn {
+            padding: 12px 24px;
+            border-radius: 50px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: var(--font-body);
+            font-size: 1rem;
+        }
+        
+        .interest-nav-btn:hover,
+        .interest-nav-btn.active {
+            background: var(--gradient-primary);
+            border-color: transparent;
+        }
+        
+        .interest-nav-btn.ai { --btn-color: var(--accent-primary); }
+        .interest-nav-btn.crypto { --btn-color: var(--accent-warning); }
+        .interest-nav-btn.cyber { --btn-color: var(--accent-tertiary); }
+        
+        .interest-section {
+            padding: 80px 0;
+            position: relative;
+        }
+        
+        .interest-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .interest-content.reverse {
+            direction: rtl;
+        }
+        
+        .interest-content.reverse > * {
+            direction: ltr;
+        }
+        
+        .interest-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .interest-text h2 .icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .interest-text .tagline {
+            font-size: 1.1rem;
+            color: var(--accent-primary);
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+        }
+        
+        .interest-text p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+        
+        .why-matters {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 2rem;
+        }
+        
+        .why-matters h4 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .why-matters ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .why-matters li {
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+            color: var(--text-secondary);
+        }
+        
+        .why-matters li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--accent-primary);
+        }
+        
+        .interest-visual {
+            position: relative;
+        }
+        
+        .visual-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .visual-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+        }
+        
+        .visual-card.ai::before { background: var(--gradient-primary); }
+        .visual-card.crypto::before { background: var(--gradient-gold); }
+        .visual-card.cyber::before { background: var(--gradient-aurora); }
+        
+        .visual-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
+        }
+        
+        .stat-item .value {
+            font-size: 2rem;
+            font-weight: 700;
+            font-family: var(--font-heading);
+        }
+        
+        .stat-item .label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        
+        .visual-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .skill-tag {
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            border: 1px solid var(--glass-border);
+        }
+        
+        /* AI Section specific */
+        .ai-demo {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(0, 212, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+        
+        .ai-demo-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: var(--accent-primary);
+        }
+        
+        .ai-demo-content {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .ai-demo-content .typing {
+            display: inline-block;
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+        
+        /* Crypto Section specific */
+        .crypto-ticker {
+            display: flex;
+            gap: 15px;
+            overflow: hidden;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(247, 147, 26, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(247, 147, 26, 0.2);
+        }
+        
+        .ticker-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+        
+        .ticker-item .symbol {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .ticker-item .change {
+            font-size: 0.85rem;
+        }
+        
+        .ticker-item .change.up { color: var(--accent-tertiary); }
+        .ticker-item .change.down { color: var(--accent-danger); }
+        
+        /* Cyber Section specific */
+        .cyber-matrix {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(19, 255, 170, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(19, 255, 170, 0.2);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            line-height: 1.4;
+            color: var(--accent-tertiary);
+            overflow: hidden;
+        }
+        
+        .cyber-matrix code {
+            display: block;
+            opacity: 0.7;
+        }
+        
+        /* Convergence Section */
+        .convergence-section {
+            padding: 100px 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(0,212,255,0.02) 50%, transparent 100%);
+        }
+        
+        .convergence-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .convergence-title h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .convergence-title p {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .convergence-diagram {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .venn-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 400px;
+            position: relative;
+        }
+        
+        .venn-circle {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            position: absolute;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .venn-circle:hover {
+            transform: scale(1.05);
+            z-index: 10;
+        }
+        
+        .venn-circle.ai {
+            background: rgba(0, 212, 255, 0.15);
+            border: 2px solid rgba(0, 212, 255, 0.5);
+            left: 50%;
+            transform: translateX(-50%);
+            top: 20px;
+        }
+        
+        .venn-circle.crypto {
+            background: rgba(247, 147, 26, 0.15);
+            border: 2px solid rgba(247, 147, 26, 0.5);
+            left: 25%;
+            bottom: 50px;
+        }
+        
+        .venn-circle.cyber {
+            background: rgba(19, 255, 170, 0.15);
+            border: 2px solid rgba(19, 255, 170, 0.5);
+            right: 25%;
+            bottom: 50px;
+        }
+        
+        .venn-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--gradient-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.4);
+            z-index: 20;
+        }
+        
+        .convergence-examples {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 60px;
+            padding: 0 20px;
+        }
+        
+        .convergence-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+        }
+        
+        .convergence-card h4 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .convergence-card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        /* My Journey Section */
+        .journey-section {
+            padding: 100px 0;
+        }
+        
+        .journey-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .journey-title h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .journey-timeline {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            padding: 0 20px;
+        }
+        
+        .journey-timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--glass-border);
+            transform: translateX(-50%);
+        }
+        
+        .journey-item {
+            display: flex;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .journey-item:nth-child(odd) {
+            justify-content: flex-start;
+            padding-right: 55%;
+        }
+        
+        .journey-item:nth-child(even) {
+            justify-content: flex-end;
+            padding-left: 55%;
+        }
+        
+        .journey-item::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 20px;
+            width: 16px;
+            height: 16px;
+            background: var(--accent-primary);
+            border-radius: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 20px var(--accent-primary);
+        }
+        
+        .journey-content {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+        
+        .journey-content .year {
+            color: var(--accent-primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .journey-content h4 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .journey-content p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        /* CTA Section */
+        .interest-cta {
+            text-align: center;
+            padding: 100px 20px;
+            background: linear-gradient(180deg, transparent 0%, rgba(0,212,255,0.03) 100%);
+        }
+        
+        .interest-cta h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .interest-cta p {
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+        
+        @media (max-width: 968px) {
+            .interest-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .interest-content.reverse {
+                direction: ltr;
+            }
+            
+            .convergence-examples {
+                grid-template-columns: 1fr;
+            }
+            
+            .venn-container {
+                flex-direction: column;
+                height: auto;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .venn-circle {
+                position: relative;
+                left: auto !important;
+                right: auto !important;
+                top: auto !important;
+                bottom: auto !important;
+                transform: none !important;
+            }
+            
+            .venn-center {
+                position: relative;
+                top: auto;
+                left: auto;
+                transform: none;
+            }
+            
+            .journey-timeline::before {
+                left: 20px;
+            }
+            
+            .journey-item,
+            .journey-item:nth-child(odd),
+            .journey-item:nth-child(even) {
+                justify-content: flex-start;
+                padding-left: 50px;
+                padding-right: 0;
+            }
+            
+            .journey-item::before {
+                left: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particle Background -->
+    <canvas id="particles"></canvas>
+    
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+    
+    <!-- Scroll Progress -->
+    <div class="scroll-progress"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <span class="logo-text">Ibnu</span>
+                <span class="logo-dot"></span>
+            </a>
+            
+            <div class="nav-menu">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="interests.html" class="nav-link active">Interests</a>
+                <a href="projects.html" class="nav-link">Projects</a>
+                <a href="certifications.html" class="nav-link">Credentials</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </div>
+            
+            <div class="nav-actions">
+                <button class="nav-btn" onclick="openCommandPalette()" title="Command Palette (Ctrl+K)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </button>
+                <button class="nav-btn mobile-toggle" onclick="toggleMobileMenu()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Hero Section -->
+    <section class="interest-hero">
+        <div class="hero-content">
+            <h1 class="gradient-text">Three Pillars of Tomorrow</h1>
+            <p>Exploring the technologies that will define the future of humanity: Artificial Intelligence, Blockchain, and Cybersecurity</p>
+            
+            <div class="interest-nav">
+                <button class="interest-nav-btn ai active" onclick="scrollToSection('ai')">
+                    🤖 Artificial Intelligence
+                </button>
+                <button class="interest-nav-btn crypto" onclick="scrollToSection('crypto')">
+                    ⛓️ Blockchain & Crypto
+                </button>
+                <button class="interest-nav-btn cyber" onclick="scrollToSection('cyber')">
+                    🛡️ Cybersecurity
+                </button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- AI Section -->
+    <section id="ai" class="interest-section">
+        <div class="interest-content">
+            <div class="interest-text">
+                <h2>
+                    <span class="icon" style="background: linear-gradient(135deg, #00d4ff, #8b5cf6);">🤖</span>
+                    Artificial Intelligence
+                </h2>
+                <p class="tagline">The Intelligence Revolution</p>
+                <p>
+                    AI is not just a technology—it's a fundamental shift in how we solve problems, make decisions, and create value. 
+                    From automating routine tasks to discovering patterns in vast datasets, AI amplifies human capability in ways 
+                    we're only beginning to understand.
+                </p>
+                <p>
+                    My focus spans from practical AI applications in government systems to cutting-edge research in autonomous 
+                    agentic systems. I believe AI's greatest potential lies in democratizing expertise and making sophisticated 
+                    decision-making tools accessible to everyone.
+                </p>
+                
+                <div class="why-matters">
+                    <h4>🌍 Why AI Matters for Our Future</h4>
+                    <ul>
+                        <li>Healthcare diagnostics with superhuman accuracy</li>
+                        <li>Climate modeling and environmental protection</li>
+                        <li>Personalized education adapting to each learner</li>
+                        <li>Scientific discovery acceleration across all fields</li>
+                        <li>Government efficiency through intelligent automation</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="interest-visual">
+                <div class="visual-card ai">
+                    <div class="visual-stats">
+                        <div class="stat-item">
+                            <div class="value" style="color: var(--accent-primary);">15+</div>
+                            <div class="label">AI/ML Courses</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="value" style="color: var(--accent-primary);">3</div>
+                            <div class="label">AI Projects</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="value" style="color: var(--accent-primary);">IBM</div>
+                            <div class="label">AI Engineering</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="value" style="color: var(--accent-primary);">Stanford</div>
+                            <div class="label">ML Certificate</div>
+                        </div>
+                    </div>
+                    
+                    <div class="visual-skills">
+                        <span class="skill-tag">LangChain</span>
+                        <span class="skill-tag">LangGraph</span>
+                        <span class="skill-tag">OpenAI API</span>
+                        <span class="skill-tag">Claude API</span>
+                        <span class="skill-tag">Computer Vision</span>
+                        <span class="skill-tag">Prompt Engineering</span>
+                        <span class="skill-tag">Agentic AI</span>
+                        <span class="skill-tag">RAG Systems</span>
+                    </div>
+                    
+                    <div class="ai-demo">
+                        <div class="ai-demo-header">
+                            <span>💬</span> AI Assistant Demo
+                        </div>
+                        <div class="ai-demo-content">
+                            <span id="ai-typing-demo">Analyzing your query...</span>
+                            <span class="typing">|</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Crypto/Blockchain Section -->
+    <section id="crypto" class="interest-section" style="background: linear-gradient(180deg, transparent 0%, rgba(247,147,26,0.02) 50%, transparent 100%);">
+        <div class="interest-content reverse">
+            <div class="interest-text">
+                <h2>
+                    <span class="icon" style="background: linear-gradient(135deg, #f7931a, #ffcd00);">⛓️</span>
+                    Blockchain & Crypto
+                </h2>
+                <p class="tagline">The Trust Revolution</p>
+                <p>
+                    Blockchain technology fundamentally reimagines how we establish trust, transfer value, and coordinate 
+                    at scale without intermediaries. It's not just about cryptocurrency—it's about creating systems where 
+                    rules are enforced by code and transparency is guaranteed by design.
+                </p>
+                <p>
+                    Beyond theory, I'm an active participant in crypto markets with practical CEX and DEX trading experience
+                    ($68k–$100k USD cumulative futures volume), applying disciplined risk management and ongoing blockchain 
+                    upskilling to turn strategy into shipped outcomes.
+                </p>
+                
+                <div class="why-matters">
+                    <h4>🌍 Why Blockchain Matters for Our Future</h4>
+                    <ul>
+                        <li>Financial inclusion for the unbanked billions</li>
+                        <li>Transparent governance and anti-corruption tools</li>
+                        <li>Digital ownership and creator economies</li>
+                        <li>Cross-border transactions without friction</li>
+                        <li>Programmable money and DeFi innovation</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="interest-visual">
+                <div class="visual-card crypto">
+                    <div class="visual-stats">
+                        <div class="stat-item">
+                            <div class="value" style="color: var(--accent-warning);">$68-100K</div>
+                            <div class="label">Futures Volume</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="value" style="color: var(--accent-warning);">CEX+DEX</div>
+                            <div class="label">Trading Experience</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="value" style="color: var(--accent-warning);">INSEAD</div>
+                            <div class="label">Web3 Certificate</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="value" style="color: var(--accent-warning);">ICP</div>
+                            <div class="label">dApp Developer</div>
+                        </div>
+                    </div>
+                    
+                    <div class="visual-skills">
+                        <span class="skill-tag">Solidity</span>
+                        <span class="skill-tag">ERC-20</span>
+                        <span class="skill-tag">DeFi</span>
+                        <span class="skill-tag">Smart Contracts</span>
+                        <span class="skill-tag">On-chain Analysis</span>
+                        <span class="skill-tag">Risk Management</span>
+                        <span class="skill-tag">Motoko (ICP)</span>
+                        <span class="skill-tag">Web3.js</span>
+                    </div>
+                    
+                    <div class="crypto-ticker">
+                        <div class="ticker-item">
+                            <span class="symbol">BTC</span>
+                            <span class="change up">↑</span>
+                        </div>
+                        <div class="ticker-item">
+                            <span class="symbol">ETH</span>
+                            <span class="change up">↑</span>
+                        </div>
+                        <div class="ticker-item">
+                            <span class="symbol">SOL</span>
+                            <span class="change up">↑</span>
+                        </div>
+                        <div class="ticker-item">
+                            <span class="symbol">ICP</span>
+                            <span class="change up">↑</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Cybersecurity Section -->
+    <section id="cyber" class="interest-section">
+        <div class="interest-content">
+            <div class="interest-text">
+                <h2>
+                    <span class="icon" style="background: linear-gradient(135deg, #13FFAA, #1E67C6);">🛡️</span>
+                    Cybersecurity
+                </h2>
+                <p class="tagline">The Protection Imperative</p>
+                <p>
+                    As our world becomes increasingly digital, cybersecurity transforms from a technical concern to a 
+                    fundamental pillar of society. Every transaction, communication, and critical infrastructure depends 
+                    on our ability to defend against evolving threats.
+                </p>
+                <p>
+                    My approach combines offensive understanding (knowing how attacks work) with defensive implementation 
+                    (building resilient systems). From OSINT and threat intelligence to incident response, I'm building 
+                    comprehensive security expertise.
+                </p>
+                
+                <div class="why-matters">
+                    <h4>🌍 Why Cybersecurity Matters for Our Future</h4>
+                    <ul>
+                        <li>Protecting critical infrastructure from state actors</li>
+                        <li>Safeguarding personal privacy in the digital age</li>
+                        <li>Securing financial systems against sophisticated attacks</li>
+                        <li>Defending democratic processes from manipulation</li>
+                        <li>Enabling trust in AI and automated systems</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="interest-visual">
+                <div class="visual-card cyber">
+                    <div class="visual-stats">
+                        <div class="stat-item">
+                            <div class="value" style="color: var(--accent-tertiary);">Google</div>
+                            <div class="label">Cybersecurity Cert</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="value" style="color: var(--accent-tertiary);">IBM</div>
+                            <div class="label">Security Analyst</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="value" style="color: var(--accent-tertiary);">CISCO</div>
+                            <div class="label">Cyber Operations</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="value" style="color: var(--accent-tertiary);">INFOSEC</div>
+                            <div class="label">OWASP Training</div>
+                        </div>
+                    </div>
+                    
+                    <div class="visual-skills">
+                        <span class="skill-tag">OSINT</span>
+                        <span class="skill-tag">Threat Intelligence</span>
+                        <span class="skill-tag">Incident Response</span>
+                        <span class="skill-tag">Digital Forensics</span>
+                        <span class="skill-tag">Network Security</span>
+                        <span class="skill-tag">OWASP</span>
+                        <span class="skill-tag">Ethical Hacking</span>
+                        <span class="skill-tag">OPSEC</span>
+                    </div>
+                    
+                    <div class="cyber-matrix">
+                        <code>> Scanning network perimeter...</code>
+                        <code>> Analyzing threat vectors...</code>
+                        <code>> Deploying countermeasures...</code>
+                        <code>> System secured ✓</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Convergence Section -->
+    <section class="convergence-section">
+        <div class="convergence-title">
+            <h2 class="gradient-text">The Convergence</h2>
+            <p>These three technologies don't exist in isolation—they're converging to create unprecedented possibilities</p>
+        </div>
+        
+        <div class="convergence-diagram">
+            <div class="venn-container">
+                <div class="venn-circle ai">
+                    <span>AI</span>
+                </div>
+                <div class="venn-circle crypto">
+                    <span>Blockchain</span>
+                </div>
+                <div class="venn-circle cyber">
+                    <span>Security</span>
+                </div>
+                <div class="venn-center">
+                    <span>Future<br>Tech</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="convergence-examples">
+            <div class="convergence-card">
+                <h4 style="color: var(--accent-primary);">AI + Blockchain</h4>
+                <p>Decentralized AI models, autonomous agents with wallets, AI-powered DeFi strategies</p>
+            </div>
+            <div class="convergence-card">
+                <h4 style="color: var(--accent-tertiary);">AI + Security</h4>
+                <p>AI-powered threat detection, automated incident response, intelligent SIEM systems</p>
+            </div>
+            <div class="convergence-card">
+                <h4 style="color: var(--accent-warning);">Blockchain + Security</h4>
+                <p>Immutable audit logs, zero-knowledge proofs, decentralized identity verification</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- My Journey Section -->
+    <section class="journey-section">
+        <div class="journey-title">
+            <h2>My Learning Journey</h2>
+            <p style="color: var(--text-secondary);">How I'm building expertise across these three domains</p>
+        </div>
+        
+        <div class="journey-timeline">
+            <div class="journey-item">
+                <div class="journey-content">
+                    <div class="year">2017-2021</div>
+                    <h4>Computer Science Foundation</h4>
+                    <p>B.Sc. in Informatics from Telkom University, building strong fundamentals in programming and systems</p>
+                </div>
+            </div>
+            
+            <div class="journey-item">
+                <div class="journey-content">
+                    <div class="year">2021</div>
+                    <h4>Crypto Trading Journey Begins</h4>
+                    <p>Started actively trading digital assets, learning market dynamics and risk management firsthand</p>
+                </div>
+            </div>
+            
+            <div class="journey-item">
+                <div class="journey-content">
+                    <div class="year">2022</div>
+                    <h4>Strategic Education</h4>
+                    <p>Harvard Leadership, Cambridge Finance, Stanford ML—building interdisciplinary expertise</p>
+                </div>
+            </div>
+            
+            <div class="journey-item">
+                <div class="journey-content">
+                    <div class="year">2022-2024</div>
+                    <h4>MBA & Professional Growth</h4>
+                    <p>Senior Executive MBA from UGM while managing consulting portfolio and government projects</p>
+                </div>
+            </div>
+            
+            <div class="journey-item">
+                <div class="journey-content">
+                    <div class="year">2023-2024</div>
+                    <h4>Security & Web3 Deep Dive</h4>
+                    <p>INSEAD Web3, Google Cybersecurity, IBM AI Engineering—specializing in emerging tech</p>
+                </div>
+            </div>
+            
+            <div class="journey-item">
+                <div class="journey-content">
+                    <div class="year">2024-Present</div>
+                    <h4>Government Tech & Research</h4>
+                    <p>CPNS at Ministry PKP, applying tech expertise to public sector digital transformation</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="interest-cta">
+        <h2>Let's Build the Future Together</h2>
+        <p>Interested in AI, Blockchain, or Cybersecurity? I'm always excited to connect with fellow enthusiasts and explore collaboration opportunities.</p>
+        <div class="btn-group">
+            <a href="contact.html" class="btn btn-primary btn-glow">Get In Touch</a>
+            <a href="projects.html" class="btn btn-secondary">View My Projects</a>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="logo-text">Ibnu</span>
+                <p>Government Tech • AI Researcher • Crypto Enthusiast</p>
+            </div>
+            <div class="footer-links">
+                <a href="https://linkedin.com/in/subkhanibnuaji" target="_blank">LinkedIn</a>
+                <a href="https://github.com/subkhanibnuaji" target="_blank">GitHub</a>
+                <a href="mailto:hi@heyibnu.com">Email</a>
+            </div>
+            <div class="footer-copyright">
+                <p>© 2025 Ibnu. Crafted with passion.</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Chatbot Widget -->
+    <div class="chatbot-widget" id="chatbot">
+        <button class="chatbot-trigger" onclick="toggleChatbot()">
+            <span class="chatbot-icon">💬</span>
+            <span class="chatbot-label">Ask Ibnu AI</span>
+        </button>
+        <div class="chatbot-window" id="chatbotWindow">
+            <div class="chatbot-header">
+                <div class="chatbot-avatar">🤖</div>
+                <div class="chatbot-info">
+                    <h4>Ibnu AI Assistant</h4>
+                    <span class="status">Online</span>
+                </div>
+                <button class="chatbot-close" onclick="toggleChatbot()">×</button>
+            </div>
+            <div class="chatbot-messages" id="chatbotMessages">
+                <div class="message bot">
+                    <p>Hi! I'm Ibnu's AI assistant. Ask me about his interests in AI, Blockchain, or Cybersecurity! 🚀</p>
+                </div>
+            </div>
+            <div class="chatbot-suggestions" id="chatSuggestions">
+                <button onclick="askQuestion('Why AI matters?')">Why AI matters?</button>
+                <button onclick="askQuestion('Tell me about crypto trading')">Crypto trading</button>
+                <button onclick="askQuestion('Cybersecurity skills')">Security skills</button>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" id="chatInput" placeholder="Ask me anything..." onkeypress="handleChatKeypress(event)">
+                <button onclick="sendMessage()">→</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Command Palette -->
+    <div class="command-palette-overlay" id="commandPalette" onclick="closeCommandPalette(event)">
+        <div class="command-palette">
+            <div class="command-search">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input type="text" id="commandInput" placeholder="Type a command or search..." oninput="filterCommands()">
+                <kbd>ESC</kbd>
+            </div>
+            <div class="command-list" id="commandList">
+                <div class="command-group">
+                    <div class="command-group-title">Navigation</div>
+                    <button class="command-item" onclick="executeCommand('home')">
+                        <span class="command-icon">🏠</span>
+                        <span class="command-label">Go to Home</span>
+                        <kbd>G H</kbd>
+                    </button>
+                    <button class="command-item" onclick="executeCommand('interests')">
+                        <span class="command-icon">💡</span>
+                        <span class="command-label">View Interests</span>
+                        <kbd>G I</kbd>
+                    </button>
+                    <button class="command-item" onclick="executeCommand('projects')">
+                        <span class="command-icon">🚀</span>
+                        <span class="command-label">View Projects</span>
+                        <kbd>G P</kbd>
+                    </button>
+                    <button class="command-item" onclick="executeCommand('credentials')">
+                        <span class="command-icon">🏆</span>
+                        <span class="command-label">View Credentials</span>
+                        <kbd>G C</kbd>
+                    </button>
+                    <button class="command-item" onclick="executeCommand('contact')">
+                        <span class="command-icon">✉️</span>
+                        <span class="command-label">Contact</span>
+                        <kbd>G K</kbd>
+                    </button>
+                </div>
+                <div class="command-group">
+                    <div class="command-group-title">Actions</div>
+                    <button class="command-item" onclick="executeCommand('chatbot')">
+                        <span class="command-icon">💬</span>
+                        <span class="command-label">Open AI Chatbot</span>
+                        <kbd>A</kbd>
+                    </button>
+                    <button class="command-item" onclick="executeCommand('terminal')">
+                        <span class="command-icon">⌨️</span>
+                        <span class="command-label">Open Terminal</span>
+                        <kbd>T</kbd>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Terminal -->
+    <div class="terminal-overlay" id="terminalOverlay" onclick="closeTerminal(event)">
+        <div class="terminal-window">
+            <div class="terminal-header">
+                <div class="terminal-buttons">
+                    <span class="terminal-btn close" onclick="closeTerminal()"></span>
+                    <span class="terminal-btn minimize"></span>
+                    <span class="terminal-btn maximize"></span>
+                </div>
+                <div class="terminal-title">ibnu@portfolio:~</div>
+            </div>
+            <div class="terminal-body" id="terminalBody">
+                <div class="terminal-output" id="terminalOutput">
+                    <pre class="ascii-art">
+ _____ _                 
+|_   _| |__  _ __  _   _ 
+  | | | '_ \| '_ \| | | |
+  | | | |_) | | | | |_| |
+  |_| |_.__/|_| |_|\__,_|
+                         
+                    </pre>
+                    <p>Welcome to Ibnu's Terminal v2.0</p>
+                    <p>Type 'help' for available commands.</p>
+                </div>
+            </div>
+            <div class="terminal-input-line">
+                <span class="terminal-prompt">visitor@ibnu:~$</span>
+                <input type="text" id="terminalInput" class="terminal-input" onkeypress="handleTerminalKeypress(event)" autofocus>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/main.js"></script>
+    <script src="../js/chatbot.js"></script>
+    <script src="../js/terminal.js"></script>
+    <script>
+        // Page-specific scripts
+        function scrollToSection(id) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                
+                // Update active nav button
+                document.querySelectorAll('.interest-nav-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector(`.interest-nav-btn.${id}`).classList.add('active');
+            }
+        }
+        
+        // AI Typing Demo
+        const aiDemoTexts = [
+            "Analyzing your query...",
+            "Processing natural language input...",
+            "Generating contextual response...",
+            "Applying knowledge base reasoning...",
+            "Optimizing output for clarity...",
+            "Ready to assist with your questions!"
+        ];
+        let aiDemoIndex = 0;
+        
+        setInterval(() => {
+            const demoElement = document.getElementById('ai-typing-demo');
+            if (demoElement) {
+                aiDemoIndex = (aiDemoIndex + 1) % aiDemoTexts.length;
+                demoElement.textContent = aiDemoTexts[aiDemoIndex];
+            }
+        }, 3000);
+        
+        // Scroll spy for interest sections
+        const observerOptions = {
+            threshold: 0.3,
+            rootMargin: '-100px 0px'
+        };
+        
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    document.querySelectorAll('.interest-nav-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                        if (btn.classList.contains(id)) {
+                            btn.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.interest-section').forEach(section => {
+            if (section.id) {
+                sectionObserver.observe(section);
+            }
+        });
+    </script>
+</body>
+</html>

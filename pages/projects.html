@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects | Ibnu - Government Tech & Digital Innovation</title>
+    <meta name="description" content="Explore government technology projects including HUB PKP, SIBARU, SIMONI - Enterprise systems for Indonesia's Ministry of Housing">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/styles.css">
+    <style>
+        /* Page-specific styles */
+        .projects-hero {
+            min-height: 50vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            padding: 120px 20px 60px;
+        }
+        
+        .projects-hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            margin-bottom: 1rem;
+        }
+        
+        .projects-hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .project-filters {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 10px 20px;
+            border-radius: 50px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+        }
+        
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: var(--bg-primary);
+        }
+        
+        /* Featured Project - HUB PKP */
+        .featured-project {
+            padding: 80px 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(0, 212, 255, 0.03) 50%, transparent 100%);
+        }
+        
+        .featured-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+        
+        .featured-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: start;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .featured-info h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .featured-info .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.7;
+        }
+        
+        .project-meta {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .meta-item {
+            padding: 1rem;
+            background: var(--glass-bg);
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .meta-item label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+        
+        .meta-item span {
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .project-tag {
+            padding: 6px 14px;
+            background: rgba(0, 212, 255, 0.1);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: var(--accent-primary);
+        }
+        
+        .featured-visual {
+            position: relative;
+        }
+        
+        .project-mockup {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 25px 80px rgba(0, 212, 255, 0.15);
+        }
+        
+        .mockup-browser {
+            background: var(--bg-secondary);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .browser-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .browser-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        
+        .browser-dot.red { background: #ff5f57; }
+        .browser-dot.yellow { background: #febc2e; }
+        .browser-dot.green { background: #28c840; }
+        
+        .browser-url {
+            flex: 1;
+            margin-left: 12px;
+            padding: 6px 12px;
+            background: var(--bg-primary);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+        
+        .browser-content {
+            padding: 20px;
+            min-height: 400px;
+            background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .app-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .app-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            color: var(--accent-primary);
+        }
+        
+        .app-nav {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .app-nav span {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+        
+        .app-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .app-card {
+            padding: 15px;
+            background: var(--glass-bg);
+            border-radius: 10px;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .app-card .icon {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        
+        .app-card h4 {
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+        
+        .app-card p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        
+        /* Project Details Sections */
+        .project-details {
+            padding: 80px 0;
+        }
+        
+        .details-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .detail-card {
+            padding: 30px;
+            background: var(--glass-bg);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+        
+        .detail-card:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-5px);
+        }
+        
+        .detail-card .icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .detail-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        
+        .detail-card p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+        
+        /* Features Section */
+        .features-section {
+            padding: 80px 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(139, 92, 246, 0.03) 50%, transparent 100%);
+        }
+        
+        .features-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .features-header h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .feature-item {
+            display: flex;
+            gap: 20px;
+            padding: 25px;
+            background: var(--glass-bg);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-item:hover {
+            border-color: var(--accent-secondary);
+        }
+        
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            min-width: 50px;
+            background: rgba(139, 92, 246, 0.2);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .feature-text h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .feature-text p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        /* Other Projects Grid */
+        .other-projects {
+            padding: 80px 0;
+        }
+        
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .project-card {
+            background: var(--glass-bg);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .project-card:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 212, 255, 0.1);
+        }
+        
+        .project-card-image {
+            height: 200px;
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .project-card-image::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(139, 92, 246, 0.1));
+        }
+        
+        .project-card-image .icon {
+            font-size: 4rem;
+            opacity: 0.3;
+        }
+        
+        .project-card-body {
+            padding: 25px;
+        }
+        
+        .project-card-category {
+            display: inline-block;
+            padding: 4px 12px;
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 50px;
+            font-size: 0.75rem;
+            color: var(--accent-primary);
+            margin-bottom: 1rem;
+        }
+        
+        .project-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .project-card p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+        
+        .project-card-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        
+        .project-card-tags span {
+            padding: 4px 10px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+        }
+        
+        /* Flowchart Section */
+        .flowchart-section {
+            padding: 80px 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(19, 255, 170, 0.03) 50%, transparent 100%);
+        }
+        
+        .flowchart-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .flowchart {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .flow-number {
+            width: 50px;
+            height: 50px;
+            min-width: 50px;
+            background: linear-gradient(135deg, var(--accent-tertiary), var(--accent-primary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--bg-primary);
+        }
+        
+        .flow-content {
+            flex: 1;
+            padding: 20px 25px;
+            background: var(--glass-bg);
+            border-radius: 12px;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .flow-content h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: var(--accent-tertiary);
+        }
+        
+        .flow-content p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        
+        .flow-arrow {
+            width: 50px;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .flow-arrow::after {
+            content: '↓';
+            font-size: 1.5rem;
+            color: var(--accent-tertiary);
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .featured-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+            
+            .details-grid,
+            .projects-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .details-grid,
+            .projects-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .project-meta {
+                grid-template-columns: 1fr;
+            }
+            
+            .app-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Particle Background -->
+    <canvas id="particles"></canvas>
+    
+    <!-- Custom Cursor -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+    
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">
+                <span class="logo-text">Ibnu</span>
+                <span class="logo-dot"></span>
+            </a>
+            <div class="nav-menu">
+                <a href="../index.html" class="nav-link">Home</a>
+                <a href="interests.html" class="nav-link">Interests</a>
+                <a href="projects.html" class="nav-link active">Projects</a>
+                <a href="certifications.html" class="nav-link">Credentials</a>
+                <a href="about.html" class="nav-link">About</a>
+                <a href="contact.html" class="nav-link">Contact</a>
+            </div>
+            <div class="nav-actions">
+                <button class="nav-btn" id="cmdPaletteBtn" title="Command Palette (Ctrl+K)">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                </button>
+                <button class="nav-btn mobile-toggle" id="mobileToggle">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Progress Bar -->
+    <div class="scroll-progress">
+        <div class="scroll-progress-bar"></div>
+    </div>
+    
+    <!-- Projects Hero -->
+    <section class="projects-hero">
+        <div class="container">
+            <h1>My <span class="gradient-text">Projects</span></h1>
+            <p>Government technology initiatives and digital transformation projects that make real impact on public services.</p>
+            
+            <div class="project-filters">
+                <button class="filter-btn active" data-filter="all">All Projects</button>
+                <button class="filter-btn" data-filter="government">Government</button>
+                <button class="filter-btn" data-filter="enterprise">Enterprise</button>
+                <button class="filter-btn" data-filter="healthcare">Healthcare</button>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Featured Project: HUB PKP -->
+    <section class="featured-project" id="hub-pkp">
+        <div class="container">
+            <div class="featured-content">
+                <div class="featured-info">
+                    <span class="featured-badge">
+                        ⭐ Featured Project
+                    </span>
+                    <h2>HUB Rumah Swadaya Layak Huni</h2>
+                    <p class="subtitle">
+                        A comprehensive digital ecosystem for self-built housing in Indonesia. This platform streamlines 
+                        the entire process from design consultation to construction supervision, helping citizens build 
+                        proper, certified homes while connecting them with architects, contractors, and financing options.
+                    </p>
+                    
+                    <div class="project-meta">
+                        <div class="meta-item">
+                            <label>Organization</label>
+                            <span>Ministry of Housing (PKP)</span>
+                        </div>
+                        <div class="meta-item">
+                            <label>Role</label>
+                            <span>IT Project Handler</span>
+                        </div>
+                        <div class="meta-item">
+                            <label>Timeline</label>
+                            <span>2024 - Present</span>
+                        </div>
+                        <div class="meta-item">
+                            <label>Status</label>
+                            <span style="color: var(--accent-tertiary);">● In Development</span>
+                        </div>
+                    </div>
+                    
+                    <div class="project-tags">
+                        <span class="project-tag">Digital Transformation</span>
+                        <span class="project-tag">Government Tech</span>
+                        <span class="project-tag">Public Housing</span>
+                        <span class="project-tag">Self-Built Housing</span>
+                        <span class="project-tag">Enterprise System</span>
+                    </div>
+                </div>
+                
+                <div class="featured-visual">
+                    <div class="mockup-browser">
+                        <div class="browser-header">
+                            <span class="browser-dot red"></span>
+                            <span class="browser-dot yellow"></span>
+                            <span class="browser-dot green"></span>
+                            <span class="browser-url">klinik.pkp.go.id/hub</span>
+                        </div>
+                        <div class="browser-content">
+                            <div class="app-header">
+                                <div class="app-logo">
+                                    🏠 HUB PKP
+                                </div>
+                                <div class="app-nav">
+                                    <span>Beranda</span>
+                                    <span>Konsultasi</span>
+                                    <span>Perizinan</span>
+                                    <span>Material</span>
+                                </div>
+                            </div>
+                            <div class="app-cards">
+                                <div class="app-card">
+                                    <div class="icon">📐</div>
+                                    <h4>Design Consultation</h4>
+                                    <p>Connect with architects</p>
+                                </div>
+                                <div class="app-card">
+                                    <div class="icon">📋</div>
+                                    <h4>Permits & Licensing</h4>
+                                    <p>PBG facilitation</p>
+                                </div>
+                                <div class="app-card">
+                                    <div class="icon">🏗️</div>
+                                    <h4>Materials & Workers</h4>
+                                    <p>Verified suppliers</p>
+                                </div>
+                            </div>
+                            <div class="app-cards" style="margin-top: 15px;">
+                                <div class="app-card">
+                                    <div class="icon">💰</div>
+                                    <h4>Financing</h4>
+                                    <p>Bank partnerships</p>
+                                </div>
+                                <div class="app-card">
+                                    <div class="icon">👷</div>
+                                    <h4>Contractors</h4>
+                                    <p>Certified workers</p>
+                                </div>
+                                <div class="app-card">
+                                    <div class="icon">📊</div>
+                                    <h4>Monitoring</h4>
+                                    <p>Construction oversight</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Project Details -->
+    <section class="project-details">
+        <div class="details-grid">
+            <div class="detail-card">
+                <div class="icon">🎯</div>
+                <h3>The Challenge</h3>
+                <p>Over 83.99% of Indonesian homes are self-built, but many lack proper permits, don't meet safety standards, 
+                   and homeowners struggle to access quality materials and skilled workers at fair prices.</p>
+            </div>
+            <div class="detail-card">
+                <div class="icon">💡</div>
+                <h3>The Solution</h3>
+                <p>A unified digital ecosystem that guides citizens through the entire home-building journey, connecting them 
+                   with verified professionals, facilitating permits, and ensuring construction quality compliance.</p>
+            </div>
+            <div class="detail-card">
+                <div class="icon">📈</div>
+                <h3>The Impact</h3>
+                <p>Streamlined access to housing services across Indonesia, improved construction quality standards, 
+                   and transparent pricing for materials and labor in self-built housing projects.</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="container">
+            <div class="features-header">
+                <h2>Platform <span class="gradient-text">Features</span></h2>
+                <p style="color: var(--text-secondary);">Comprehensive suite of tools for self-built housing</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">📐</div>
+                    <div class="feature-text">
+                        <h4>Design Consultation</h4>
+                        <p>Access prototype designs (22-36m²) based on ministerial standards, or connect with licensed architects 
+                           and architecture students for custom designs with consultation options.</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">📋</div>
+                    <div class="feature-text">
+                        <h4>Permit Facilitation (PBG)</h4>
+                        <p>Integrated with SIMBG system for automatic document upload, KRK verification, and streamlined 
+                           building permit processing with status tracking.</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">🏪</div>
+                    <div class="feature-text">
+                        <h4>Material Marketplace</h4>
+                        <p>Auto-generated Bill of Quantities from DED, location-based material store search, price comparison, 
+                           and integrated ordering with verified suppliers.</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">👷</div>
+                    <div class="feature-text">
+                        <h4>Worker Facilitation</h4>
+                        <p>Find certified construction workers, foremen, and contractors based on project requirements 
+                           and location with transparent pricing and negotiation features.</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">💳</div>
+                    <div class="feature-text">
+                        <h4>Housing Finance</h4>
+                        <p>Financing calculator, loan simulation based on income, and integration with partner banks 
+                           for construction loans (KBR/KRR) with streamlined application.</p>
+                    </div>
+                </div>
+                
+                <div class="feature-item">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-text">
+                        <h4>Construction Monitoring</h4>
+                        <p>Project tracking dashboard, document management, daily reports, inspection checklists, 
+                           and progress monitoring for both users and local government oversight.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- User Flow -->
+    <section class="flowchart-section">
+        <div class="container">
+            <div class="features-header">
+                <h2>User <span class="gradient-text">Journey</span></h2>
+                <p style="color: var(--text-secondary);">From consultation to completed home</p>
+            </div>
+            
+            <div class="flowchart-container">
+                <div class="flowchart">
+                    <div class="flow-step">
+                        <div class="flow-number">1</div>
+                        <div class="flow-content">
+                            <h4>Access Application</h4>
+                            <p>User registers and fills in personal data including address and construction location coordinates.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flow-arrow"></div>
+                    
+                    <div class="flow-step">
+                        <div class="flow-number">2</div>
+                        <div class="flow-content">
+                            <h4>Design Selection</h4>
+                            <p>Choose prototype design or consult with architect. Generate DED and RAB documents.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flow-arrow"></div>
+                    
+                    <div class="flow-step">
+                        <div class="flow-number">3</div>
+                        <div class="flow-content">
+                            <h4>Permit Processing</h4>
+                            <p>Automatic integration with SIMBG for PBG application and tracking.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flow-arrow"></div>
+                    
+                    <div class="flow-step">
+                        <div class="flow-number">4</div>
+                        <div class="flow-content">
+                            <h4>Resource Selection</h4>
+                            <p>Select materials from nearby verified stores and hire certified workers/contractors.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flow-arrow"></div>
+                    
+                    <div class="flow-step">
+                        <div class="flow-number">5</div>
+                        <div class="flow-content">
+                            <h4>Financing (Optional)</h4>
+                            <p>Apply for construction loans through integrated banking partners.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flow-arrow"></div>
+                    
+                    <div class="flow-step">
+                        <div class="flow-number">6</div>
+                        <div class="flow-content">
+                            <h4>Construction & Monitoring</h4>
+                            <p>Track progress, manage documents, and ensure quality compliance until completion.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Other Projects -->
+    <section class="other-projects">
+        <div class="container">
+            <div class="features-header">
+                <h2>Other <span class="gradient-text">Projects</span></h2>
+                <p style="color: var(--text-secondary);">More government technology initiatives</p>
+            </div>
+            
+            <div class="projects-grid">
+                <div class="project-card" data-category="government">
+                    <div class="project-card-image">
+                        <span class="icon">🏢</span>
+                    </div>
+                    <div class="project-card-body">
+                        <span class="project-card-category">Government</span>
+                        <h3>SIBARU</h3>
+                        <p>Enterprise information system for housing and settlement data management with comprehensive 
+                           reporting and analytics capabilities.</p>
+                        <div class="project-card-tags">
+                            <span>Enterprise System</span>
+                            <span>Data Management</span>
+                            <span>Analytics</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="project-card" data-category="government">
+                    <div class="project-card-image">
+                        <span class="icon">📊</span>
+                    </div>
+                    <div class="project-card-body">
+                        <span class="project-card-category">Government</span>
+                        <h3>SIMONI</h3>
+                        <p>Monitoring and evaluation system for housing programs, enabling real-time tracking of 
+                           project progress and outcomes.</p>
+                        <div class="project-card-tags">
+                            <span>Monitoring</span>
+                            <span>Evaluation</span>
+                            <span>Dashboard</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="project-card" data-category="healthcare">
+                    <div class="project-card-image">
+                        <span class="icon">🏥</span>
+                    </div>
+                    <div class="project-card-body">
+                        <span class="project-card-category">Healthcare</span>
+                        <h3>Hospital Feasibility Study</h3>
+                        <p>Comprehensive feasibility study for RS Wibawa Mukti Type B hospital including market, 
+                           technical, and financial analysis.</p>
+                        <div class="project-card-tags">
+                            <span>Healthcare</span>
+                            <span>Analysis</span>
+                            <span>Strategy</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="project-card" data-category="enterprise">
+                    <div class="project-card-image">
+                        <span class="icon">🤖</span>
+                    </div>
+                    <div class="project-card-body">
+                        <span class="project-card-category">Enterprise</span>
+                        <h3>RPA Solutions</h3>
+                        <p>Robotic Process Automation solutions delivered to 50+ clients, automating repetitive 
+                           business processes and improving efficiency.</p>
+                        <div class="project-card-tags">
+                            <span>Automation</span>
+                            <span>UiPath</span>
+                            <span>Process</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="project-card" data-category="enterprise">
+                    <div class="project-card-image">
+                        <span class="icon">🔗</span>
+                    </div>
+                    <div class="project-card-body">
+                        <span class="project-card-category">Blockchain</span>
+                        <h3>ICP Token dApp</h3>
+                        <p>Fungible token canister on Internet Computer with React frontend, featuring faucet, 
+                           transfers, and Internet Identity integration.</p>
+                        <div class="project-card-tags">
+                            <span>Motoko</span>
+                            <span>React</span>
+                            <span>Web3</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="project-card" data-category="enterprise">
+                    <div class="project-card-image">
+                        <span class="icon">🍽️</span>
+                    </div>
+                    <div class="project-card-body">
+                        <span class="project-card-category">Enterprise</span>
+                        <h3>Animo F&B System</h3>
+                        <p>Web-based automation for F&B SMEs with COGS calculation, inventory tracking, and 
+                           sales reporting capabilities.</p>
+                        <div class="project-card-tags">
+                            <span>Web App</span>
+                            <span>Automation</span>
+                            <span>F&B</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta-section" style="padding: 80px 0; text-align: center;">
+        <div class="container">
+            <h2 style="font-size: 2rem; margin-bottom: 1rem;">Interested in <span class="gradient-text">Collaboration?</span></h2>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+                I'm always open to discussing new projects, government tech initiatives, or potential partnerships.
+            </p>
+            <a href="contact.html" class="btn btn-primary btn-glow">
+                Get in Touch
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+    </section>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="../index.html" class="footer-logo">Ibnu<span>.</span></a>
+                    <p>Civil Servant & Tech Enthusiast exploring the intersection of AI, Blockchain, and Cybersecurity.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Navigation</h4>
+                        <a href="../index.html">Home</a>
+                        <a href="interests.html">Interests</a>
+                        <a href="projects.html">Projects</a>
+                        <a href="about.html">About</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Resources</h4>
+                        <a href="certifications.html">Credentials</a>
+                        <a href="contact.html">Contact</a>
+                    </div>
+                    <div class="footer-column">
+                        <h4>Connect</h4>
+                        <a href="https://github.com/subkhanibnuaji" target="_blank">GitHub</a>
+                        <a href="https://linkedin.com/in/subkhanibnuaji" target="_blank">LinkedIn</a>
+                        <a href="https://tiktok.com/@ibnu" target="_blank">TikTok</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Ibnu. All rights reserved.</p>
+                <p class="footer-shortcut">Press <kbd>Ctrl</kbd> + <kbd>K</kbd> for command palette</p>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Command Palette Modal -->
+    <div class="cmd-palette-overlay" id="cmdPalette">
+        <div class="cmd-palette">
+            <div class="cmd-search">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+                <input type="text" placeholder="Type a command or search..." id="cmdInput">
+                <kbd>ESC</kbd>
+            </div>
+            <div class="cmd-results" id="cmdResults">
+                <div class="cmd-group">
+                    <div class="cmd-group-title">Navigation</div>
+                    <div class="cmd-item" data-action="navigate" data-url="../index.html">
+                        <span class="cmd-icon">🏠</span>
+                        <span class="cmd-text">Go to Home</span>
+                        <kbd>G H</kbd>
+                    </div>
+                    <div class="cmd-item" data-action="navigate" data-url="interests.html">
+                        <span class="cmd-icon">💡</span>
+                        <span class="cmd-text">Go to Interests</span>
+                        <kbd>G I</kbd>
+                    </div>
+                    <div class="cmd-item" data-action="navigate" data-url="projects.html">
+                        <span class="cmd-icon">🚀</span>
+                        <span class="cmd-text">Go to Projects</span>
+                        <kbd>G P</kbd>
+                    </div>
+                    <div class="cmd-item" data-action="navigate" data-url="certifications.html">
+                        <span class="cmd-icon">🏆</span>
+                        <span class="cmd-text">Go to Credentials</span>
+                        <kbd>G K</kbd>
+                    </div>
+                    <div class="cmd-item" data-action="navigate" data-url="contact.html">
+                        <span class="cmd-icon">📧</span>
+                        <span class="cmd-text">Go to Contact</span>
+                        <kbd>G C</kbd>
+                    </div>
+                </div>
+                <div class="cmd-group">
+                    <div class="cmd-group-title">Actions</div>
+                    <div class="cmd-item" data-action="terminal">
+                        <span class="cmd-icon">💻</span>
+                        <span class="cmd-text">Open Terminal</span>
+                        <kbd>T</kbd>
+                    </div>
+                    <div class="cmd-item" data-action="chatbot">
+                        <span class="cmd-icon">🤖</span>
+                        <span class="cmd-text">Open AI Assistant</span>
+                        <kbd>A</kbd>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Terminal Modal -->
+    <div class="terminal-overlay" id="terminalOverlay">
+        <div class="terminal">
+            <div class="terminal-header">
+                <div class="terminal-buttons">
+                    <span class="terminal-btn close" id="terminalClose"></span>
+                    <span class="terminal-btn minimize"></span>
+                    <span class="terminal-btn maximize"></span>
+                </div>
+                <div class="terminal-title">ibnu@portfolio:~</div>
+            </div>
+            <div class="terminal-body" id="terminalBody">
+                <div class="terminal-output" id="terminalOutput"></div>
+                <div class="terminal-input-line">
+                    <span class="terminal-prompt">visitor@ibnu.dev:~$</span>
+                    <input type="text" class="terminal-input" id="terminalInput" autofocus>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- AI Chatbot Widget -->
+    <div class="chatbot-widget">
+        <button class="chatbot-trigger" id="chatbotTrigger">
+            <span class="chatbot-icon">🤖</span>
+            <span class="chatbot-pulse"></span>
+        </button>
+        
+        <div class="chatbot-window" id="chatbotWindow">
+            <div class="chatbot-header">
+                <div class="chatbot-avatar">🤖</div>
+                <div class="chatbot-info">
+                    <h4>Ask Ibnu AI</h4>
+                    <span class="chatbot-status">● Online</span>
+                </div>
+                <button class="chatbot-close" id="chatbotClose">×</button>
+            </div>
+            <div class="chatbot-messages" id="chatbotMessages">
+                <div class="chat-message bot">
+                    <div class="message-content">
+                        Hi! I'm Ibnu's AI assistant. Ask me anything about his projects, interests, or experience!
+                    </div>
+                </div>
+            </div>
+            <div class="chatbot-suggestions" id="chatbotSuggestions">
+                <button class="suggestion-chip">What is HUB PKP?</button>
+                <button class="suggestion-chip">Your tech stack?</button>
+                <button class="suggestion-chip">Experience with AI?</button>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" placeholder="Type your message..." id="chatInput">
+                <button class="chat-send" id="chatSend">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="../js/main.js"></script>
+    <script src="../js/chatbot.js"></script>
+    <script src="../js/terminal.js"></script>
+    <script>
+        // Project filter functionality
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                
+                const filter = btn.dataset.filter;
+                document.querySelectorAll('.project-card').forEach(card => {
+                    if (filter === 'all' || card.dataset.category === filter) {
+                        card.style.display = 'block';
+                        card.style.animation = 'fadeIn 0.5s ease';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

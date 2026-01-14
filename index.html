@@ -1,1 +1,682 @@
-
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ibnu | AI • Blockchain • Cybersecurity</title>
+  <meta name="description" content="Subkhan Ibnu Aji - Civil Servant (CPNS) at Ministry PKP, specializing in AI, Blockchain/Crypto, and Cybersecurity. Building the future of digital transformation.">
+  <meta name="keywords" content="AI, Blockchain, Crypto, Cybersecurity, Digital Transformation, Indonesia, Government IT">
+  <meta name="author" content="Subkhan Ibnu Aji">
+  
+  <!-- Open Graph -->
+  <meta property="og:title" content="Ibnu | AI • Blockchain • Cybersecurity">
+  <meta property="og:description" content="Building the future at the intersection of AI, Blockchain, and Cybersecurity">
+  <meta property="og:type" content="website">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+</head>
+<body>
+  <!-- Particle Background Canvas -->
+  <canvas id="particleCanvas"></canvas>
+  
+  <!-- Custom Cursor -->
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+  
+  <!-- Navigation -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="index.html" class="nav-logo">
+        <span class="logo-text">IBNU</span>
+        <span class="logo-dot"></span>
+      </a>
+      
+      <div class="nav-menu" id="navMenu">
+        <a href="index.html" class="nav-link active">Home</a>
+        <a href="pages/interests.html" class="nav-link">Interests</a>
+        <a href="pages/projects.html" class="nav-link">Projects</a>
+        <a href="pages/certifications.html" class="nav-link">Credentials</a>
+        <a href="pages/about.html" class="nav-link">About</a>
+        <a href="pages/contact.html" class="nav-link nav-cta">
+          <span>Let's Connect</span>
+          <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+      
+      <div class="nav-actions">
+        <button class="cmd-trigger" id="cmdTrigger" title="Command Palette (⌘K)">
+          <i class="fas fa-search"></i>
+          <span>⌘K</span>
+        </button>
+        <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- Hero Section -->
+  <section class="hero" id="hero">
+    <div class="hero-background">
+      <div class="hero-gradient"></div>
+      <div class="hero-grid"></div>
+      <div class="hero-orbs">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+      </div>
+    </div>
+    
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span class="badge-dot"></span>
+        <span>Available for Opportunities</span>
+      </div>
+      
+      <h1 class="hero-title">
+        <span class="title-line">Hi, I'm</span>
+        <span class="title-name" data-text="Ibnu">Ibnu</span>
+      </h1>
+      
+      <div class="hero-tagline">
+        <span class="tagline-static">I explore the future of</span>
+        <div class="tagline-rotator">
+          <span class="rotate-text active" data-color="ai">Artificial Intelligence</span>
+          <span class="rotate-text" data-color="crypto">Blockchain & Crypto</span>
+          <span class="rotate-text" data-color="cyber">Cybersecurity</span>
+        </div>
+      </div>
+      
+      <p class="hero-description">
+        Civil Servant (CPNS) at Indonesia's Ministry of Housing & Settlement Areas, 
+        handling IT projects including enterprise systems like <strong>HUB PKP</strong>, <strong>SIBARU</strong>, and <strong>SIMONI</strong>. 
+        Combining government experience with deep interests in emerging technologies.
+      </p>
+      
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-icon"><i class="fas fa-certificate"></i></span>
+          <span class="stat-value">50+</span>
+          <span class="stat-label">Certifications</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon"><i class="fas fa-code-branch"></i></span>
+          <span class="stat-value">$68-100k</span>
+          <span class="stat-label">Trading Volume</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon"><i class="fas fa-graduation-cap"></i></span>
+          <span class="stat-value">MBA + S.Kom</span>
+          <span class="stat-label">Education</span>
+        </div>
+      </div>
+      
+      <div class="hero-actions">
+        <a href="pages/projects.html" class="btn btn-primary">
+          <span>Explore My Work</span>
+          <i class="fas fa-arrow-right"></i>
+        </a>
+        <a href="pages/interests.html" class="btn btn-secondary">
+          <span>My Interests</span>
+          <i class="fas fa-sparkles"></i>
+        </a>
+        <button class="btn btn-terminal" id="openTerminal">
+          <i class="fas fa-terminal"></i>
+          <span>Open Terminal</span>
+        </button>
+      </div>
+      
+      <div class="hero-scroll">
+        <span>Scroll to explore</span>
+        <div class="scroll-indicator">
+          <div class="scroll-dot"></div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 3D Visual Element -->
+    <div class="hero-visual">
+      <div class="tech-cube">
+        <div class="cube-face front"><i class="fas fa-brain"></i></div>
+        <div class="cube-face back"><i class="fab fa-bitcoin"></i></div>
+        <div class="cube-face right"><i class="fas fa-shield-halved"></i></div>
+        <div class="cube-face left"><i class="fas fa-code"></i></div>
+        <div class="cube-face top"><i class="fas fa-microchip"></i></div>
+        <div class="cube-face bottom"><i class="fas fa-network-wired"></i></div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Three Interests Section -->
+  <section class="interests-section" id="interests">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-label">Core Focus Areas</span>
+        <h2 class="section-title">Three Pillars of the Future</h2>
+        <p class="section-subtitle">
+          These technologies will fundamentally reshape how we live, work, and interact. 
+          I'm deeply invested in understanding and building with them.
+        </p>
+      </div>
+      
+      <div class="interests-grid">
+        <!-- AI Card -->
+        <div class="interest-card" data-interest="ai">
+          <div class="card-glow"></div>
+          <div class="card-border"></div>
+          <div class="card-content">
+            <div class="card-icon">
+              <div class="icon-ring"></div>
+              <i class="fas fa-brain"></i>
+            </div>
+            <h3 class="card-title">Artificial Intelligence</h3>
+            <p class="card-description">
+              From LLMs to autonomous agents, AI is becoming the most transformative 
+              technology in human history. I research agentic AI systems for government 
+              documentation and build practical solutions.
+            </p>
+            <div class="card-tags">
+              <span class="tag">LangChain</span>
+              <span class="tag">AutoGen</span>
+              <span class="tag">LLMs</span>
+              <span class="tag">RAG</span>
+            </div>
+            <div class="card-future">
+              <h4><i class="fas fa-rocket"></i> Why It Matters</h4>
+              <p>
+                AI will augment human capabilities exponentially, automating complex tasks 
+                and enabling breakthroughs in science, medicine, and governance. Those who 
+                understand AI will shape the next century.
+              </p>
+            </div>
+            <a href="pages/interests.html#ai" class="card-link">
+              <span>Deep Dive</span>
+              <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+        
+        <!-- Blockchain Card -->
+        <div class="interest-card" data-interest="crypto">
+          <div class="card-glow"></div>
+          <div class="card-border"></div>
+          <div class="card-content">
+            <div class="card-icon">
+              <div class="icon-ring"></div>
+              <i class="fab fa-bitcoin"></i>
+            </div>
+            <h3 class="card-title">Blockchain & Crypto</h3>
+            <p class="card-description">
+              Decentralized systems are rewriting the rules of finance, ownership, and trust. 
+              Active trader with $68k-$100k cumulative futures volume, disciplined risk 
+              management, and continuous blockchain upskilling.
+            </p>
+            <div class="card-tags">
+              <span class="tag">DeFi</span>
+              <span class="tag">Web3</span>
+              <span class="tag">Trading</span>
+              <span class="tag">Smart Contracts</span>
+            </div>
+            <div class="card-future">
+              <h4><i class="fas fa-rocket"></i> Why It Matters</h4>
+              <p>
+                Blockchain enables trustless systems, programmable money, and true digital 
+                ownership. It will transform finance, supply chains, identity, and governance 
+                - creating more transparent and equitable systems.
+              </p>
+            </div>
+            <a href="pages/interests.html#crypto" class="card-link">
+              <span>Deep Dive</span>
+              <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+        
+        <!-- Cybersecurity Card -->
+        <div class="interest-card" data-interest="cyber">
+          <div class="card-glow"></div>
+          <div class="card-border"></div>
+          <div class="card-content">
+            <div class="card-icon">
+              <div class="icon-ring"></div>
+              <i class="fas fa-shield-halved"></i>
+            </div>
+            <h3 class="card-title">Cybersecurity</h3>
+            <p class="card-description">
+              As our world becomes digital, protecting systems and data is critical. 
+              I study defensive security, OSINT, threat intelligence, and the dark web 
+              to understand the full security landscape.
+            </p>
+            <div class="card-tags">
+              <span class="tag">OSINT</span>
+              <span class="tag">Threat Intel</span>
+              <span class="tag">Forensics</span>
+              <span class="tag">OPSEC</span>
+            </div>
+            <div class="card-future">
+              <h4><i class="fas fa-rocket"></i> Why It Matters</h4>
+              <p>
+                Cyber threats evolve faster than defenses. Understanding security is 
+                essential for protecting infrastructure, privacy, and democracy. Security 
+                professionals will be the guardians of our digital civilization.
+              </p>
+            </div>
+            <a href="pages/interests.html#cyber" class="card-link">
+              <span>Deep Dive</span>
+              <i class="fas fa-arrow-right"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Featured Project Section -->
+  <section class="featured-section" id="featured">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-label">Government Project</span>
+        <h2 class="section-title">HUB PKP - Klinik Rumah</h2>
+        <p class="section-subtitle">
+          Digital ecosystem for self-built housing in Indonesia, integrating design 
+          consultation, permits, materials, contractors, financing, and construction monitoring.
+        </p>
+      </div>
+      
+      <div class="featured-project">
+        <div class="project-showcase">
+          <div class="showcase-frame">
+            <div class="frame-header">
+              <span class="frame-dot red"></span>
+              <span class="frame-dot yellow"></span>
+              <span class="frame-dot green"></span>
+              <span class="frame-title">HUB Rumah Swadaya Layak Huni</span>
+            </div>
+            <div class="showcase-content">
+              <div class="app-mockup">
+                <div class="mockup-screen">
+                  <div class="screen-header">
+                    <i class="fas fa-home"></i>
+                    <span>Klinik PKP</span>
+                  </div>
+                  <div class="screen-features">
+                    <div class="feature-item">
+                      <i class="fas fa-drafting-compass"></i>
+                      <span>Konsultasi Desain</span>
+                    </div>
+                    <div class="feature-item">
+                      <i class="fas fa-file-certificate"></i>
+                      <span>Perizinan PBG</span>
+                    </div>
+                    <div class="feature-item">
+                      <i class="fas fa-store"></i>
+                      <span>Toko Material</span>
+                    </div>
+                    <div class="feature-item">
+                      <i class="fas fa-hard-hat"></i>
+                      <span>Pekerja Konstruksi</span>
+                    </div>
+                    <div class="feature-item">
+                      <i class="fas fa-money-bill-wave"></i>
+                      <span>Pembiayaan</span>
+                    </div>
+                    <div class="feature-item">
+                      <i class="fas fa-clipboard-check"></i>
+                      <span>Pengawasan</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="project-info">
+          <div class="info-block">
+            <h4>The Challenge</h4>
+            <p>
+              83.99% of houses in Indonesia are self-built by communities, often without 
+              proper permits (PBG), standards compliance, or access to quality materials 
+              and skilled workers.
+            </p>
+          </div>
+          
+          <div class="info-block">
+            <h4>The Solution</h4>
+            <p>
+              HUB PKP creates an integrated digital ecosystem connecting homeowners with 
+              architects, permit systems (SIMBG), material suppliers, construction workers, 
+              and financing options - all in one platform.
+            </p>
+          </div>
+          
+          <div class="project-tech">
+            <span class="tech-badge">Government System</span>
+            <span class="tech-badge">Multi-stakeholder</span>
+            <span class="tech-badge">End-to-end Integration</span>
+          </div>
+          
+          <a href="pages/projects.html#hub-pkp" class="btn btn-primary">
+            <span>View Full Case Study</span>
+            <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Skills Overview Section -->
+  <section class="skills-section" id="skills">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-label">Capabilities</span>
+        <h2 class="section-title">Skills & Expertise</h2>
+      </div>
+      
+      <div class="skills-grid">
+        <div class="skill-category">
+          <div class="category-icon"><i class="fas fa-chess"></i></div>
+          <h3>Strategic Management</h3>
+          <ul class="skill-list">
+            <li>Strategic Planning & Analysis</li>
+            <li>Change Management</li>
+            <li>Project Execution</li>
+            <li>Industry Analysis</li>
+          </ul>
+        </div>
+        
+        <div class="skill-category">
+          <div class="category-icon"><i class="fas fa-shield-alt"></i></div>
+          <h3>Risk Management</h3>
+          <ul class="skill-list">
+            <li>Risk Assessment & Mitigation</li>
+            <li>Compliance Management</li>
+            <li>Business Continuity</li>
+            <li>Incident Management</li>
+          </ul>
+        </div>
+        
+        <div class="skill-category">
+          <div class="category-icon"><i class="fas fa-code"></i></div>
+          <h3>Technical Skills</h3>
+          <ul class="skill-list">
+            <li>Python, JavaScript, SQL</li>
+            <li>AI/ML, LangChain, RAG</li>
+            <li>Blockchain, Web3, Solidity</li>
+            <li>Cloud (AWS), DevOps</li>
+          </ul>
+        </div>
+        
+        <div class="skill-category">
+          <div class="category-icon"><i class="fas fa-chart-line"></i></div>
+          <h3>Financial Skills</h3>
+          <ul class="skill-list">
+            <li>Portfolio Management</li>
+            <li>Crypto Trading (CEX/DEX)</li>
+            <li>Financial Analysis</li>
+            <li>Risk-adjusted Returns</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="skills-cta">
+        <a href="pages/about.html#skills" class="btn btn-secondary">
+          <span>View All Skills</span>
+          <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Credentials Preview -->
+  <section class="credentials-section" id="credentials">
+    <div class="section-container">
+      <div class="section-header">
+        <span class="section-label">Education & Certifications</span>
+        <h2 class="section-title">World-Class Credentials</h2>
+        <p class="section-subtitle">
+          Continuous learning from the world's best institutions and organizations.
+        </p>
+      </div>
+      
+      <div class="credentials-showcase">
+        <div class="credential-logos">
+          <div class="logo-item" data-name="Harvard"><img src="https://upload.wikimedia.org/wikipedia/commons/c/cc/Harvard_University_coat_of_arms.svg" alt="Harvard"></div>
+          <div class="logo-item" data-name="Stanford"><img src="https://upload.wikimedia.org/wikipedia/en/b/b7/Stanford_University_seal_2003.svg" alt="Stanford"></div>
+          <div class="logo-item" data-name="Cambridge"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Coat_of_Arms_of_the_University_of_Cambridge.svg" alt="Cambridge"></div>
+          <div class="logo-item" data-name="McKinsey"><img src="https://upload.wikimedia.org/wikipedia/commons/7/79/McKinsey_%26_Company_Logo_1.svg" alt="McKinsey"></div>
+          <div class="logo-item" data-name="Google"><img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google"></div>
+          <div class="logo-item" data-name="IBM"><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/IBM_logo.svg" alt="IBM"></div>
+          <div class="logo-item" data-name="AWS"><img src="https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg" alt="AWS"></div>
+          <div class="logo-item" data-name="INSEAD"><img src="https://upload.wikimedia.org/wikipedia/commons/5/56/INSEAD_LOGO.png" alt="INSEAD"></div>
+        </div>
+        
+        <div class="credential-highlight">
+          <div class="highlight-card">
+            <div class="card-icon"><i class="fas fa-graduation-cap"></i></div>
+            <div class="card-info">
+              <h4>Education</h4>
+              <p>MBA - Universitas Gadjah Mada</p>
+              <p>S.Kom - Telkom University</p>
+              <p>TOEFL ITP: 593</p>
+            </div>
+          </div>
+          <div class="highlight-card">
+            <div class="card-icon"><i class="fas fa-certificate"></i></div>
+            <div class="card-info">
+              <h4>Certifications</h4>
+              <p>50+ Professional Certifications</p>
+              <p>From Harvard, Stanford, Google, IBM, McKinsey, BCG, and more</p>
+            </div>
+          </div>
+          <div class="highlight-card">
+            <div class="card-icon"><i class="fas fa-users"></i></div>
+            <div class="card-info">
+              <h4>Memberships</h4>
+              <p>CFA Institute, KADIN Indonesia, HIPMI JAYA, Akademi Crypto</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="credentials-cta">
+        <a href="pages/certifications.html" class="btn btn-primary">
+          <span>View All Credentials</span>
+          <i class="fas fa-arrow-right"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Contact CTA Section -->
+  <section class="contact-cta-section" id="contact-cta">
+    <div class="section-container">
+      <div class="cta-content">
+        <h2 class="cta-title">Let's Build the Future Together</h2>
+        <p class="cta-description">
+          Interested in AI, blockchain, or cybersecurity projects? 
+          Let's connect and explore possibilities.
+        </p>
+        <div class="cta-actions">
+          <a href="pages/contact.html" class="btn btn-primary btn-large">
+            <span>Get In Touch</span>
+            <i class="fas fa-arrow-right"></i>
+          </a>
+          <a href="mailto:hi@heyibnu.com" class="btn btn-secondary btn-large">
+            <i class="fas fa-envelope"></i>
+            <span>hi@heyibnu.com</span>
+          </a>
+        </div>
+        <div class="cta-socials">
+          <a href="https://github.com/subkhanibnuaji" target="_blank" class="social-link"><i class="fab fa-github"></i></a>
+          <a href="https://linkedin.com/in/subkhanibnuaji" target="_blank" class="social-link"><i class="fab fa-linkedin"></i></a>
+          <a href="https://tiktok.com/@heyibnu" target="_blank" class="social-link"><i class="fab fa-tiktok"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-main">
+        <div class="footer-brand">
+          <span class="brand-name">IBNU</span>
+          <p>Building at the intersection of AI, Blockchain, and Cybersecurity</p>
+        </div>
+        <div class="footer-links">
+          <div class="link-group">
+            <h4>Pages</h4>
+            <a href="index.html">Home</a>
+            <a href="pages/interests.html">Interests</a>
+            <a href="pages/projects.html">Projects</a>
+            <a href="pages/certifications.html">Credentials</a>
+          </div>
+          <div class="link-group">
+            <h4>Connect</h4>
+            <a href="pages/contact.html">Contact</a>
+            <a href="mailto:hi@heyibnu.com">Email</a>
+            <a href="https://linkedin.com/in/subkhanibnuaji">LinkedIn</a>
+            <a href="https://github.com/subkhanibnuaji">GitHub</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 Subkhan Ibnu Aji. All rights reserved.</p>
+        <p class="footer-note">Built with passion for technology and the future.</p>
+      </div>
+    </div>
+  </footer>
+  
+  <!-- Command Palette Modal -->
+  <div class="modal cmd-palette" id="cmdPalette">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="cmd-header">
+        <i class="fas fa-search"></i>
+        <input type="text" id="cmdInput" placeholder="Type a command or search..." autocomplete="off">
+        <kbd>ESC</kbd>
+      </div>
+      <div class="cmd-results" id="cmdResults">
+        <div class="cmd-group">
+          <div class="cmd-group-title">Navigation</div>
+          <div class="cmd-item" data-action="navigate" data-target="index.html">
+            <i class="fas fa-home"></i><span>Home</span><kbd>G H</kbd>
+          </div>
+          <div class="cmd-item" data-action="navigate" data-target="pages/interests.html">
+            <i class="fas fa-star"></i><span>Interests</span><kbd>G I</kbd>
+          </div>
+          <div class="cmd-item" data-action="navigate" data-target="pages/projects.html">
+            <i class="fas fa-folder"></i><span>Projects</span><kbd>G P</kbd>
+          </div>
+          <div class="cmd-item" data-action="navigate" data-target="pages/certifications.html">
+            <i class="fas fa-certificate"></i><span>Credentials</span><kbd>G C</kbd>
+          </div>
+          <div class="cmd-item" data-action="navigate" data-target="pages/contact.html">
+            <i class="fas fa-envelope"></i><span>Contact</span><kbd>G K</kbd>
+          </div>
+        </div>
+        <div class="cmd-group">
+          <div class="cmd-group-title">Actions</div>
+          <div class="cmd-item" data-action="terminal">
+            <i class="fas fa-terminal"></i><span>Open Terminal</span><kbd>T</kbd>
+          </div>
+          <div class="cmd-item" data-action="chatbot">
+            <i class="fas fa-robot"></i><span>AI Assistant</span><kbd>A</kbd>
+          </div>
+          <div class="cmd-item" data-action="theme">
+            <i class="fas fa-moon"></i><span>Toggle Theme</span><kbd>D</kbd>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Terminal Modal -->
+  <div class="modal terminal-modal" id="terminalModal">
+    <div class="modal-overlay"></div>
+    <div class="terminal-window">
+      <div class="terminal-header">
+        <div class="terminal-buttons">
+          <span class="term-btn close" id="closeTerminal"></span>
+          <span class="term-btn minimize"></span>
+          <span class="term-btn maximize"></span>
+        </div>
+        <span class="terminal-title">ibnu@portfolio:~</span>
+      </div>
+      <div class="terminal-body" id="terminalBody">
+        <div class="terminal-output" id="terminalOutput"></div>
+        <div class="terminal-input-line">
+          <span class="prompt">visitor@ibnu.dev:~$</span>
+          <input type="text" id="terminalInput" autocomplete="off" spellcheck="false">
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- AI Chatbot -->
+  <div class="chatbot" id="chatbot">
+    <button class="chatbot-trigger" id="chatbotTrigger">
+      <i class="fas fa-robot"></i>
+      <span class="chatbot-pulse"></span>
+    </button>
+    <div class="chatbot-window" id="chatbotWindow">
+      <div class="chatbot-header">
+        <div class="chatbot-avatar">
+          <i class="fas fa-robot"></i>
+        </div>
+        <div class="chatbot-info">
+          <h4>Ibnu AI Assistant</h4>
+          <span class="chatbot-status">
+            <span class="status-dot"></span>
+            Online
+          </span>
+        </div>
+        <button class="chatbot-close" id="chatbotClose">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="chatbot-messages" id="chatbotMessages">
+        <div class="message bot">
+          <div class="message-content">
+            <p>Hi! I'm Ibnu's AI assistant. Ask me about his skills, projects, interests in AI/Blockchain/Cybersecurity, or anything else!</p>
+          </div>
+        </div>
+      </div>
+      <div class="chatbot-suggestions">
+        <button class="suggestion" data-query="What are Ibnu's main interests?">Main interests</button>
+        <button class="suggestion" data-query="Tell me about the HUB PKP project">HUB PKP project</button>
+        <button class="suggestion" data-query="What certifications does Ibnu have?">Certifications</button>
+      </div>
+      <div class="chatbot-input">
+        <input type="text" id="chatbotInput" placeholder="Ask me anything...">
+        <button id="chatbotSend">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Scroll Progress -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+  
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+  <script src="js/chatbot.js"></script>
+  <script src="js/terminal.js"></script>
+</body>
+</html>

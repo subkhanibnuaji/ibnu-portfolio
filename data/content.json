@@ -1,0 +1,435 @@
+{
+  "profile": {
+    "name": "Subkhan Ibnu Aji",
+    "title": "S.Kom., M.B.A.",
+    "tagline": "Government Tech Leader • AI Researcher • Crypto Enthusiast",
+    "email": "hi@heyibnu.com",
+    "location": "Jakarta, Indonesia",
+    "bio": "Cross-functional professional with expertise in Digital Transformation, IT Governance, AI/ML, Blockchain/Web3, and Cybersecurity. Currently serving at Indonesia's Ministry of Housing and Settlement Areas (Kementerian PKP), handling enterprise IT projects including SIBARU, PKP HUB, and SIMONI systems.",
+    "avatar": "https://ui-avatars.com/api/?name=Ibnu&background=00d4ff&color=fff&size=200",
+    "resume_url": "#",
+    "toefl_score": "593"
+  },
+  "social": {
+    "github": "https://github.com/subkhanibnuaji",
+    "linkedin": "https://linkedin.com/in/subkhanibnuaji",
+    "twitter": "https://twitter.com/subkhanibnuaji",
+    "tiktok": "https://tiktok.com/@subkhanibnuaji",
+    "email": "hi@heyibnu.com"
+  },
+  "stats": {
+    "years_experience": "5+",
+    "projects_completed": "50+",
+    "portfolio_managed": "1T+",
+    "tiktok_followers": "40K+",
+    "certifications": "50+",
+    "futures_volume": "$68K-100K"
+  },
+  "skills": {
+    "programming": [
+      { "name": "Python", "level": 90 },
+      { "name": "JavaScript", "level": 85 },
+      { "name": "TypeScript", "level": 80 },
+      { "name": "SQL", "level": 85 },
+      { "name": "Solidity", "level": 70 },
+      { "name": "Motoko", "level": 60 }
+    ],
+    "frameworks": [
+      { "name": "React/Next.js", "level": 85 },
+      { "name": "Node.js/Express", "level": 80 },
+      { "name": "FastAPI", "level": 70 },
+      { "name": "LangChain/LangGraph", "level": 75 },
+      { "name": "TailwindCSS", "level": 85 }
+    ],
+    "ai_ml": [
+      { "name": "LLM Workflows", "level": 85 },
+      { "name": "Prompt Engineering", "level": 90 },
+      { "name": "Agentic AI Systems", "level": 80 },
+      { "name": "Computer Vision", "level": 70 },
+      { "name": "Data Engineering", "level": 75 }
+    ],
+    "blockchain": [
+      { "name": "DeFi Protocols", "level": 80 },
+      { "name": "Smart Contracts (ERC-20)", "level": 70 },
+      { "name": "ICP Development", "level": 60 },
+      { "name": "On-chain Analysis", "level": 75 },
+      { "name": "Portfolio Management", "level": 85 }
+    ],
+    "cloud_devops": [
+      { "name": "AWS", "level": 80 },
+      { "name": "Docker", "level": 70 },
+      { "name": "Linux Administration", "level": 80 },
+      { "name": "CI/CD", "level": 70 },
+      { "name": "Git/GitHub", "level": 90 }
+    ],
+    "security": [
+      { "name": "Cybersecurity Fundamentals", "level": 75 },
+      { "name": "OSINT", "level": 70 },
+      { "name": "Web Security", "level": 70 },
+      { "name": "Incident Response", "level": 65 },
+      { "name": "Risk Assessment", "level": 80 }
+    ],
+    "management": [
+      { "name": "Project Management", "level": 90 },
+      { "name": "Strategic Planning", "level": 85 },
+      { "name": "Change Management", "level": 85 },
+      { "name": "Stakeholder Management", "level": 90 },
+      { "name": "Vendor Coordination", "level": 85 }
+    ]
+  },
+  "projects": [
+    {
+      "id": "hub-pkp",
+      "name": "HUB PKP",
+      "subtitle": "Digital Housing Ecosystem",
+      "category": "Government",
+      "description": "Comprehensive digital platform for Indonesia's self-built housing program under Ministry PKP. Features include AI-powered design consultation, integrated permit processing, material marketplace, certified worker facilitation, housing finance integration, and construction monitoring.",
+      "long_description": "HUB PKP is the flagship digital platform I developed to transform Indonesia's self-built housing ecosystem. It addresses the gap between housing stakeholders and citizens who need affordable access to quality housing. The platform integrates multiple services: design consultation (prototype and custom), SIMBG permit integration, verified material suppliers, certified construction workers, banking partnerships for financing, and real-time construction monitoring.",
+      "technologies": ["React", "TypeScript", "Node.js", "PostgreSQL", "AWS", "SIMBG API"],
+      "features": [
+        "AI-powered house design consultation",
+        "Integrated permit processing (PBG/SIMBG)",
+        "Material marketplace with price comparison",
+        "Certified worker facilitation",
+        "Housing finance integration with banks",
+        "Construction monitoring system"
+      ],
+      "impact": "Streamlines housing construction process for 84% of Indonesian homes built through self-construction (swadaya)",
+      "featured": true,
+      "status": "In Development",
+      "live_url": "#",
+      "github_url": "#"
+    },
+    {
+      "id": "sibaru",
+      "name": "SIBARU",
+      "subtitle": "Ministry Information System",
+      "category": "Government",
+      "description": "Enterprise information system for ministry operations and data management.",
+      "technologies": ["React", "FastAPI", "PostgreSQL", "Docker"],
+      "featured": false,
+      "status": "Active",
+      "live_url": "#",
+      "github_url": "#"
+    },
+    {
+      "id": "simoni",
+      "name": "SIMONI",
+      "subtitle": "Monitoring & Evaluation System",
+      "category": "Government",
+      "description": "Comprehensive monitoring and evaluation system for housing program tracking and reporting.",
+      "technologies": ["React", "Node.js", "MongoDB", "Chart.js"],
+      "featured": false,
+      "status": "Active",
+      "live_url": "#",
+      "github_url": "#"
+    },
+    {
+      "id": "hospital-feasibility",
+      "name": "Hospital Feasibility Study",
+      "subtitle": "RS Wibawa Mukti Type B",
+      "category": "Healthcare",
+      "description": "Comprehensive feasibility study for 11,000 m² hospital with IDR 331B budget, including market analysis, technical review, financial projections, and risk assessment.",
+      "technologies": ["Financial Modeling", "Market Analysis", "Risk Assessment"],
+      "featured": false,
+      "status": "Completed",
+      "live_url": "#",
+      "github_url": "#"
+    },
+    {
+      "id": "rpa-solutions",
+      "name": "RPA Solutions",
+      "subtitle": "Process Automation Platform",
+      "category": "Enterprise",
+      "description": "Delivered automation solutions to 50+ clients, significantly enhancing operational efficiencies and reducing manual workload.",
+      "technologies": ["UiPath", "Power Automate", "Python", "Process Mining"],
+      "featured": false,
+      "status": "Completed",
+      "live_url": "#",
+      "github_url": "#"
+    },
+    {
+      "id": "icp-token",
+      "name": "ICP Token dApp",
+      "subtitle": "Internet Computer Token",
+      "category": "Web3",
+      "description": "Fungible token canister on Internet Computer with React frontend, featuring balance tracking, faucet, and transfer functionality.",
+      "technologies": ["Motoko", "React", "Internet Computer", "Internet Identity"],
+      "featured": false,
+      "status": "Completed",
+      "live_url": "#",
+      "github_url": "#"
+    },
+    {
+      "id": "animo-fnb",
+      "name": "Animo",
+      "subtitle": "F&B Automation System",
+      "category": "Enterprise",
+      "description": "Web-based automation tool for F&B SMEs with COGS/HPP calculation, inventory tracking, and sales logging.",
+      "technologies": ["JavaScript", "Node.js", "PostgreSQL"],
+      "featured": false,
+      "status": "Completed",
+      "live_url": "#",
+      "github_url": "#"
+    }
+  ],
+  "experience": [
+    {
+      "title": "Civil Servant (ASN)",
+      "company": "Ministry of Housing & Settlement Areas (PKP)",
+      "location": "Jakarta, Indonesia",
+      "period": "Aug 2024 - Present",
+      "description": "Managing end-to-end delivery of multiple enterprise IT applications (SIBARU, PKP HUB, SIMONI). Contributing to ministerial regulations and supporting strategic procurement for projects valued >IDR 10B.",
+      "highlights": [
+        "Lead development of PKP HUB digital housing ecosystem",
+        "Coordinate vendor delivery and user adoption",
+        "Support ministerial policy drafting",
+        "Evaluate procurement proposals >IDR 10B"
+      ],
+      "current": true
+    },
+    {
+      "title": "Founder & CEO",
+      "company": "Virtus Futura Consulting",
+      "location": "Jakarta, Indonesia",
+      "period": "Jul 2021 - Jul 2024",
+      "description": "Led project-based consulting in strategy, operations, and digital transformation across public, healthcare, and private sectors. Managed portfolio value >IDR 1T (~USD 71M).",
+      "highlights": [
+        "Hospital feasibility studies (IDR 331B project)",
+        "Healthcare turnaround management",
+        "Multi-clinic governance models",
+        "F&B scale-up operations (IDR 100M → IDR 1B/month)"
+      ],
+      "current": false
+    },
+    {
+      "title": "Founder & CEO",
+      "company": "CV Solusi Automasi Indonesia (Automate All)",
+      "location": "Bandung, Indonesia",
+      "period": "Aug 2020 - Aug 2022",
+      "description": "Grew RPA company valuation to IDR 1B through pre-seed funding efforts. Delivered automation solutions to 50+ clients across diverse industries.",
+      "highlights": [
+        "Built 100+ RPA bots for 10+ clients",
+        "Achieved IDR 1B valuation",
+        "Top 100 Startup - Startup4Industry 2021",
+        "Top 100 Startup - ASMI 2021"
+      ],
+      "current": false
+    },
+    {
+      "title": "Independent Crypto Investor",
+      "company": "Self-funded Portfolio",
+      "location": "Remote",
+      "period": "Jul 2021 - Present",
+      "description": "Managing self-funded digital asset portfolio with thesis-driven, risk-controlled approach. Core-satellite allocation with disciplined position sizing.",
+      "highlights": [
+        "$68K-100K cumulative futures volume",
+        "70% BTC / 15% Strong Altcoin / 10% Memecoin / 5% DEX allocation",
+        "Spot and CEX/DEX derivatives strategies",
+        "On-chain research for liquidity/flows analysis"
+      ],
+      "current": true
+    }
+  ],
+  "education": [
+    {
+      "degree": "Senior Executive MBA",
+      "institution": "Universitas Gadjah Mada (UGM)",
+      "location": "Jakarta, Indonesia",
+      "period": "2022 - 2024",
+      "gpa": "3.60/4.00",
+      "thesis": "Evaluation of Product Differentiation Strategy Implementation at PT Sambel Korek DNO"
+    },
+    {
+      "degree": "Bachelor of Science in Informatics",
+      "institution": "Telkom University",
+      "location": "Bandung, Indonesia",
+      "period": "2017 - 2021",
+      "gpa": "3.34/4.00",
+      "thesis": "Animo: Web-Based Automation for F&B SMEs"
+    }
+  ],
+  "certifications": {
+    "elite_universities": [
+      { "name": "Leadership", "issuer": "Harvard University", "year": "2022" },
+      { "name": "Foundations of Finance", "issuer": "University of Cambridge", "year": "2022" },
+      { "name": "Machine Learning", "issuer": "Stanford University", "year": "2022" },
+      { "name": "Game Theory", "issuer": "Stanford University", "year": "2022" },
+      { "name": "Web3 & Blockchain Fundamentals", "issuer": "INSEAD", "year": "2023" }
+    ],
+    "tech_giants": [
+      { "name": "Cybersecurity Specialization", "issuer": "Google", "year": "2024" },
+      { "name": "Business Intelligence Professional", "issuer": "Google", "year": "2024" },
+      { "name": "Project Management", "issuer": "Google", "year": "2024" },
+      { "name": "Data Engineering Specialization", "issuer": "IBM", "year": "2024" },
+      { "name": "AI Engineering Specialization", "issuer": "IBM", "year": "2024" },
+      { "name": "AWS Fundamentals", "issuer": "Amazon", "year": "2024" },
+      { "name": "Azure AI Fundamentals", "issuer": "Microsoft", "year": "2024" }
+    ],
+    "consulting": [
+      { "name": "Forward Program", "issuer": "McKinsey & Company", "year": "2022" },
+      { "name": "Strategy Consulting", "issuer": "BCG", "year": "2023" },
+      { "name": "Technology Consulting", "issuer": "Deloitte", "year": "2023" },
+      { "name": "Data Analysis: PwC Approach", "issuer": "PwC", "year": "2023" },
+      { "name": "Climate Change & Sustainability", "issuer": "EY", "year": "2023" },
+      { "name": "Audit & Assurance", "issuer": "KPMG", "year": "2023" },
+      { "name": "Strategy Consulting", "issuer": "Accenture", "year": "2022" }
+    ],
+    "finance": [
+      { "name": "Investment Banking", "issuer": "Bank of America", "year": "2023" },
+      { "name": "Commercial Banking", "issuer": "JP Morgan", "year": "2023" },
+      { "name": "Software Engineering", "issuer": "Goldman Sachs", "year": "2023" },
+      { "name": "Wealth & Personal Banking", "issuer": "Citi/HSBC", "year": "2023" }
+    ],
+    "specialized": [
+      { "name": "Robotic Process Automation", "issuer": "UiPath", "year": "2023" },
+      { "name": "Cybersecurity Operations", "issuer": "Cisco", "year": "2023" },
+      { "name": "SAP Technology Consultant", "issuer": "SAP", "year": "2023" }
+    ]
+  },
+  "organizations": [
+    {
+      "name": "CFA Institute",
+      "role": "Member",
+      "id": "200530563",
+      "period": "2024 - Present"
+    },
+    {
+      "name": "Strategic Club - MBA Student Association",
+      "role": "Member",
+      "institution": "UGM",
+      "period": "2022 - 2024"
+    },
+    {
+      "name": "KADIN Indonesia",
+      "role": "Member",
+      "id": "20203-2132274685",
+      "period": "2022 - Present"
+    },
+    {
+      "name": "BPD HIPMI JAYA",
+      "role": "Member",
+      "location": "DKI Jakarta",
+      "period": "2021 - Present"
+    },
+    {
+      "name": "JAYA GOLF CLUB",
+      "role": "Member",
+      "period": "Present"
+    },
+    {
+      "name": "Akademi Crypto",
+      "role": "Lifetime Member",
+      "period": "2023 - Present"
+    }
+  ],
+  "interests": [
+    {
+      "id": "ai",
+      "title": "Artificial Intelligence",
+      "icon": "🤖",
+      "tagline": "Building intelligent systems that augment human capability",
+      "description": "Exploring agentic AI systems, LLM workflows, and their applications in government and enterprise digital transformation.",
+      "focus_areas": [
+        "Agentic AI & Multi-Agent Systems",
+        "LLM Workflows & Prompt Engineering",
+        "AI for Government Documentation",
+        "Enterprise AI Integration"
+      ],
+      "future_impact": "AI will revolutionize government service delivery through autonomous document processing, intelligent citizen assistance, and predictive policy analysis."
+    },
+    {
+      "id": "crypto",
+      "title": "Crypto & Blockchain",
+      "icon": "🔗",
+      "tagline": "Navigating digital finance with disciplined strategy",
+      "description": "Active portfolio management with thesis-driven approach, focusing on disciplined risk controls and DeFi research.",
+      "focus_areas": [
+        "Portfolio Construction & Risk Management",
+        "DeFi Protocols & Yield Strategies",
+        "On-chain Analysis & Research",
+        "Smart Contract Development"
+      ],
+      "future_impact": "Blockchain will transform government transparency through immutable records, smart contract-based procurement, and decentralized identity systems."
+    },
+    {
+      "id": "cybersecurity",
+      "title": "Cybersecurity",
+      "icon": "🛡️",
+      "tagline": "Protecting digital assets in an evolving threat landscape",
+      "description": "Defensive security, OSINT, and threat intelligence for protecting digital assets and ensuring compliance.",
+      "focus_areas": [
+        "Defensive Security & OPSEC",
+        "OSINT & Threat Intelligence",
+        "Web Application Security",
+        "Incident Response & Forensics"
+      ],
+      "future_impact": "Robust cybersecurity will be essential as government systems become more digital, requiring proactive threat hunting and zero-trust architectures."
+    }
+  ],
+  "languages": [
+    { "name": "Indonesian", "level": "Native" },
+    { "name": "English", "level": "Advanced (C1)", "certification": "TOEFL ITP 593" },
+    { "name": "Arabic", "level": "Beginner" },
+    { "name": "Mandarin", "level": "Beginner (HSK 1)" }
+  ],
+  "awards": [
+    {
+      "title": "2nd Best Outstanding Graduate (Innovation & Entrepreneurship)",
+      "issuer": "Telkom University",
+      "year": "2022"
+    },
+    {
+      "title": "Top 100 Startup - Startup4Industry 2021",
+      "issuer": "Ministry of Industry",
+      "year": "2021"
+    },
+    {
+      "title": "Top 100 Startup - ASMI 2021",
+      "issuer": "Kemendikbud/Dikti",
+      "year": "2021"
+    },
+    {
+      "title": "Top 45 Selected Startup - Bandung Startup Pitching Day",
+      "issuer": "SBM ITB / LPIK ITB",
+      "year": "2021"
+    },
+    {
+      "title": "Top 20 Startup - BLOCK71 Community Open Incubation",
+      "issuer": "NUS Enterprise",
+      "year": "2021"
+    }
+  ],
+  "crypto_portfolio": {
+    "allocation": {
+      "bitcoin": 70,
+      "strong_altcoins": 15,
+      "memecoin": 10,
+      "dex_coins": 5
+    },
+    "trading_stats": {
+      "cumulative_futures_volume": "$68K-100K USD",
+      "strategy": "Thesis-driven, risk-controlled",
+      "focus": "Spot and CEX/DEX derivatives"
+    },
+    "approach": [
+      "Position sizing based on conviction",
+      "R-multiple risk management",
+      "On-chain research for flows/liquidity",
+      "Portfolio journaling and tracking"
+    ]
+  },
+  "settings": {
+    "theme": "dark",
+    "particles_enabled": true,
+    "cursor_enabled": true,
+    "analytics_enabled": true,
+    "maintenance_mode": false,
+    "version": "2.0.0"
+  },
+  "meta": {
+    "last_updated": "2025-01-14",
+    "author": "Subkhan Ibnu Aji",
+    "website": "https://heyibnu.com"
+  }
+}
