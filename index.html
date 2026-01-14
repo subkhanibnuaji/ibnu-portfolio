@@ -3,232 +3,373 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ibnu | Government Tech Leader & AI Researcher</title>
-  <meta name="description" content="Personal portfolio of Ibnu - ASN at Ministry PKP, AI researcher, crypto enthusiast, and content creator.">
+  <title>Ibnu | Government Tech Leader & Digital Innovator</title>
+  <meta name="description" content="Ibnu - ASN at Ministry PKP, AI Researcher, Content Creator. Building digital solutions for government and beyond.">
+  <meta name="keywords" content="Ibnu, Government Tech, AI Research, Content Creator, Indonesia">
+  <meta property="og:title" content="Ibnu | Government Tech Leader">
+  <meta property="og:description" content="Building digital solutions for government and beyond">
+  <meta property="og:type" content="website">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            'display': ['Sora', 'sans-serif'],
+            'heading': ['Space Grotesk', 'sans-serif'],
+            'body': ['Inter', 'sans-serif'],
+            'mono': ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    :root { --accent: #00d4ff; --accent2: #8b5cf6; --accent3: #13FFAA; --danger: #ff006e; --warning: #f7931a; }
+    :root {
+      --accent-cyan: #22d3ee;
+      --accent-purple: #8b5cf6;
+      --accent-emerald: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+    }
+    
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
-    body { background: #020617; color: #f8fafc; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-    
-    @media (min-width: 769px) {
-      body { cursor: none; }
-      .cursor-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9999; mix-blend-mode: difference; }
-      .cursor-ring { width: 40px; height: 40px; border: 2px solid var(--accent); border-radius: 50%; position: fixed; pointer-events: none; z-index: 9998; transition: all 0.15s; opacity: 0.5; }
-      .cursor-ring.hover { transform: scale(1.5); background: rgba(0,212,255,0.1); }
+    body { 
+      background: linear-gradient(135deg, #020617 0%, #0f172a 50%, #020617 100%);
+      color: #f1f5f9;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
     }
-    @media (max-width: 768px) { .cursor-dot, .cursor-ring { display: none !important; } }
     
-    .scroll-progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--accent2), var(--danger)); z-index: 9999; width: 0%; }
-    .grid-bg { position: fixed; inset: 0; background-image: linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px); background-size: 50px 50px; pointer-events: none; }
+    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar-track { background: #0f172a; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(var(--accent-cyan), var(--accent-purple)); border-radius: 4px; }
     
-    .gradient-text { background: linear-gradient(135deg, #00d4ff, #8b5cf6, #ff006e); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-    .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); border-radius: 20px; transition: all 0.3s; }
-    .glass:hover { background: rgba(255,255,255,0.05); border-color: rgba(0,212,255,0.3); transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 30px rgba(0,212,255,0.1); }
+    @media (min-width: 1024px) {
+      body { cursor: none; }
+      .cursor-dot { width: 6px; height: 6px; background: var(--accent-cyan); border-radius: 50%; position: fixed; pointer-events: none; z-index: 99999; }
+      .cursor-ring { width: 36px; height: 36px; border: 1.5px solid var(--accent-cyan); border-radius: 50%; position: fixed; pointer-events: none; z-index: 99998; transition: all 0.15s ease-out; opacity: 0.6; }
+      .cursor-ring.active { transform: scale(1.8); opacity: 0.3; background: rgba(34,211,238,0.1); }
+    }
+    @media (max-width: 1023px) { .cursor-dot, .cursor-ring { display: none !important; } }
+    
+    .gradient-text { 
+      background: linear-gradient(135deg, #22d3ee 0%, #8b5cf6 50%, #f43f5e 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    
+    .glass {
+      background: rgba(255,255,255,0.02); backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.05); border-radius: 20px;
+    }
+    .glass-card {
+      background: rgba(255,255,255,0.03); backdrop-filter: blur(24px);
+      border: 1px solid rgba(255,255,255,0.06); border-radius: 24px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .glass-card:hover {
+      background: rgba(255,255,255,0.05); border-color: rgba(34,211,238,0.2);
+      transform: translateY(-8px);
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5), 0 0 40px rgba(34,211,238,0.1);
+    }
     
     @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-    @keyframes pulse-glow { 0%, 100% { box-shadow: 0 0 5px var(--accent), 0 0 10px var(--accent); } 50% { box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent); } }
-    @keyframes blob { 0%, 100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; } 50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; } }
-    .animate-float { animation: float 6s ease-in-out infinite; }
-    .animate-pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
-    .animate-blob { animation: blob 8s ease-in-out infinite; }
+    @keyframes scale-in { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+    .animate-float { animation: float 8s ease-in-out infinite; }
     
-    .reveal { opacity: 0; transform: translateY(40px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
+    .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1); }
     .reveal.active { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
     
-    .skill-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
-    .skill-fill { height: 100%; border-radius: 4px; transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1); }
+    .scroll-progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple), var(--accent-rose)); z-index: 99999; }
     
-    .chatbot { position: fixed; bottom: 24px; right: 24px; z-index: 1000; }
-    .chat-btn { width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--accent2)); display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 10px 30px rgba(0,212,255,0.3); transition: all 0.3s; }
-    .chat-btn:hover { transform: scale(1.1); }
-    .chat-window { position: absolute; bottom: 80px; right: 0; width: 380px; max-width: calc(100vw - 48px); height: 500px; background: rgba(10,10,26,0.98); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; display: none; flex-direction: column; overflow: hidden; }
-    .chat-window.active { display: flex; }
+    .grid-pattern {
+      position: fixed; inset: 0; pointer-events: none; opacity: 0.3;
+      background-image: linear-gradient(rgba(34,211,238,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .gradient-orb { position: fixed; border-radius: 50%; filter: blur(80px); pointer-events: none; opacity: 0.4; }
     
-    .cmd-palette { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 10000; display: none; align-items: flex-start; justify-content: center; padding-top: 20vh; }
-    .cmd-palette.active { display: flex; }
-    .cmd-box { width: 600px; max-width: 90vw; background: rgba(15,23,42,0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden; }
+    .skill-progress { height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+    .skill-fill { height: 100%; border-radius: 3px; transition: width 1.5s cubic-bezier(0.16, 1, 0.3, 1); }
     
-    .terminal { position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10001; display: none; font-family: 'JetBrains Mono', monospace; }
-    .terminal.active { display: block; }
+    .timeline-line { position: absolute; left: 20px; top: 0; bottom: 0; width: 2px; background: linear-gradient(to bottom, var(--accent-cyan), var(--accent-purple), transparent); }
+    .timeline-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--accent-cyan); border: 3px solid #0f172a; position: absolute; left: 15px; top: 8px; z-index: 1; }
+    .timeline-dot.active { box-shadow: 0 0 20px var(--accent-cyan); }
     
-    .back-top { position: fixed; bottom: 100px; right: 24px; width: 50px; height: 50px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; cursor: pointer; opacity: 0; visibility: hidden; transition: all 0.3s; z-index: 100; }
-    .back-top.visible { opacity: 1; visibility: visible; }
-    .back-top:hover { background: var(--accent); transform: translateY(-5px); }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      color: white; font-weight: 600; padding: 14px 32px; border-radius: 12px;
+      transition: all 0.3s; position: relative; overflow: hidden;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 20px 40px rgba(34,211,238,0.3); }
     
-    .loading { position: fixed; inset: 0; background: #020617; z-index: 99999; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 24px; transition: opacity 0.5s, visibility 0.5s; }
+    .btn-secondary {
+      background: rgba(255,255,255,0.05); color: white; font-weight: 500;
+      padding: 14px 32px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); transition: all 0.3s;
+    }
+    .btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: var(--accent-cyan); }
+    
+    .tag { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 500; }
+    .tag-cyan { background: rgba(34,211,238,0.1); color: #22d3ee; border: 1px solid rgba(34,211,238,0.2); }
+    .tag-purple { background: rgba(139,92,246,0.1); color: #a78bfa; border: 1px solid rgba(139,92,246,0.2); }
+    .tag-emerald { background: rgba(16,185,129,0.1); color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
+    .tag-amber { background: rgba(245,158,11,0.1); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); }
+    .tag-rose { background: rgba(244,63,94,0.1); color: #fb7185; border: 1px solid rgba(244,63,94,0.2); }
+    
+    .chat-window { 
+      position: fixed; bottom: 100px; right: 24px; width: 400px; max-width: calc(100vw - 48px);
+      height: 520px; background: rgba(15,23,42,0.98); backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 24px;
+      display: none; flex-direction: column; z-index: 1000; overflow: hidden;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    }
+    .chat-window.active { display: flex; animation: scale-in 0.3s ease-out; }
+    
+    .cmd-palette {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
+      z-index: 10000; display: none; align-items: flex-start; justify-content: center; padding-top: 15vh;
+    }
+    .cmd-palette.active { display: flex; animation: fade-in 0.2s; }
+    .cmd-box {
+      width: 580px; max-width: 90vw; background: rgba(15,23,42,0.98);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; overflow: hidden;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5); animation: scale-in 0.2s ease-out;
+    }
+    
+    .terminal {
+      position: fixed; inset: 0; background: rgba(2,6,23,0.98); z-index: 10001;
+      display: none; font-family: 'JetBrains Mono', monospace;
+    }
+    .terminal.active { display: block; animation: fade-in 0.2s; }
+    
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; transition: all 0.3s; padding: 16px 0; }
+    nav.scrolled { background: rgba(2,6,23,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05); }
+    
+    .section-label { 
+      display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600;
+      text-transform: uppercase; letter-spacing: 2px; color: var(--accent-cyan); margin-bottom: 16px;
+    }
+    .section-label::before { content: ''; width: 24px; height: 2px; background: var(--accent-cyan); }
+    
+    .loading {
+      position: fixed; inset: 0; background: #020617; z-index: 999999;
+      display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 24px;
+      transition: opacity 0.5s, visibility 0.5s;
+    }
     .loading.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-    .load-bar { width: 200px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden; }
-    .load-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); animation: loading 1.5s ease-in-out infinite; }
-    @keyframes loading { 0% { width: 0; margin-left: 0; } 50% { width: 100%; margin-left: 0; } 100% { width: 0; margin-left: 100%; } }
+    .loader-ring { width: 48px; height: 48px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--accent-cyan); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
     
-    .font-display { font-family: 'Orbitron', sans-serif; }
-    .font-heading { font-family: 'Space Grotesk', sans-serif; }
-    .font-mono { font-family: 'JetBrains Mono', monospace; }
     .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
     
-    .github-graph { display: grid; grid-template-columns: repeat(52, 1fr); gap: 2px; }
-    .gh-cell { width: 10px; height: 10px; border-radius: 2px; background: rgba(255,255,255,0.05); }
-    .gh-cell.l1 { background: rgba(0,212,255,0.2); }
-    .gh-cell.l2 { background: rgba(0,212,255,0.4); }
-    .gh-cell.l3 { background: rgba(0,212,255,0.6); }
-    .gh-cell.l4 { background: rgba(0,212,255,0.9); }
+    .social-link {
+      width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      color: #94a3b8; transition: all 0.3s;
+    }
+    .social-link:hover { background: var(--accent-cyan); color: white; border-color: var(--accent-cyan); transform: translateY(-4px); }
     
-    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; transition: all 0.3s; }
+    .form-input {
+      width: 100%; padding: 14px 18px; border-radius: 12px;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      color: white; font-size: 15px; transition: all 0.3s;
+    }
+    .form-input:focus { outline: none; border-color: var(--accent-cyan); background: rgba(255,255,255,0.08); }
+    .form-input::placeholder { color: #64748b; }
+    
+    .project-card .project-image { transition: transform 0.5s; }
+    .project-card:hover .project-image { transform: scale(1.05); }
+    
+    .back-top {
+      position: fixed; bottom: 24px; right: 24px; width: 48px; height: 48px;
+      border-radius: 12px; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center;
+      color: white; cursor: pointer; opacity: 0; visibility: hidden; transition: all 0.3s; z-index: 90;
+    }
+    .back-top.visible { opacity: 1; visibility: visible; }
+    .back-top:hover { background: var(--accent-cyan); transform: translateY(-4px); }
+    
+    .hover-lift { transition: transform 0.3s; }
+    .hover-lift:hover { transform: translateY(-4px); }
+    
+    @media (max-width: 768px) { .container { padding: 0 16px; } .glass-card { border-radius: 16px; } }
   </style>
 </head>
 <body>
-  <!-- Loading Screen -->
+  <!-- Loading -->
   <div class="loading" id="loader">
-    <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-cyan-400 via-purple-500 to-pink-500 flex items-center justify-center animate-pulse-glow">
-      <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M13 3L4 14h7l-2 7 9-11h-7l2-7z"/></svg>
-    </div>
-    <div class="load-bar"><div class="load-fill"></div></div>
-    <p class="text-gray-400 text-sm font-mono">Initializing...</p>
+    <div class="loader-ring"></div>
+    <p class="text-gray-400 text-sm font-mono">Loading portfolio...</p>
   </div>
-
-  <!-- IMMEDIATE LOADING FIX - This runs first! -->
+  
   <script>
-  (function(){
-    function hideLoader(){
-      var l=document.getElementById('loader');
-      if(l){l.classList.add('hidden');}
-    }
-    // Multiple fallbacks to ensure loader hides
-    setTimeout(hideLoader, 1500);
-    setTimeout(hideLoader, 2500);
-    setTimeout(hideLoader, 4000);
-    window.addEventListener('load', function(){setTimeout(hideLoader,500);});
-    document.addEventListener('DOMContentLoaded', function(){setTimeout(hideLoader,1000);});
-  })();
+    (function(){
+      function hide(){var l=document.getElementById('loader');if(l)l.classList.add('hidden');}
+      setTimeout(hide,1800);setTimeout(hide,3000);
+      window.addEventListener('load',function(){setTimeout(hide,800);});
+      document.addEventListener('DOMContentLoaded',function(){setTimeout(hide,1200);});
+    })();
   </script>
 
-  <!-- Custom Cursor -->
-  <div class="cursor-dot" id="dot"></div>
-  <div class="cursor-ring" id="ring"></div>
+  <!-- Cursor -->
+  <div class="cursor-dot" id="cursorDot"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
   
-  <!-- Scroll Progress -->
-  <div class="scroll-progress" id="progress"></div>
+  <!-- Progress -->
+  <div class="scroll-progress" id="scrollProgress"></div>
   
   <!-- Background -->
-  <div class="grid-bg"></div>
-  <canvas id="particles" class="fixed inset-0 pointer-events-none"></canvas>
-  
-  <!-- Floating Orbs -->
-  <div class="fixed top-20 left-10 w-72 h-72 bg-cyan-500/20 rounded-full blur-3xl animate-blob"></div>
-  <div class="fixed top-40 right-10 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-blob" style="animation-delay: 2s"></div>
-  <div class="fixed bottom-20 left-1/3 w-80 h-80 bg-pink-500/10 rounded-full blur-3xl animate-blob" style="animation-delay: 4s"></div>
+  <div class="grid-pattern"></div>
+  <div class="gradient-orb" style="width:600px;height:600px;top:-200px;left:-200px;background:radial-gradient(circle,rgba(34,211,238,0.15),transparent 70%);"></div>
+  <div class="gradient-orb" style="width:500px;height:500px;top:40%;right:-150px;background:radial-gradient(circle,rgba(139,92,246,0.15),transparent 70%);"></div>
+  <div class="gradient-orb" style="width:400px;height:400px;bottom:-100px;left:30%;background:radial-gradient(circle,rgba(244,63,94,0.1),transparent 70%);"></div>
 
   <!-- Navigation -->
-  <nav id="nav" class="py-4">
+  <nav id="navbar">
     <div class="container flex items-center justify-between">
       <a href="#" class="font-display text-2xl font-bold gradient-text">IBNU</a>
       <div class="hidden lg:flex items-center gap-8">
-        <a href="#about" class="text-gray-400 hover:text-white transition">About</a>
-        <a href="#experience" class="text-gray-400 hover:text-white transition">Experience</a>
-        <a href="#projects" class="text-gray-400 hover:text-white transition">Projects</a>
-        <a href="#skills" class="text-gray-400 hover:text-white transition">Skills</a>
-        <a href="#contact" class="text-gray-400 hover:text-white transition">Contact</a>
+        <a href="#about" class="text-gray-400 hover:text-white transition text-sm font-medium">About</a>
+        <a href="#experience" class="text-gray-400 hover:text-white transition text-sm font-medium">Experience</a>
+        <a href="#projects" class="text-gray-400 hover:text-white transition text-sm font-medium">Projects</a>
+        <a href="#skills" class="text-gray-400 hover:text-white transition text-sm font-medium">Skills</a>
+        <a href="#contact" class="text-gray-400 hover:text-white transition text-sm font-medium">Contact</a>
       </div>
-      <div class="flex items-center gap-4">
-        <button onclick="openCmd()" class="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-gray-400 text-sm hover:border-cyan-400/30">
+      <div class="flex items-center gap-3">
+        <button onclick="openCmd()" class="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-400 text-sm hover:border-cyan-400/30 transition">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-          <span>⌘K</span>
+          <span class="font-mono text-xs">⌘K</span>
         </button>
-        <a href="#contact" class="hidden md:flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-semibold text-sm hover:shadow-lg hover:shadow-cyan-500/25 transition">Let's Talk</a>
+        <a href="#contact" class="btn-primary text-sm !py-2.5 !px-5">Let's Talk</a>
       </div>
     </div>
   </nav>
 
   <!-- Hero Section -->
-  <section class="min-h-screen flex items-center pt-20">
+  <section class="min-h-screen flex items-center pt-24 pb-16">
     <div class="container">
       <div class="max-w-4xl">
-        <div class="reveal inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-400/10 border border-emerald-400/20 text-emerald-400 text-sm mb-6">
+        <div class="reveal inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm font-medium mb-8">
           <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          Available for opportunities
+          Open to new opportunities
         </div>
         
-        <h1 class="reveal font-display text-5xl md:text-7xl lg:text-8xl font-bold mb-6">
-          <span class="text-gray-400">Hello, I'm</span><br>
-          <span class="gradient-text">IBNU</span>
+        <h1 class="reveal reveal-delay-1 font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight mb-6">
+          <span class="text-gray-400 block text-2xl sm:text-3xl md:text-4xl font-normal mb-2">Hello, I'm</span>
+          <span class="gradient-text">Subkhan Ibnu Aji</span>
         </h1>
         
-        <p class="reveal text-xl md:text-2xl text-gray-400 mb-4">
-          Government Tech Leader • AI Researcher • Crypto Enthusiast
+        <p class="reveal reveal-delay-2 text-xl md:text-2xl text-gray-400 mb-4 font-light">
+          Government Tech Professional & Digital Innovator
         </p>
         
-        <div class="reveal h-8 mb-8">
-          <span id="typed" class="text-cyan-400 font-mono text-lg"></span>
+        <div class="reveal reveal-delay-3 h-8 mb-10">
+          <span id="typedText" class="text-cyan-400 font-mono text-lg"></span>
+          <span class="inline-block w-0.5 h-5 bg-cyan-400 ml-1 animate-pulse"></span>
         </div>
         
-        <div class="reveal flex flex-wrap gap-4 mb-12">
-          <a href="#projects" class="group px-8 py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-semibold flex items-center gap-2 hover:shadow-lg hover:shadow-cyan-500/25 transition">
+        <p class="reveal reveal-delay-3 text-gray-400 text-lg leading-relaxed mb-10 max-w-2xl">
+          ASN at Ministry of Housing & Settlement Areas (PKP), passionate about leveraging technology 
+          to improve public services. Also exploring AI research and building digital content.
+        </p>
+        
+        <div class="reveal reveal-delay-4 flex flex-wrap gap-4 mb-12">
+          <a href="#projects" class="btn-primary inline-flex items-center gap-2 group">
             View My Work
-            <svg class="w-5 h-5 group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
           </a>
-          <a href="#contact" class="px-8 py-4 rounded-xl glass text-white font-semibold hover:border-cyan-400/50">Let's Connect</a>
+          <a href="#contact" class="btn-secondary inline-flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            Get In Touch
+          </a>
         </div>
         
-        <div class="reveal flex items-center gap-6">
-          <a href="https://github.com/subkhanibnuaji" target="_blank" class="text-gray-400 hover:text-white transition"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
-          <a href="https://linkedin.com/in/ibnu" target="_blank" class="text-gray-400 hover:text-white transition"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></a>
-          <a href="https://tiktok.com/@ibnu" target="_blank" class="text-gray-400 hover:text-white transition"><svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg></a>
+        <div class="reveal reveal-delay-4 flex items-center gap-3">
+          <a href="https://github.com/subkhanibnuaji" target="_blank" class="social-link" title="GitHub">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+          </a>
+          <a href="https://linkedin.com/in/subkhanibnuaji" target="_blank" class="social-link" title="LinkedIn">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+          </a>
+          <a href="https://tiktok.com/@subkhanibnuaji" target="_blank" class="social-link" title="TikTok">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>
+          </a>
+          <a href="mailto:subkhanibnuaji@gmail.com" class="social-link" title="Email">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </a>
         </div>
       </div>
     </div>
   </section>
 
   <!-- About Section -->
-  <section id="about" class="py-32">
+  <section id="about" class="py-24">
     <div class="container">
-      <div class="text-center mb-16">
-        <h2 class="reveal font-display text-4xl md:text-5xl font-bold gradient-text mb-4">About Me</h2>
-        <p class="reveal text-gray-400 text-lg">The person behind the code</p>
-      </div>
-      
-      <div class="grid lg:grid-cols-2 gap-12 items-center">
-        <div class="reveal">
+      <div class="grid lg:grid-cols-2 gap-16 items-center">
+        <div class="reveal order-2 lg:order-1">
           <div class="relative">
-            <div class="w-80 h-80 mx-auto rounded-3xl bg-gradient-to-br from-cyan-500/20 to-purple-500/20 flex items-center justify-center">
-              <div class="w-64 h-64 rounded-2xl bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center text-6xl">👨‍💻</div>
+            <div class="aspect-square max-w-md mx-auto rounded-3xl overflow-hidden glass-card p-2">
+              <div class="w-full h-full rounded-2xl bg-gradient-to-br from-cyan-500/20 via-purple-500/20 to-rose-500/20 flex items-center justify-center">
+                <div class="text-center">
+                  <div class="w-32 h-32 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center text-6xl shadow-lg shadow-cyan-500/25">👨‍💻</div>
+                  <p class="text-gray-400 text-sm font-medium">Subkhan Ibnu Aji</p>
+                </div>
+              </div>
             </div>
-            <div class="absolute -bottom-4 -right-4 glass px-4 py-2 rounded-xl">
-              <p class="text-cyan-400 font-mono text-sm">10+ Years Experience</p>
-            </div>
+            <div class="absolute -top-4 -right-4 glass px-4 py-3 rounded-xl animate-float" style="animation-delay:0s;"><p class="text-cyan-400 font-mono text-sm font-medium">🎓 S1 CS + MBA</p></div>
+            <div class="absolute -bottom-4 -left-4 glass px-4 py-3 rounded-xl animate-float" style="animation-delay:2s;"><p class="text-emerald-400 font-mono text-sm font-medium">📍 Jakarta, ID</p></div>
           </div>
         </div>
         
-        <div>
-          <p class="reveal text-gray-300 text-lg leading-relaxed mb-6">
-            I'm a <span class="text-cyan-400 font-semibold">Government Technology Leader</span> at Indonesia's Ministry of Housing and Settlement Areas (Kementerian PKP), where I manage large-scale IT projects worth over <span class="text-emerald-400 font-semibold">IDR 1 Trillion</span>.
-          </p>
-          <p class="reveal text-gray-300 text-lg leading-relaxed mb-6">
-            With a background in <span class="text-purple-400 font-semibold">Computer Science</span> from Telkom University and an <span class="text-purple-400 font-semibold">MBA</span> from UGM, I bridge the gap between technical expertise and strategic leadership.
-          </p>
-          <p class="reveal text-gray-300 text-lg leading-relaxed mb-8">
-            Beyond my government role, I'm passionate about <span class="text-pink-400 font-semibold">AI research</span>, <span class="text-amber-400 font-semibold">cryptocurrency trading</span>, and creating content for my <span class="text-cyan-400 font-semibold">40,000+ TikTok followers</span>.
-          </p>
+        <div class="order-1 lg:order-2">
+          <div class="section-label reveal">About Me</div>
+          <h2 class="reveal reveal-delay-1 font-display text-3xl md:text-4xl font-bold text-white mb-6">
+            Bridging Technology & <span class="gradient-text">Public Service</span>
+          </h2>
           
-          <div class="reveal grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="glass p-4 text-center">
-              <p class="text-3xl font-bold gradient-text">10+</p>
-              <p class="text-gray-400 text-sm">Years Exp</p>
+          <div class="space-y-4 text-gray-400 leading-relaxed">
+            <p class="reveal reveal-delay-2">
+              I'm an <span class="text-cyan-400 font-medium">Aparatur Sipil Negara (ASN)</span> at Indonesia's 
+              Ministry of Housing and Settlement Areas (Kementerian PKP), where I work on digital transformation 
+              initiatives for government services.
+            </p>
+            <p class="reveal reveal-delay-3">
+              With a background in <span class="text-purple-400 font-medium">Computer Science</span> from Telkom University 
+              and an <span class="text-purple-400 font-medium">MBA</span> from Universitas Gadjah Mada, I combine technical 
+              expertise with strategic thinking.
+            </p>
+            <p class="reveal reveal-delay-4">
+              Outside of my government role, I'm passionate about <span class="text-emerald-400 font-medium">AI research</span>, 
+              exploring <span class="text-amber-400 font-medium">blockchain technology</span>, and creating educational 
+              content for my growing social media community.
+            </p>
+          </div>
+          
+          <div class="reveal reveal-delay-4 grid grid-cols-2 sm:grid-cols-4 gap-4 mt-10">
+            <div class="glass-card p-4 text-center">
+              <p class="text-2xl font-bold gradient-text">5+</p>
+              <p class="text-gray-500 text-sm mt-1">Years Exp</p>
             </div>
-            <div class="glass p-4 text-center">
-              <p class="text-3xl font-bold gradient-text">1T+</p>
-              <p class="text-gray-400 text-sm">IDR Managed</p>
+            <div class="glass-card p-4 text-center">
+              <p class="text-2xl font-bold gradient-text">20+</p>
+              <p class="text-gray-500 text-sm mt-1">Projects</p>
             </div>
-            <div class="glass p-4 text-center">
-              <p class="text-3xl font-bold gradient-text">50+</p>
-              <p class="text-gray-400 text-sm">Projects</p>
+            <div class="glass-card p-4 text-center">
+              <p class="text-2xl font-bold gradient-text">593</p>
+              <p class="text-gray-500 text-sm mt-1">TOEFL ITP</p>
             </div>
-            <div class="glass p-4 text-center">
-              <p class="text-3xl font-bold gradient-text">40K+</p>
-              <p class="text-gray-400 text-sm">Followers</p>
+            <div class="glass-card p-4 text-center">
+              <p class="text-2xl font-bold gradient-text">40K+</p>
+              <p class="text-gray-500 text-sm mt-1">Followers</p>
             </div>
           </div>
         </div>
@@ -237,62 +378,107 @@
   </section>
 
   <!-- Experience Section -->
-  <section id="experience" class="py-32 relative">
+  <section id="experience" class="py-24 relative">
     <div class="container">
       <div class="text-center mb-16">
-        <h2 class="reveal font-display text-4xl md:text-5xl font-bold gradient-text mb-4">Experience</h2>
-        <p class="reveal text-gray-400 text-lg">My professional journey</p>
+        <div class="section-label reveal justify-center">Career Journey</div>
+        <h2 class="reveal reveal-delay-1 font-display text-3xl md:text-4xl font-bold text-white">Professional <span class="gradient-text">Experience</span></h2>
       </div>
       
-      <div class="max-w-3xl mx-auto space-y-8">
-        <div class="reveal glass p-8 relative overflow-hidden border-l-4 border-cyan-400">
-          <div class="absolute top-0 right-0 w-32 h-32 bg-cyan-400/10 rounded-full blur-2xl"></div>
-          <div class="flex flex-wrap justify-between items-start mb-4">
-            <div>
-              <h3 class="text-xl font-bold text-white">IT Project Manager</h3>
-              <p class="text-cyan-400">Kementerian PKP</p>
+      <div class="max-w-3xl mx-auto">
+        <div class="relative pl-12">
+          <div class="timeline-line"></div>
+          
+          <div class="reveal mb-12 relative">
+            <div class="timeline-dot active"></div>
+            <div class="glass-card p-6 md:p-8">
+              <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
+                <div>
+                  <h3 class="text-xl font-bold text-white">IT Staff / Project Coordinator</h3>
+                  <p class="text-cyan-400 font-medium">Kementerian Perumahan dan Kawasan Permukiman</p>
+                </div>
+                <span class="tag tag-cyan">2020 - Present</span>
+              </div>
+              <p class="text-gray-400 mb-4 leading-relaxed">
+                Supporting digital transformation initiatives within the ministry. Coordinating IT projects 
+                including internal systems development, managing vendor relationships, and ensuring smooth 
+                implementation of technology solutions.
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <span class="tag tag-purple">Project Coordination</span>
+                <span class="tag tag-emerald">System Development</span>
+                <span class="tag tag-amber">Vendor Management</span>
+              </div>
             </div>
-            <span class="px-3 py-1 rounded-full bg-cyan-400/10 text-cyan-400 text-sm">2020 - Present</span>
           </div>
-          <p class="text-gray-400 mb-4">Managing enterprise IT projects including SIBARU, PKP HUB, and SIMONI systems worth over IDR 1 Trillion.</p>
-          <div class="flex flex-wrap gap-2">
-            <span class="px-3 py-1 rounded-full bg-white/5 text-gray-300 text-sm">Project Management</span>
-            <span class="px-3 py-1 rounded-full bg-white/5 text-gray-300 text-sm">Enterprise Systems</span>
-            <span class="px-3 py-1 rounded-full bg-white/5 text-gray-300 text-sm">Government Tech</span>
-          </div>
-        </div>
-        
-        <div class="reveal glass p-8 relative overflow-hidden border-l-4 border-purple-400">
-          <div class="absolute top-0 right-0 w-32 h-32 bg-purple-400/10 rounded-full blur-2xl"></div>
-          <div class="flex flex-wrap justify-between items-start mb-4">
-            <div>
-              <h3 class="text-xl font-bold text-white">AI Researcher</h3>
-              <p class="text-purple-400">Independent</p>
+          
+          <div class="reveal mb-12 relative">
+            <div class="timeline-dot"></div>
+            <div class="glass-card p-6 md:p-8">
+              <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
+                <div>
+                  <h3 class="text-xl font-bold text-white">AI Research Enthusiast</h3>
+                  <p class="text-purple-400 font-medium">Independent / Self-Study</p>
+                </div>
+                <span class="tag tag-purple">2022 - Present</span>
+              </div>
+              <p class="text-gray-400 mb-4 leading-relaxed">
+                Exploring applications of AI and machine learning for government documentation and workflow 
+                automation. Actively learning about LLMs, prompt engineering, and agentic AI systems. 
+                Aspiring to pursue further academic research (Fulbright AMINEF applicant).
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <span class="tag tag-cyan">Machine Learning</span>
+                <span class="tag tag-purple">LLM Applications</span>
+                <span class="tag tag-emerald">Research</span>
+              </div>
             </div>
-            <span class="px-3 py-1 rounded-full bg-purple-400/10 text-purple-400 text-sm">2022 - Present</span>
           </div>
-          <p class="text-gray-400 mb-4">Researching Autonomous Agentic AI for Government Documentation. PhD candidate and Fulbright AMINEF applicant.</p>
-          <div class="flex flex-wrap gap-2">
-            <span class="px-3 py-1 rounded-full bg-white/5 text-gray-300 text-sm">Machine Learning</span>
-            <span class="px-3 py-1 rounded-full bg-white/5 text-gray-300 text-sm">LLMs</span>
-            <span class="px-3 py-1 rounded-full bg-white/5 text-gray-300 text-sm">Research</span>
-          </div>
-        </div>
-        
-        <div class="reveal glass p-8 relative overflow-hidden border-l-4 border-amber-400">
-          <div class="absolute top-0 right-0 w-32 h-32 bg-amber-400/10 rounded-full blur-2xl"></div>
-          <div class="flex flex-wrap justify-between items-start mb-4">
-            <div>
-              <h3 class="text-xl font-bold text-white">Content Creator & Crypto Trader</h3>
-              <p class="text-amber-400">Self-employed</p>
+          
+          <div class="reveal mb-12 relative">
+            <div class="timeline-dot"></div>
+            <div class="glass-card p-6 md:p-8">
+              <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
+                <div>
+                  <h3 class="text-xl font-bold text-white">Content Creator</h3>
+                  <p class="text-amber-400 font-medium">TikTok & Social Media</p>
+                </div>
+                <span class="tag tag-amber">2021 - Present</span>
+              </div>
+              <p class="text-gray-400 mb-4 leading-relaxed">
+                Creating educational and entertaining content about technology, career development, 
+                and personal finance. Building an engaged community of 40,000+ followers interested 
+                in tech trends, productivity tips, and ASN life.
+              </p>
+              <div class="flex flex-wrap gap-2">
+                <span class="tag tag-rose">Content Strategy</span>
+                <span class="tag tag-amber">Video Production</span>
+                <span class="tag tag-cyan">Community Building</span>
+              </div>
             </div>
-            <span class="px-3 py-1 rounded-full bg-amber-400/10 text-amber-400 text-sm">2021 - Present</span>
           </div>
-          <p class="text-gray-400 mb-4">Building a 40K+ TikTok following while actively trading cryptocurrency and exploring DeFi protocols.</p>
-          <div class="flex flex-wrap gap-2">
-            <span class="px-3 py-1 rounded-full bg-white/5 text-gray-300 text-sm">Content Creation</span>
-            <span class="px-3 py-1 rounded-full bg-white/5 text-gray-300 text-sm">Crypto Trading</span>
-            <span class="px-3 py-1 rounded-full bg-white/5 text-gray-300 text-sm">Web3</span>
+          
+          <div class="reveal relative">
+            <div class="timeline-dot"></div>
+            <div class="glass-card p-6 md:p-8">
+              <div class="flex flex-wrap items-start justify-between gap-4 mb-4">
+                <div>
+                  <h3 class="text-xl font-bold text-white">Education</h3>
+                  <p class="text-emerald-400 font-medium">Academic Background</p>
+                </div>
+                <span class="tag tag-emerald">2012 - 2019</span>
+              </div>
+              <div class="space-y-4 text-gray-400">
+                <div class="flex items-start gap-3">
+                  <span class="text-xl">🎓</span>
+                  <div><p class="text-white font-medium">MBA - Management</p><p class="text-sm">Universitas Gadjah Mada (UGM)</p></div>
+                </div>
+                <div class="flex items-start gap-3">
+                  <span class="text-xl">🎓</span>
+                  <div><p class="text-white font-medium">S1 - Computer Science</p><p class="text-sm">Telkom University</p></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -300,68 +486,105 @@
   </section>
 
   <!-- Projects Section -->
-  <section id="projects" class="py-32">
+  <section id="projects" class="py-24">
     <div class="container">
       <div class="text-center mb-16">
-        <h2 class="reveal font-display text-4xl md:text-5xl font-bold gradient-text mb-4">Projects</h2>
-        <p class="reveal text-gray-400 text-lg">Featured work and case studies</p>
+        <div class="section-label reveal justify-center">Portfolio</div>
+        <h2 class="reveal reveal-delay-1 font-display text-3xl md:text-4xl font-bold text-white mb-4">Featured <span class="gradient-text">Projects</span></h2>
+        <p class="reveal reveal-delay-2 text-gray-400 max-w-2xl mx-auto">A selection of projects I've contributed to or built independently</p>
       </div>
       
       <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <div class="reveal glass overflow-hidden group">
-          <div class="aspect-video relative overflow-hidden bg-gradient-to-br from-cyan-500/20 to-blue-500/20">
-            <div class="absolute inset-0 flex items-center justify-center text-6xl">🏛️</div>
-            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition flex items-end p-6">
-              <a href="#" class="px-4 py-2 rounded-lg bg-white/20 text-white text-sm backdrop-blur">View Project →</a>
-            </div>
+        <div class="reveal glass-card project-card overflow-hidden">
+          <div class="aspect-video relative overflow-hidden bg-gradient-to-br from-cyan-500/20 to-cyan-700/20">
+            <div class="project-image absolute inset-0 flex items-center justify-center"><div class="text-6xl">🏛️</div></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+            <div class="absolute bottom-4 left-4 right-4"><span class="tag tag-cyan text-xs">Government System</span></div>
           </div>
           <div class="p-6">
-            <span class="text-cyan-400 text-sm font-mono">Government System</span>
-            <h3 class="text-xl font-bold text-white mt-2 mb-3">SIBARU</h3>
-            <p class="text-gray-400 text-sm mb-4">Integrated building permit management system for the Ministry of PKP.</p>
+            <h3 class="text-lg font-bold text-white mb-2">Internal Ministry Systems</h3>
+            <p class="text-gray-400 text-sm mb-4 leading-relaxed">Contributed to development and coordination of internal information systems for ministry operations.</p>
             <div class="flex flex-wrap gap-2">
-              <span class="px-2 py-1 rounded bg-white/5 text-gray-400 text-xs">React</span>
-              <span class="px-2 py-1 rounded bg-white/5 text-gray-400 text-xs">Node.js</span>
-              <span class="px-2 py-1 rounded bg-white/5 text-gray-400 text-xs">PostgreSQL</span>
+              <span class="px-2 py-1 rounded-md bg-white/5 text-gray-400 text-xs">Coordination</span>
+              <span class="px-2 py-1 rounded-md bg-white/5 text-gray-400 text-xs">Documentation</span>
             </div>
           </div>
         </div>
         
-        <div class="reveal glass overflow-hidden group">
-          <div class="aspect-video relative overflow-hidden bg-gradient-to-br from-purple-500/20 to-pink-500/20">
-            <div class="absolute inset-0 flex items-center justify-center text-6xl">🤖</div>
-            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition flex items-end p-6">
-              <a href="#" class="px-4 py-2 rounded-lg bg-white/20 text-white text-sm backdrop-blur">View Project →</a>
-            </div>
+        <div class="reveal reveal-delay-1 glass-card project-card overflow-hidden">
+          <div class="aspect-video relative overflow-hidden bg-gradient-to-br from-purple-500/20 to-purple-700/20">
+            <div class="project-image absolute inset-0 flex items-center justify-center"><div class="text-6xl">🤖</div></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+            <div class="absolute bottom-4 left-4 right-4"><span class="tag tag-purple text-xs">AI / Research</span></div>
           </div>
           <div class="p-6">
-            <span class="text-purple-400 text-sm font-mono">AI/ML Project</span>
-            <h3 class="text-xl font-bold text-white mt-2 mb-3">AI Doc Processor</h3>
-            <p class="text-gray-400 text-sm mb-4">Autonomous AI system for government document processing and analysis.</p>
+            <h3 class="text-lg font-bold text-white mb-2">AI Document Assistant</h3>
+            <p class="text-gray-400 text-sm mb-4 leading-relaxed">Personal project exploring AI-powered document processing using LLMs and RAG architecture.</p>
             <div class="flex flex-wrap gap-2">
-              <span class="px-2 py-1 rounded bg-white/5 text-gray-400 text-xs">Python</span>
-              <span class="px-2 py-1 rounded bg-white/5 text-gray-400 text-xs">LangChain</span>
-              <span class="px-2 py-1 rounded bg-white/5 text-gray-400 text-xs">OpenAI</span>
+              <span class="px-2 py-1 rounded-md bg-white/5 text-gray-400 text-xs">Python</span>
+              <span class="px-2 py-1 rounded-md bg-white/5 text-gray-400 text-xs">LangChain</span>
             </div>
           </div>
         </div>
         
-        <div class="reveal glass overflow-hidden group">
+        <div class="reveal reveal-delay-2 glass-card project-card overflow-hidden">
           <div class="aspect-video relative overflow-hidden bg-gradient-to-br from-amber-500/20 to-orange-500/20">
-            <div class="absolute inset-0 flex items-center justify-center text-6xl">📊</div>
-            <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition flex items-end p-6">
-              <a href="#" class="px-4 py-2 rounded-lg bg-white/20 text-white text-sm backdrop-blur">View Project →</a>
-            </div>
+            <div class="project-image absolute inset-0 flex items-center justify-center"><div class="text-6xl">📊</div></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+            <div class="absolute bottom-4 left-4 right-4"><span class="tag tag-amber text-xs">Web3 / Personal</span></div>
           </div>
           <div class="p-6">
-            <span class="text-amber-400 text-sm font-mono">Web3/DeFi</span>
-            <h3 class="text-xl font-bold text-white mt-2 mb-3">DeFi Dashboard</h3>
-            <p class="text-gray-400 text-sm mb-4">Personal cryptocurrency portfolio tracker with DeFi protocol integration.</p>
+            <h3 class="text-lg font-bold text-white mb-2">Crypto Portfolio Tracker</h3>
+            <p class="text-gray-400 text-sm mb-4 leading-relaxed">Personal tool for tracking cryptocurrency investments and analyzing portfolio performance.</p>
             <div class="flex flex-wrap gap-2">
-              <span class="px-2 py-1 rounded bg-white/5 text-gray-400 text-xs">Next.js</span>
-              <span class="px-2 py-1 rounded bg-white/5 text-gray-400 text-xs">Web3.js</span>
-              <span class="px-2 py-1 rounded bg-white/5 text-gray-400 text-xs">Ethereum</span>
+              <span class="px-2 py-1 rounded-md bg-white/5 text-gray-400 text-xs">Next.js</span>
+              <span class="px-2 py-1 rounded-md bg-white/5 text-gray-400 text-xs">Web3.js</span>
             </div>
+          </div>
+        </div>
+        
+        <div class="reveal glass-card project-card overflow-hidden">
+          <div class="aspect-video relative overflow-hidden bg-gradient-to-br from-rose-500/20 to-pink-500/20">
+            <div class="project-image absolute inset-0 flex items-center justify-center"><div class="text-6xl">🎬</div></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+            <div class="absolute bottom-4 left-4 right-4"><span class="tag tag-rose text-xs">Content</span></div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-lg font-bold text-white mb-2">TikTok Content Series</h3>
+            <p class="text-gray-400 text-sm mb-4 leading-relaxed">Educational content about tech careers, productivity, and ASN life with 40K+ followers.</p>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-2 py-1 rounded-md bg-white/5 text-gray-400 text-xs">Video Editing</span>
+              <span class="px-2 py-1 rounded-md bg-white/5 text-gray-400 text-xs">Storytelling</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="reveal reveal-delay-1 glass-card project-card overflow-hidden">
+          <div class="aspect-video relative overflow-hidden bg-gradient-to-br from-emerald-500/20 to-teal-500/20">
+            <div class="project-image absolute inset-0 flex items-center justify-center"><div class="text-6xl">🌐</div></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+            <div class="absolute bottom-4 left-4 right-4"><span class="tag tag-emerald text-xs">Web Development</span></div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-lg font-bold text-white mb-2">This Portfolio</h3>
+            <p class="text-gray-400 text-sm mb-4 leading-relaxed">A modern, interactive portfolio website with AI chatbot and terminal interface.</p>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-2 py-1 rounded-md bg-white/5 text-gray-400 text-xs">HTML/CSS</span>
+              <span class="px-2 py-1 rounded-md bg-white/5 text-gray-400 text-xs">JavaScript</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="reveal reveal-delay-2 glass-card project-card overflow-hidden opacity-60">
+          <div class="aspect-video relative overflow-hidden bg-gradient-to-br from-gray-500/20 to-gray-700/20">
+            <div class="project-image absolute inset-0 flex items-center justify-center"><div class="text-6xl">🚀</div></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
+            <div class="absolute bottom-4 left-4 right-4"><span class="tag bg-gray-500/20 text-gray-400 border-gray-500/30 text-xs">Coming Soon</span></div>
+          </div>
+          <div class="p-6">
+            <h3 class="text-lg font-bold text-white mb-2">More Projects</h3>
+            <p class="text-gray-400 text-sm mb-4 leading-relaxed">Always working on something new. Stay tuned for upcoming projects!</p>
+            <div class="flex flex-wrap gap-2"><span class="px-2 py-1 rounded-md bg-white/5 text-gray-400 text-xs">???</span></div>
           </div>
         </div>
       </div>
@@ -369,131 +592,117 @@
   </section>
 
   <!-- Skills Section -->
-  <section id="skills" class="py-32">
+  <section id="skills" class="py-24">
     <div class="container">
       <div class="text-center mb-16">
-        <h2 class="reveal font-display text-4xl md:text-5xl font-bold gradient-text mb-4">Skills</h2>
-        <p class="reveal text-gray-400 text-lg">Technologies I work with</p>
+        <div class="section-label reveal justify-center">Capabilities</div>
+        <h2 class="reveal reveal-delay-1 font-display text-3xl md:text-4xl font-bold text-white mb-4">Skills & <span class="gradient-text">Expertise</span></h2>
+        <p class="reveal reveal-delay-2 text-gray-400 max-w-2xl mx-auto">A diverse skill set spanning technology, management, and communication</p>
       </div>
       
-      <div class="grid md:grid-cols-2 gap-12">
-        <div class="reveal">
-          <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
-            <span class="text-cyan-400">💻</span> Programming & Frameworks
-          </h3>
-          <div class="space-y-4">
-            <div>
-              <div class="flex justify-between mb-2"><span class="text-gray-300">Python</span><span class="text-cyan-400">95%</span></div>
-              <div class="skill-bar"><div class="skill-fill bg-gradient-to-r from-cyan-400 to-cyan-500" style="width: 95%"></div></div>
+      <div class="grid lg:grid-cols-3 gap-8">
+        <div class="reveal glass-card p-8">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-12 h-12 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
             </div>
-            <div>
-              <div class="flex justify-between mb-2"><span class="text-gray-300">TypeScript/JavaScript</span><span class="text-cyan-400">90%</span></div>
-              <div class="skill-bar"><div class="skill-fill bg-gradient-to-r from-cyan-400 to-purple-500" style="width: 90%"></div></div>
-            </div>
-            <div>
-              <div class="flex justify-between mb-2"><span class="text-gray-300">React/Next.js</span><span class="text-cyan-400">90%</span></div>
-              <div class="skill-bar"><div class="skill-fill bg-gradient-to-r from-purple-400 to-purple-500" style="width: 90%"></div></div>
-            </div>
-            <div>
-              <div class="flex justify-between mb-2"><span class="text-gray-300">SQL/PostgreSQL</span><span class="text-cyan-400">85%</span></div>
-              <div class="skill-bar"><div class="skill-fill bg-gradient-to-r from-purple-400 to-pink-500" style="width: 85%"></div></div>
-            </div>
+            <h3 class="text-xl font-bold text-white">Technical</h3>
+          </div>
+          <div class="space-y-5">
+            <div><div class="flex justify-between mb-2"><span class="text-gray-300 text-sm font-medium">Python</span><span class="text-cyan-400 text-sm">Advanced</span></div><div class="skill-progress"><div class="skill-fill bg-gradient-to-r from-cyan-400 to-cyan-500" style="width:85%"></div></div></div>
+            <div><div class="flex justify-between mb-2"><span class="text-gray-300 text-sm font-medium">JavaScript / TypeScript</span><span class="text-cyan-400 text-sm">Intermediate</span></div><div class="skill-progress"><div class="skill-fill bg-gradient-to-r from-cyan-400 to-purple-500" style="width:70%"></div></div></div>
+            <div><div class="flex justify-between mb-2"><span class="text-gray-300 text-sm font-medium">SQL / Database</span><span class="text-cyan-400 text-sm">Intermediate</span></div><div class="skill-progress"><div class="skill-fill bg-gradient-to-r from-purple-400 to-purple-500" style="width:70%"></div></div></div>
+            <div><div class="flex justify-between mb-2"><span class="text-gray-300 text-sm font-medium">AI / ML Tools</span><span class="text-cyan-400 text-sm">Learning</span></div><div class="skill-progress"><div class="skill-fill bg-gradient-to-r from-purple-400 to-rose-500" style="width:60%"></div></div></div>
+            <div><div class="flex justify-between mb-2"><span class="text-gray-300 text-sm font-medium">Web3 / Blockchain</span><span class="text-cyan-400 text-sm">Learning</span></div><div class="skill-progress"><div class="skill-fill bg-gradient-to-r from-amber-400 to-amber-500" style="width:50%"></div></div></div>
           </div>
         </div>
         
-        <div class="reveal">
-          <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
-            <span class="text-purple-400">🧠</span> AI & Emerging Tech
-          </h3>
-          <div class="space-y-4">
-            <div>
-              <div class="flex justify-between mb-2"><span class="text-gray-300">Machine Learning</span><span class="text-purple-400">90%</span></div>
-              <div class="skill-bar"><div class="skill-fill bg-gradient-to-r from-purple-400 to-purple-500" style="width: 90%"></div></div>
+        <div class="reveal reveal-delay-1 glass-card p-8">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
             </div>
-            <div>
-              <div class="flex justify-between mb-2"><span class="text-gray-300">LLMs/LangChain</span><span class="text-purple-400">85%</span></div>
-              <div class="skill-bar"><div class="skill-fill bg-gradient-to-r from-purple-400 to-pink-500" style="width: 85%"></div></div>
+            <h3 class="text-xl font-bold text-white">Management</h3>
+          </div>
+          <div class="space-y-5">
+            <div><div class="flex justify-between mb-2"><span class="text-gray-300 text-sm font-medium">Project Coordination</span><span class="text-purple-400 text-sm">Strong</span></div><div class="skill-progress"><div class="skill-fill bg-gradient-to-r from-purple-400 to-purple-500" style="width:85%"></div></div></div>
+            <div><div class="flex justify-between mb-2"><span class="text-gray-300 text-sm font-medium">Documentation</span><span class="text-purple-400 text-sm">Strong</span></div><div class="skill-progress"><div class="skill-fill bg-gradient-to-r from-purple-400 to-cyan-500" style="width:85%"></div></div></div>
+            <div><div class="flex justify-between mb-2"><span class="text-gray-300 text-sm font-medium">Stakeholder Communication</span><span class="text-purple-400 text-sm">Good</span></div><div class="skill-progress"><div class="skill-fill bg-gradient-to-r from-emerald-400 to-emerald-500" style="width:75%"></div></div></div>
+            <div><div class="flex justify-between mb-2"><span class="text-gray-300 text-sm font-medium">Vendor Management</span><span class="text-purple-400 text-sm">Good</span></div><div class="skill-progress"><div class="skill-fill bg-gradient-to-r from-emerald-400 to-teal-500" style="width:70%"></div></div></div>
+            <div><div class="flex justify-between mb-2"><span class="text-gray-300 text-sm font-medium">Strategic Planning</span><span class="text-purple-400 text-sm">Developing</span></div><div class="skill-progress"><div class="skill-fill bg-gradient-to-r from-amber-400 to-amber-500" style="width:65%"></div></div></div>
+          </div>
+        </div>
+        
+        <div class="reveal reveal-delay-2 glass-card p-8">
+          <div class="flex items-center gap-3 mb-6">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
             </div>
-            <div>
-              <div class="flex justify-between mb-2"><span class="text-gray-300">Blockchain/Web3</span><span class="text-purple-400">70%</span></div>
-              <div class="skill-bar"><div class="skill-fill bg-gradient-to-r from-amber-400 to-amber-500" style="width: 70%"></div></div>
-            </div>
-            <div>
-              <div class="flex justify-between mb-2"><span class="text-gray-300">Cloud/DevOps</span><span class="text-purple-400">80%</span></div>
-              <div class="skill-bar"><div class="skill-fill bg-gradient-to-r from-emerald-400 to-emerald-500" style="width: 80%"></div></div>
-            </div>
+            <h3 class="text-xl font-bold text-white">Soft Skills</h3>
+          </div>
+          <div class="space-y-5">
+            <div><div class="flex justify-between mb-2"><span class="text-gray-300 text-sm font-medium">Public Speaking</span><span class="text-emerald-400 text-sm">Good</span></div><div class="skill-progress"><div class="skill-fill bg-gradient-to-r from-emerald-400 to-emerald-500" style="width:75%"></div></div></div>
+            <div><div class="flex justify-between mb-2"><span class="text-gray-300 text-sm font-medium">Content Creation</span><span class="text-emerald-400 text-sm">Strong</span></div><div class="skill-progress"><div class="skill-fill bg-gradient-to-r from-rose-400 to-rose-500" style="width:80%"></div></div></div>
+            <div><div class="flex justify-between mb-2"><span class="text-gray-300 text-sm font-medium">English (TOEFL 593)</span><span class="text-emerald-400 text-sm">Proficient</span></div><div class="skill-progress"><div class="skill-fill bg-gradient-to-r from-cyan-400 to-cyan-500" style="width:80%"></div></div></div>
+            <div><div class="flex justify-between mb-2"><span class="text-gray-300 text-sm font-medium">Problem Solving</span><span class="text-emerald-400 text-sm">Strong</span></div><div class="skill-progress"><div class="skill-fill bg-gradient-to-r from-purple-400 to-purple-500" style="width:80%"></div></div></div>
+            <div><div class="flex justify-between mb-2"><span class="text-gray-300 text-sm font-medium">Continuous Learning</span><span class="text-emerald-400 text-sm">Always!</span></div><div class="skill-progress"><div class="skill-fill bg-gradient-to-r from-amber-400 to-amber-500" style="width:95%"></div></div></div>
           </div>
         </div>
       </div>
       
-      <!-- GitHub Activity -->
-      <div class="reveal mt-16 glass p-8">
-        <h3 class="text-xl font-bold text-white mb-6 flex items-center gap-2">
-          <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-          GitHub Activity
-        </h3>
-        <div class="github-graph" id="gh"></div>
+      <div class="reveal mt-12 glass-card p-8">
+        <h3 class="text-xl font-bold text-white mb-6 text-center">Tools & Technologies I Use</h3>
+        <div class="flex flex-wrap justify-center gap-3">
+          <span class="tag tag-cyan">VS Code</span><span class="tag tag-purple">Git</span><span class="tag tag-emerald">React</span><span class="tag tag-amber">Next.js</span>
+          <span class="tag tag-rose">Tailwind CSS</span><span class="tag tag-cyan">Node.js</span><span class="tag tag-purple">PostgreSQL</span><span class="tag tag-emerald">Docker</span>
+          <span class="tag tag-amber">Figma</span><span class="tag tag-rose">Notion</span><span class="tag tag-cyan">ChatGPT/Claude</span><span class="tag tag-purple">Cursor AI</span>
+          <span class="tag tag-emerald">CapCut</span><span class="tag tag-amber">Canva</span>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- Contact Section -->
-  <section id="contact" class="py-32">
+  <section id="contact" class="py-24">
     <div class="container">
       <div class="text-center mb-16">
-        <h2 class="reveal font-display text-4xl md:text-5xl font-bold gradient-text mb-4">Get In Touch</h2>
-        <p class="reveal text-gray-400 text-lg">Let's work together</p>
+        <div class="section-label reveal justify-center">Get In Touch</div>
+        <h2 class="reveal reveal-delay-1 font-display text-3xl md:text-4xl font-bold text-white mb-4">Let's <span class="gradient-text">Connect</span></h2>
+        <p class="reveal reveal-delay-2 text-gray-400 max-w-2xl mx-auto">Have a question or want to collaborate? Feel free to reach out!</p>
       </div>
       
-      <div class="grid lg:grid-cols-2 gap-12">
-        <div class="reveal">
-          <form class="space-y-6" onsubmit="event.preventDefault(); alert('Message sent! (Demo)')">
-            <div>
-              <label class="block text-gray-400 text-sm mb-2">Your Name</label>
-              <input type="text" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-cyan-400 focus:outline-none transition" placeholder="John Doe">
-            </div>
-            <div>
-              <label class="block text-gray-400 text-sm mb-2">Email Address</label>
-              <input type="email" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-cyan-400 focus:outline-none transition" placeholder="john@example.com">
-            </div>
-            <div>
-              <label class="block text-gray-400 text-sm mb-2">Message</label>
-              <textarea rows="5" class="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:border-cyan-400 focus:outline-none transition resize-none" placeholder="Your message..."></textarea>
-            </div>
-            <button type="submit" class="w-full px-8 py-4 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-semibold hover:shadow-lg hover:shadow-cyan-500/25 transition">
-              Send Message
+      <div class="grid lg:grid-cols-2 gap-12 max-w-5xl mx-auto">
+        <div class="reveal glass-card p-8">
+          <form id="contactForm" class="space-y-5">
+            <div><label class="block text-gray-400 text-sm font-medium mb-2">Your Name</label><input type="text" name="name" required class="form-input" placeholder="John Doe"></div>
+            <div><label class="block text-gray-400 text-sm font-medium mb-2">Email Address</label><input type="email" name="email" required class="form-input" placeholder="john@example.com"></div>
+            <div><label class="block text-gray-400 text-sm font-medium mb-2">Subject</label><select name="subject" class="form-input"><option value="general">General Inquiry</option><option value="collaboration">Collaboration</option><option value="consulting">Consulting</option><option value="other">Other</option></select></div>
+            <div><label class="block text-gray-400 text-sm font-medium mb-2">Message</label><textarea name="message" rows="4" required class="form-input resize-none" placeholder="Your message..."></textarea></div>
+            <button type="submit" class="btn-primary w-full flex items-center justify-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>Send Message
             </button>
           </form>
         </div>
         
-        <div class="space-y-6">
-          <div class="reveal glass p-6 flex items-center gap-4">
-            <div class="p-4 rounded-xl bg-cyan-400/10 text-cyan-400">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-            </div>
-            <div>
-              <p class="text-gray-500 text-sm">Email</p>
-              <a href="mailto:ibnu@heyibnu.com" class="text-white hover:text-cyan-400 transition">ibnu@heyibnu.com</a>
-            </div>
+        <div class="reveal reveal-delay-1 space-y-6">
+          <div class="glass-card p-6 flex items-center gap-4 hover-lift">
+            <div class="w-14 h-14 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 flex-shrink-0"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div>
+            <div><p class="text-gray-500 text-sm">Email</p><a href="mailto:subkhanibnuaji@gmail.com" class="text-white hover:text-cyan-400 transition font-medium">subkhanibnuaji@gmail.com</a></div>
           </div>
-          
-          <div class="reveal glass p-6 flex items-center gap-4">
-            <div class="p-4 rounded-xl bg-purple-400/10 text-purple-400">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            </div>
-            <div>
-              <p class="text-gray-500 text-sm">Location</p>
-              <p class="text-white">Jakarta, Indonesia</p>
-            </div>
+          <div class="glass-card p-6 flex items-center gap-4 hover-lift">
+            <div class="w-14 h-14 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-400 flex-shrink-0"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div>
+            <div><p class="text-gray-500 text-sm">Location</p><p class="text-white font-medium">Jakarta, Indonesia</p></div>
           </div>
-          
-          <div class="reveal glass p-6 flex items-center gap-4">
-            <div class="p-4 rounded-xl bg-emerald-400/10 text-emerald-400">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            </div>
-            <div>
-              <p class="text-gray-500 text-sm">Response Time</p>
-              <p class="text-white">Within 24 hours</p>
+          <div class="glass-card p-6 flex items-center gap-4 hover-lift">
+            <div class="w-14 h-14 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-400 flex-shrink-0"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+            <div><p class="text-gray-500 text-sm">Response Time</p><p class="text-white font-medium">Usually within 24-48 hours</p></div>
+          </div>
+          <div class="glass-card p-6">
+            <p class="text-gray-400 text-sm mb-4">Connect on social media</p>
+            <div class="flex gap-3">
+              <a href="https://github.com/subkhanibnuaji" target="_blank" class="social-link"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></a>
+              <a href="https://linkedin.com/in/subkhanibnuaji" target="_blank" class="social-link"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg></a>
+              <a href="https://tiktok.com/@subkhanibnuaji" target="_blank" class="social-link"><svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg></a>
             </div>
           </div>
         </div>
@@ -502,230 +711,129 @@
   </section>
 
   <!-- Footer -->
-  <footer class="py-8 border-t border-white/10">
-    <div class="container flex flex-col md:flex-row justify-between items-center gap-4">
-      <p class="text-gray-500 text-sm">© 2025 Ibnu. All rights reserved.</p>
-      <p class="text-gray-500 text-sm">Built with ❤️ and lots of ☕</p>
+  <footer class="py-8 border-t border-white/5">
+    <div class="container">
+      <div class="flex flex-col md:flex-row justify-between items-center gap-4">
+        <p class="text-gray-500 text-sm">© 2025 Subkhan Ibnu Aji. All rights reserved.</p>
+        <div class="flex items-center gap-6 text-gray-500 text-sm">
+          <button onclick="openTerminal()" class="hover:text-white transition">Terminal</button>
+          <span>•</span>
+          <p>Built with passion & ☕</p>
+        </div>
+      </div>
     </div>
   </footer>
 
   <!-- Chatbot -->
-  <div class="chatbot">
-    <div class="chat-window" id="chatWin">
-      <div class="p-4 border-b border-white/10 flex items-center justify-between">
+  <div class="fixed bottom-6 right-6 z-50">
+    <div class="chat-window" id="chatWindow">
+      <div class="p-4 border-b border-white/10 flex items-center justify-between bg-slate-900/50">
         <div class="flex items-center gap-3">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center">
-            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M13 3L4 14h7l-2 7 9-11h-7l2-7z"/></svg>
-          </div>
-          <div>
-            <p class="text-white font-semibold text-sm">Ask Ibnu AI</p>
-            <p class="text-gray-500 text-xs">Powered by AI</p>
-          </div>
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center shadow-lg"><svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M13 3L4 14h7l-2 7 9-11h-7l2-7z"/></svg></div>
+          <div><p class="text-white font-semibold text-sm">Ask Ibnu AI</p><p class="text-gray-500 text-xs">Ask me anything!</p></div>
         </div>
-        <button onclick="toggleChat()" class="text-gray-400 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+        <button onclick="toggleChat()" class="w-8 h-8 rounded-lg hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
       </div>
-      <div class="flex-1 p-4 overflow-y-auto space-y-4" id="chatMsgs">
+      <div class="flex-1 p-4 overflow-y-auto space-y-4" id="chatMessages">
         <div class="flex gap-3">
           <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M13 3L4 14h7l-2 7 9-11h-7l2-7z"/></svg></div>
-          <div class="glass p-3 max-w-[80%]"><p class="text-sm text-gray-300">Hi! I'm Ibnu's AI assistant. Ask me anything about his skills, projects, or experience!</p></div>
+          <div class="glass px-4 py-3 max-w-[80%]"><p class="text-sm text-gray-300">Hi! 👋 I'm Ibnu's AI assistant. Feel free to ask about his skills, experience, projects, or anything else!</p></div>
         </div>
       </div>
-      <div class="p-4 border-t border-white/10">
+      <div class="p-4 border-t border-white/10 bg-slate-900/30">
         <div class="flex flex-wrap gap-2 mb-3">
-          <button onclick="ask('What are your main skills?')" class="px-3 py-1 rounded-full bg-white/5 text-gray-400 text-xs hover:bg-white/10">Skills</button>
-          <button onclick="ask('Tell me about SIBARU')" class="px-3 py-1 rounded-full bg-white/5 text-gray-400 text-xs hover:bg-white/10">Projects</button>
-          <button onclick="ask('What is your experience?')" class="px-3 py-1 rounded-full bg-white/5 text-gray-400 text-xs hover:bg-white/10">Experience</button>
+          <button onclick="askQuestion('What are your skills?')" class="px-3 py-1.5 rounded-full bg-white/5 text-gray-400 text-xs hover:bg-white/10 transition">Skills</button>
+          <button onclick="askQuestion('Tell me about your experience')" class="px-3 py-1.5 rounded-full bg-white/5 text-gray-400 text-xs hover:bg-white/10 transition">Experience</button>
+          <button onclick="askQuestion('What projects have you worked on?')" class="px-3 py-1.5 rounded-full bg-white/5 text-gray-400 text-xs hover:bg-white/10 transition">Projects</button>
         </div>
         <div class="flex gap-2">
-          <input type="text" id="chatIn" class="flex-1 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-sm focus:border-cyan-400 focus:outline-none" placeholder="Type a message..." onkeypress="if(event.key==='Enter')sendChat()">
-          <button onclick="sendChat()" class="p-2 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-500 text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg></button>
+          <input type="text" id="chatInput" class="form-input !py-2.5 text-sm" placeholder="Type your message..." onkeypress="if(event.key==='Enter')sendMessage()">
+          <button onclick="sendMessage()" class="w-11 h-11 rounded-xl bg-gradient-to-r from-cyan-500 to-purple-500 flex items-center justify-center text-white hover:shadow-lg hover:shadow-cyan-500/25 transition flex-shrink-0"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg></button>
         </div>
       </div>
     </div>
-    <div class="chat-btn" onclick="toggleChat()">
-      <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
-    </div>
+    <button onclick="toggleChat()" class="w-14 h-14 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500 flex items-center justify-center text-white shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 hover:scale-110 transition-all" id="chatBtn"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg></button>
   </div>
 
   <!-- Command Palette -->
   <div class="cmd-palette" id="cmdPalette" onclick="if(event.target===this)closeCmd()">
     <div class="cmd-box">
       <div class="p-4 border-b border-white/10">
-        <input type="text" id="cmdIn" class="w-full bg-transparent text-white text-lg focus:outline-none" placeholder="Type a command..." onkeyup="filterCmd(this.value)">
+        <div class="flex items-center gap-3">
+          <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input type="text" id="cmdInput" class="flex-1 bg-transparent text-white text-lg focus:outline-none" placeholder="Search or type a command..." onkeyup="filterCommands(this.value)" onkeydown="if(event.key==='Escape')closeCmd()">
+        </div>
       </div>
       <div class="p-2 max-h-80 overflow-y-auto" id="cmdList">
-        <a href="#about" onclick="closeCmd()" class="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 text-gray-300">
-          <span class="text-cyan-400">👤</span> About Me
-        </a>
-        <a href="#experience" onclick="closeCmd()" class="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 text-gray-300">
-          <span class="text-purple-400">💼</span> Experience
-        </a>
-        <a href="#projects" onclick="closeCmd()" class="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 text-gray-300">
-          <span class="text-pink-400">🚀</span> Projects
-        </a>
-        <a href="#skills" onclick="closeCmd()" class="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 text-gray-300">
-          <span class="text-emerald-400">🛠️</span> Skills
-        </a>
-        <a href="#contact" onclick="closeCmd()" class="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 text-gray-300">
-          <span class="text-amber-400">📧</span> Contact
-        </a>
-        <button onclick="openTerminal();closeCmd()" class="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 text-gray-300">
-          <span class="text-gray-400">💻</span> Open Terminal
-        </button>
+        <div class="px-3 py-2 text-xs text-gray-500 font-medium uppercase tracking-wider">Navigation</div>
+        <a href="#about" onclick="closeCmd()" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-gray-300 transition"><span class="text-lg">👤</span> <span>About Me</span></a>
+        <a href="#experience" onclick="closeCmd()" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-gray-300 transition"><span class="text-lg">💼</span> <span>Experience</span></a>
+        <a href="#projects" onclick="closeCmd()" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-gray-300 transition"><span class="text-lg">🚀</span> <span>Projects</span></a>
+        <a href="#skills" onclick="closeCmd()" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-gray-300 transition"><span class="text-lg">🛠️</span> <span>Skills</span></a>
+        <a href="#contact" onclick="closeCmd()" class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-gray-300 transition"><span class="text-lg">📧</span> <span>Contact</span></a>
+        <div class="px-3 py-2 text-xs text-gray-500 font-medium uppercase tracking-wider mt-2">Actions</div>
+        <button onclick="openTerminal();closeCmd()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-gray-300 transition text-left"><span class="text-lg">💻</span> <span>Open Terminal</span></button>
+        <button onclick="toggleChat();closeCmd()" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 text-gray-300 transition text-left"><span class="text-lg">🤖</span> <span>Open AI Chat</span></button>
       </div>
+      <div class="p-3 border-t border-white/10 flex items-center justify-between text-xs text-gray-500"><span>↑↓ Navigate</span><span>↵ Select</span><span>Esc Close</span></div>
     </div>
   </div>
 
   <!-- Terminal -->
-  <div class="terminal" id="term">
-    <div class="h-full flex flex-col p-6">
-      <div class="flex items-center justify-between mb-4">
-        <div class="flex items-center gap-2">
-          <div class="w-3 h-3 rounded-full bg-red-500"></div>
-          <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
-          <div class="w-3 h-3 rounded-full bg-green-500"></div>
-          <span class="ml-4 text-gray-400 text-sm">ibnu@portfolio:~</span>
+  <div class="terminal" id="terminal">
+    <div class="h-full flex flex-col p-6 max-w-4xl mx-auto">
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <div class="flex gap-2"><button onclick="closeTerm()" class="w-3 h-3 rounded-full bg-red-500 hover:bg-red-400 transition"></button><div class="w-3 h-3 rounded-full bg-yellow-500"></div><div class="w-3 h-3 rounded-full bg-green-500"></div></div>
+          <span class="ml-4 text-gray-400 text-sm font-mono">ibnu@portfolio ~ zsh</span>
         </div>
-        <button onclick="closeTerm()" class="text-gray-400 hover:text-white"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+        <button onclick="closeTerm()" class="text-gray-400 hover:text-white transition"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
       </div>
-      <div class="flex-1 overflow-y-auto text-sm space-y-1" id="termOut">
-        <p class="text-emerald-400">Welcome to Ibnu's Terminal! Type 'help' for commands.</p>
-        <p class="text-gray-500">────────────────────────────────────────</p>
+      <div class="flex-1 overflow-y-auto text-sm space-y-1 font-mono" id="terminalOutput">
+        <p class="text-emerald-400">Welcome to Ibnu's Interactive Terminal! 🚀</p>
+        <p class="text-gray-500">Type 'help' for available commands.</p>
+        <p class="text-gray-600">─────────────────────────────────────────────</p>
       </div>
-      <div class="flex items-center gap-2 mt-4">
-        <span class="text-emerald-400">visitor@ibnu</span><span class="text-white">:</span><span class="text-cyan-400">~</span><span class="text-white">$</span>
-        <input type="text" id="termIn" class="flex-1 bg-transparent text-white focus:outline-none" onkeypress="if(event.key==='Enter')runCmd()">
+      <div class="flex items-center gap-2 mt-4 font-mono">
+        <span class="text-emerald-400">visitor</span><span class="text-gray-500">@</span><span class="text-cyan-400">ibnu.dev</span><span class="text-gray-500">~</span><span class="text-white">$</span>
+        <input type="text" id="terminalInput" class="flex-1 bg-transparent text-white focus:outline-none ml-2" onkeypress="if(event.key==='Enter')runTerminalCmd()">
       </div>
     </div>
   </div>
 
   <!-- Back to Top -->
-  <button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">
-    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
-  </button>
+  <button class="back-top" id="backToTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg></button>
 
-  <!-- Scripts -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.12/typed.min.js"></script>
   <script>
-    // Reveal Animation
-    function initReveal(){
-      const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('active')}),{threshold:0.1});
-      document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
-    }
-    initReveal();
+    document.addEventListener('DOMContentLoaded',function(){initReveal();initCursor();initScroll();initTyping();initFormHandler();});
     
-    // Cursor
-    const dot=document.getElementById('dot'),ring=document.getElementById('ring');
-    if(dot&&ring){
-      document.addEventListener('mousemove',e=>{
-        dot.style.left=e.clientX+'px';dot.style.top=e.clientY+'px';
-        ring.style.left=(e.clientX-16)+'px';ring.style.top=(e.clientY-16)+'px';
-      });
-      document.querySelectorAll('a,button,input,textarea').forEach(el=>{
-        el.addEventListener('mouseenter',()=>ring.classList.add('hover'));
-        el.addEventListener('mouseleave',()=>ring.classList.remove('hover'));
-      });
-    }
+    function initReveal(){const obs=new IntersectionObserver((entries)=>{entries.forEach(entry=>{if(entry.isIntersecting)entry.target.classList.add('active');});},{threshold:0.1,rootMargin:'-50px'});document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));}
     
-    // Scroll Progress
-    window.addEventListener('scroll',()=>{
-      const p=document.getElementById('progress'),b=document.getElementById('backTop'),n=document.getElementById('nav');
-      const s=window.scrollY,h=document.documentElement.scrollHeight-window.innerHeight;
-      if(p)p.style.width=(s/h*100)+'%';
-      if(b)b.classList.toggle('visible',s>500);
-      if(n){n.style.background=s>50?'rgba(2,6,23,0.9)':'transparent';n.style.backdropFilter=s>50?'blur(20px)':'none';}
-    });
+    function initCursor(){const dot=document.getElementById('cursorDot'),ring=document.getElementById('cursorRing');if(!dot||!ring||window.innerWidth<1024)return;let mouseX=0,mouseY=0,ringX=0,ringY=0;document.addEventListener('mousemove',(e)=>{mouseX=e.clientX;mouseY=e.clientY;dot.style.left=mouseX+'px';dot.style.top=mouseY+'px';});function animateRing(){ringX+=(mouseX-ringX)*0.15;ringY+=(mouseY-ringY)*0.15;ring.style.left=(ringX-18)+'px';ring.style.top=(ringY-18)+'px';requestAnimationFrame(animateRing);}animateRing();document.querySelectorAll('a,button,input,textarea,select,[onclick]').forEach(el=>{el.addEventListener('mouseenter',()=>ring.classList.add('active'));el.addEventListener('mouseleave',()=>ring.classList.remove('active'));});}
     
-    // Typed.js
-    try{
-      new Typed('#typed',{
-        strings:['Building AI for Government 🏛️','Managing IDR 1T+ Projects 💼','Trading Crypto Markets 📈','Creating for 40K+ Followers 🎬','Pursuing PhD Research 🎓'],
-        typeSpeed:50,backSpeed:30,backDelay:2000,loop:true
-      });
-    }catch(e){console.log('Typed.js error');}
+    function initScroll(){const progress=document.getElementById('scrollProgress'),backTop=document.getElementById('backToTop'),navbar=document.getElementById('navbar');window.addEventListener('scroll',()=>{const scrollY=window.scrollY,docHeight=document.documentElement.scrollHeight-window.innerHeight,scrollPercent=(scrollY/docHeight)*100;if(progress)progress.style.width=scrollPercent+'%';if(backTop)backTop.classList.toggle('visible',scrollY>500);if(navbar)navbar.classList.toggle('scrolled',scrollY>50);});}
     
-    // Particles
-    const c=document.getElementById('particles');
-    if(c){
-      const ctx=c.getContext('2d');
-      function resize(){c.width=window.innerWidth;c.height=window.innerHeight}
-      resize();window.addEventListener('resize',resize);
-      const pts=[];for(let i=0;i<50;i++)pts.push({x:Math.random()*c.width,y:Math.random()*c.height,vx:(Math.random()-0.5)*0.3,vy:(Math.random()-0.5)*0.3,s:Math.random()*2+1,c:['rgba(0,212,255,0.5)','rgba(139,92,246,0.5)','rgba(19,255,170,0.3)'][Math.floor(Math.random()*3)]});
-      function draw(){
-        ctx.clearRect(0,0,c.width,c.height);
-        pts.forEach((p,i)=>{
-          p.x+=p.vx;p.y+=p.vy;
-          if(p.x<0||p.x>c.width)p.vx*=-1;
-          if(p.y<0||p.y>c.height)p.vy*=-1;
-          ctx.beginPath();ctx.arc(p.x,p.y,p.s,0,Math.PI*2);ctx.fillStyle=p.c;ctx.fill();
-          pts.forEach((q,j)=>{if(i===j)return;const d=Math.sqrt((p.x-q.x)**2+(p.y-q.y)**2);if(d<100){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(q.x,q.y);ctx.strokeStyle='rgba(0,212,255,'+(1-d/100)*0.1+')';ctx.stroke();}});
-        });
-        requestAnimationFrame(draw);
-      }
-      draw();
-    }
+    function initTyping(){const texts=['Building digital solutions for government 🏛️','Exploring AI & Machine Learning 🤖','Creating content for 40K+ followers 🎬','Learning blockchain technology ⛓️','Aspiring PhD researcher 🎓'];let textIndex=0,charIndex=0,isDeleting=false;const typedEl=document.getElementById('typedText');if(!typedEl)return;function type(){const currentText=texts[textIndex];if(isDeleting){typedEl.textContent=currentText.substring(0,charIndex-1);charIndex--;}else{typedEl.textContent=currentText.substring(0,charIndex+1);charIndex++;}let delay=isDeleting?30:60;if(!isDeleting&&charIndex===currentText.length){delay=2500;isDeleting=true;}else if(isDeleting&&charIndex===0){isDeleting=false;textIndex=(textIndex+1)%texts.length;delay=500;}setTimeout(type,delay);}type();}
     
-    // GitHub Graph
-    const gh=document.getElementById('gh');
-    if(gh){for(let i=0;i<52*7;i++){const d=document.createElement('div');d.className='gh-cell';const l=Math.random();if(l>0.7)d.classList.add('l4');else if(l>0.5)d.classList.add('l3');else if(l>0.3)d.classList.add('l2');else if(l>0.1)d.classList.add('l1');gh.appendChild(d);}}
+    function initFormHandler(){const form=document.getElementById('contactForm');if(!form)return;form.addEventListener('submit',function(e){e.preventDefault();const btn=form.querySelector('button[type="submit"]'),originalText=btn.innerHTML;btn.innerHTML='<svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Sending...';btn.disabled=true;setTimeout(()=>{btn.innerHTML='<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Message Sent!';setTimeout(()=>{btn.innerHTML=originalText;btn.disabled=false;form.reset();},3000);},1500);});}
     
-    // Chatbot
-    function toggleChat(){document.getElementById('chatWin').classList.toggle('active');}
-    function sendChat(){const i=document.getElementById('chatIn'),m=i.value.trim();if(!m)return;addMsg(m,'u');i.value='';setTimeout(()=>addMsg(respond(m),'b'),800);}
-    function ask(q){addMsg(q,'u');setTimeout(()=>addMsg(respond(q),'b'),800);}
-    function addMsg(t,s){
-      const c=document.getElementById('chatMsgs'),d=document.createElement('div');
-      d.className='flex gap-3'+(s==='u'?' justify-end':'');
-      d.innerHTML=s==='u'?'<div class="glass p-3 max-w-[80%] bg-cyan-400/10 border-cyan-400/20"><p class="text-sm text-white">'+t+'</p></div>':'<div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M13 3L4 14h7l-2 7 9-11h-7l2-7z"/></svg></div><div class="glass p-3 max-w-[80%]"><p class="text-sm text-gray-300">'+t+'</p></div>';
-      c.appendChild(d);c.scrollTop=c.scrollHeight;
-    }
-    function respond(q){
-      q=q.toLowerCase();
-      if(q.includes('skill'))return'My main skills: Python (95%), TypeScript (90%), React/Next.js (90%), Machine Learning (90%), and Web3/Blockchain (70%).';
-      if(q.includes('project')||q.includes('sibaru'))return'Key projects: SIBARU (building permits), PKP HUB (ministry portal), SIMONI (monitoring system), and AI Doc Processor.';
-      if(q.includes('experience')||q.includes('work'))return'10+ years in tech. Currently IT Project Manager at Ministry PKP, managing projects worth IDR 1T+.';
-      if(q.includes('contact')||q.includes('email'))return'Email me at ibnu@heyibnu.com or connect on LinkedIn!';
-      if(q.includes('crypto')||q.includes('trading'))return'I actively trade crypto and explore DeFi protocols. Also building Web3 dashboards!';
-      return'Thanks for your question! I can tell you about my skills, projects, experience, or how to contact me.';
-    }
+    function toggleChat(){const chatWindow=document.getElementById('chatWindow'),chatBtn=document.getElementById('chatBtn');chatWindow.classList.toggle('active');chatBtn.style.display=chatWindow.classList.contains('active')?'none':'flex';}
+    function sendMessage(){const input=document.getElementById('chatInput'),message=input.value.trim();if(!message)return;addChatMessage(message,'user');input.value='';setTimeout(()=>{const response=generateResponse(message);addChatMessage(response,'bot');},800);}
+    function askQuestion(q){addChatMessage(q,'user');setTimeout(()=>{const response=generateResponse(q);addChatMessage(response,'bot');},800);}
+    function addChatMessage(text,sender){const container=document.getElementById('chatMessages'),div=document.createElement('div');div.className='flex gap-3'+(sender==='user'?' justify-end':'');if(sender==='user'){div.innerHTML='<div class="glass px-4 py-3 max-w-[80%] bg-cyan-500/10 border-cyan-500/20"><p class="text-sm text-white">'+text+'</p></div>';}else{div.innerHTML='<div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-purple-500 flex items-center justify-center flex-shrink-0"><svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M13 3L4 14h7l-2 7 9-11h-7l2-7z"/></svg></div><div class="glass px-4 py-3 max-w-[80%]"><p class="text-sm text-gray-300">'+text+'</p></div>';}container.appendChild(div);container.scrollTop=container.scrollHeight;}
+    function generateResponse(q){q=q.toLowerCase();if(q.includes('skill')||q.includes('kemampuan'))return'My skills span across technical (Python, JavaScript, SQL), management (project coordination, documentation), and soft skills (public speaking, content creation). TOEFL ITP: 593!';if(q.includes('experience')||q.includes('pengalaman')||q.includes('kerja'))return'I\'m currently an ASN at Ministry PKP working on IT coordination. I also explore AI research and create content on TikTok with 40K+ followers. Background: S1 CS from Telkom University, MBA from UGM.';if(q.includes('project')||q.includes('proyek'))return'I\'ve contributed to ministry internal systems, built personal AI document processing tools, created a crypto portfolio tracker, and regularly produce educational content.';if(q.includes('contact')||q.includes('hubungi')||q.includes('email'))return'Email me at subkhanibnuaji@gmail.com or connect on LinkedIn/TikTok @subkhanibnuaji!';if(q.includes('hello')||q.includes('hi')||q.includes('halo'))return'Hello! 👋 Nice to meet you! Feel free to ask about skills, experience, or projects!';return'Thanks for your question! I can tell you about skills, experience, projects, education, or how to contact me.';}
     
-    // Command Palette
-    function openCmd(){document.getElementById('cmdPalette').classList.add('active');document.getElementById('cmdIn').focus();}
-    function closeCmd(){document.getElementById('cmdPalette').classList.remove('active');}
-    function filterCmd(v){document.querySelectorAll('#cmdList > *').forEach(el=>{el.style.display=el.textContent.toLowerCase().includes(v.toLowerCase())?'':'none';});}
+    function openCmd(){document.getElementById('cmdPalette').classList.add('active');document.getElementById('cmdInput').focus();}
+    function closeCmd(){document.getElementById('cmdPalette').classList.remove('active');document.getElementById('cmdInput').value='';}
+    function filterCommands(value){const items=document.querySelectorAll('#cmdList > a, #cmdList > button');const v=value.toLowerCase();items.forEach(item=>{const text=item.textContent.toLowerCase();item.style.display=text.includes(v)?'':'none';});}
     
-    // Terminal
-    function openTerminal(){document.getElementById('term').classList.add('active');document.getElementById('termIn').focus();}
-    function closeTerm(){document.getElementById('term').classList.remove('active');}
-    function runCmd(){
-      const i=document.getElementById('termIn'),o=document.getElementById('termOut'),cmd=i.value.trim().toLowerCase();
-      if(!cmd){i.value='';return;}
-      const l=document.createElement('p');l.innerHTML='<span class="text-emerald-400">visitor@ibnu</span>:<span class="text-cyan-400">~</span>$ '+i.value;o.appendChild(l);
-      const r=document.createElement('p');r.className='mb-2 text-gray-300';
-      switch(cmd){
-        case'help':r.innerHTML='Commands: <span class="text-cyan-400">about, skills, projects, contact, clear, exit</span>';break;
-        case'about':r.innerHTML='👋 Ibnu - Gov Tech Leader, AI Researcher, Crypto Trader, 40K+ Content Creator';break;
-        case'skills':r.innerHTML='Python 95% | TypeScript 90% | React 90% | ML 90% | Web3 70%';break;
-        case'projects':r.innerHTML='SIBARU | PKP HUB | SIMONI | AI Doc Processor | DeFi Dashboard';break;
-        case'contact':r.innerHTML='📧 ibnu@heyibnu.com | 📍 Jakarta, Indonesia';break;
-        case'clear':o.innerHTML='';i.value='';return;
-        case'exit':closeTerm();i.value='';return;
-        default:r.innerHTML='<span class="text-red-400">Command not found:</span> '+cmd;
-      }
-      o.appendChild(r);o.scrollTop=o.scrollHeight;i.value='';
-    }
+    function openTerminal(){document.getElementById('terminal').classList.add('active');document.getElementById('terminalInput').focus();}
+    function closeTerm(){document.getElementById('terminal').classList.remove('active');}
+    function runTerminalCmd(){const input=document.getElementById('terminalInput'),output=document.getElementById('terminalOutput'),cmd=input.value.trim().toLowerCase();if(!cmd){input.value='';return;}const cmdLine=document.createElement('p');cmdLine.innerHTML='<span class="text-emerald-400">visitor</span><span class="text-gray-500">@</span><span class="text-cyan-400">ibnu.dev</span> <span class="text-gray-500">~</span> $ '+input.value;output.appendChild(cmdLine);const response=document.createElement('p');response.className='mb-3 text-gray-300';switch(cmd){case'help':response.innerHTML='<span class="text-cyan-400">Commands:</span> about, skills, projects, contact, social, clear, exit';break;case'about':response.innerHTML='👋 <span class="text-white">Subkhan Ibnu Aji</span> - ASN @ Ministry PKP, AI Enthusiast, Content Creator';break;case'skills':response.innerHTML='<span class="text-cyan-400">Tech:</span> Python, JS, SQL | <span class="text-purple-400">Mgmt:</span> Coordination, Docs | <span class="text-emerald-400">Soft:</span> Speaking, Content';break;case'projects':response.innerHTML='Ministry Systems | AI Doc Assistant | Crypto Tracker | TikTok (40K+)';break;case'contact':response.innerHTML='📧 subkhanibnuaji@gmail.com | 📍 Jakarta, ID';break;case'social':response.innerHTML='🔗 github/linkedin/tiktok: @subkhanibnuaji';break;case'clear':output.innerHTML='<p class="text-emerald-400">Terminal cleared.</p>';input.value='';return;case'exit':closeTerm();input.value='';return;case'sudo':response.innerHTML='<span class="text-rose-400">Nice try! 😄</span>';break;case'ls':response.innerHTML='about.txt  projects/  skills.json  contact.md';break;case'pwd':response.innerHTML='/home/visitor/ibnu-portfolio';break;case'whoami':response.innerHTML='visitor (guest)';break;default:response.innerHTML='<span class="text-rose-400">Command not found:</span> '+cmd+' <span class="text-gray-500">| Type \'help\'</span>';}output.appendChild(response);output.scrollTop=output.scrollHeight;input.value='';}
     
-    // Keyboard Shortcuts
-    document.addEventListener('keydown',e=>{
-      if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();openCmd();}
-      if(e.key==='Escape'){closeCmd();closeTerm();}
-    });
-    
-    // Smooth Scroll
-    document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener('click',function(e){e.preventDefault();const t=document.querySelector(this.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth'});}));
-    
-    // Console Easter Egg
-    console.log('%c\n  IBNU PORTFOLIO\n  ─────────────\n  Hey developer! 👋\n  Press Cmd+K for commands\n\n','color:#00d4ff;font-family:monospace');
+    document.addEventListener('keydown',(e)=>{if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();openCmd();}if(e.key==='Escape'){closeCmd();closeTerm();if(document.getElementById('chatWindow').classList.contains('active'))toggleChat();}});
+    document.querySelectorAll('a[href^="#"]').forEach(anchor=>{anchor.addEventListener('click',function(e){e.preventDefault();const target=document.querySelector(this.getAttribute('href'));if(target)target.scrollIntoView({behavior:'smooth',block:'start'});});});
+    console.log('%c\n  IBNU PORTFOLIO v1.1\n  ═══════════════════\n  Hey developer! 👋\n  Press Cmd+K for commands\n\n','color:#22d3ee;font-family:monospace');
   </script>
 </body>
 </html>
