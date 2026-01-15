@@ -575,20 +575,20 @@
 </head>
 <body>
     <!-- Particle Background -->
-    <canvas id="particles"></canvas>
+    <canvas id="particleCanvas"></canvas>
     
     <!-- Custom Cursor -->
     <div class="cursor-dot"></div>
     <div class="cursor-ring"></div>
     
     <!-- Navigation -->
-    <nav class="navbar">
+    <nav class="navbar" id="navbar">
         <div class="nav-container">
             <a href="../index.html" class="nav-logo">
                 <span class="logo-text">Ibnu</span>
                 <span class="logo-dot"></span>
             </a>
-            <div class="nav-menu">
+            <div class="nav-menu" id="navMenu">
                 <a href="../index.html" class="nav-link">Home</a>
                 <a href="interests.html" class="nav-link">Interests</a>
                 <a href="projects.html" class="nav-link active">Projects</a>
@@ -603,7 +603,7 @@
                         <path d="m21 21-4.35-4.35"></path>
                     </svg>
                 </button>
-                <button class="nav-btn mobile-toggle" id="mobileToggle">
+                <button class="nav-btn mobile-toggle" id="navToggle">
                     <span></span>
                     <span></span>
                     <span></span>
@@ -613,9 +613,7 @@
     </nav>
     
     <!-- Progress Bar -->
-    <div class="scroll-progress">
-        <div class="scroll-progress-bar"></div>
-    </div>
+    <div class="scroll-progress" id="scrollProgress"></div>
     
     <!-- Projects Hero -->
     <section class="projects-hero">
