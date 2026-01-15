@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
   Sparkles, Box, User, Palette, Smile, MessageSquare,
-  Brain, ArrowRight, Shield, Zap, Code
+  Brain, ArrowRight, Shield, Zap, Code, Tag, Hand, QrCode, Volume2
 } from 'lucide-react'
 
 const AI_TOOLS = [
@@ -67,6 +67,56 @@ const AI_TOOLS = [
     bgColor: 'bg-cyan-500/10',
     textColor: 'text-cyan-500',
     model: 'NLP Lexicon'
+  },
+  {
+    slug: 'image-classifier',
+    name: 'Image Classification',
+    description: 'Identify objects in images using deep learning. Recognizes 1000+ categories.',
+    icon: Tag,
+    color: 'from-indigo-500 to-violet-500',
+    bgColor: 'bg-indigo-500/10',
+    textColor: 'text-indigo-500',
+    model: 'MobileNet v2'
+  },
+  {
+    slug: 'hand-gesture',
+    name: 'Hand Gesture Recognition',
+    description: 'Detect hand gestures in real-time. Recognizes thumbs up, peace, fist & more.',
+    icon: Hand,
+    color: 'from-violet-500 to-purple-500',
+    bgColor: 'bg-violet-500/10',
+    textColor: 'text-violet-500',
+    model: 'MediaPipe Hands'
+  },
+  {
+    slug: 'qr-scanner',
+    name: 'QR Code Scanner',
+    description: 'Scan QR codes using your camera or upload an image.',
+    icon: QrCode,
+    color: 'from-emerald-500 to-green-500',
+    bgColor: 'bg-emerald-500/10',
+    textColor: 'text-emerald-500',
+    model: 'jsQR'
+  },
+  {
+    slug: 'color-extractor',
+    name: 'Color Palette Extractor',
+    description: 'Extract dominant colors from images to create color palettes.',
+    icon: Palette,
+    color: 'from-rose-500 to-pink-500',
+    bgColor: 'bg-rose-500/10',
+    textColor: 'text-rose-500',
+    model: 'Canvas API'
+  },
+  {
+    slug: 'text-to-speech',
+    name: 'Text to Speech',
+    description: 'Convert text to natural-sounding speech using browser synthesis.',
+    icon: Volume2,
+    color: 'from-sky-500 to-blue-500',
+    bgColor: 'bg-sky-500/10',
+    textColor: 'text-sky-500',
+    model: 'Web Speech API'
   }
 ]
 

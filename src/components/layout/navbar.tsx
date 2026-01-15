@@ -11,9 +11,9 @@ import { cn } from '@/lib/utils'
 
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
-  { href: '/interests', label: 'Interests' },
   { href: '/projects', label: 'Projects' },
   { href: '/ai-tools', label: 'AI Tools' },
+  { href: '/tools', label: 'Tools' },
   { href: '/certifications', label: 'Credentials' },
   { href: '/about', label: 'About' },
 ]
