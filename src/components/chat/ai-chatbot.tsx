@@ -19,10 +19,10 @@ interface QuickReply {
   value: string
 }
 
-// Knowledge base for pattern matching
+// Knowledge base for pattern matching - Comprehensive version
 const knowledgeBase = {
   greetings: {
-    patterns: ['hi', 'hello', 'hey', 'halo', 'hai', 'good morning', 'good afternoon', 'good evening'],
+    patterns: ['hi', 'hello', 'hey', 'halo', 'hai', 'good morning', 'good afternoon', 'good evening', 'howdy', 'sup', 'apa kabar', 'selamat'],
     response: "Hi there! I'm Ibnu's portfolio assistant. I can help you learn about his background, projects, skills, and interests. What would you like to know?",
     quickReplies: [
       { label: 'About Ibnu', value: 'Tell me about Ibnu' },
@@ -31,7 +31,7 @@ const knowledgeBase = {
     ]
   },
   about: {
-    patterns: ['about', 'who is', 'introduce', 'background', 'tell me about ibnu', 'who are you'],
+    patterns: ['about', 'who is', 'introduce', 'background', 'tell me about ibnu', 'who are you', 'siapa', 'profil', 'profile'],
     response: `**Subkhan Ibnu Aji, S.Kom., M.B.A.**
 
 I'm a cross-functional professional currently working as a Civil Servant (ASN) at Indonesia's Ministry of Housing & Settlement Areas.
@@ -50,75 +50,120 @@ Managing enterprise IT projects including HUB PKP, SIBARU, and SIMONI at the min
     ]
   },
   education: {
-    patterns: ['education', 'study', 'university', 'degree', 'mba', 'bachelor', 'ugm', 'telkom'],
+    patterns: ['education', 'study', 'university', 'degree', 'mba', 'bachelor', 'ugm', 'telkom', 'kuliah', 'sekolah', 'pendidikan'],
     response: `**Education:**
 
 1. **Senior Executive MBA** - Universitas Gadjah Mada (UGM)
    - Period: 2022 - 2024
    - GPA: 3.60/4.00
-   - Thesis: Product Differentiation Strategy
+   - Thesis: Product Differentiation Strategy at PT Sambel Korek DNO
 
 2. **Bachelor of Informatics (S.Kom)** - Telkom University
    - Period: 2017 - 2021
    - GPA: 3.34/4.00
    - Thesis: Animo - Web-Based Automation for F&B SMEs
 
-**Languages:** Indonesian (Native), English (TOEFL 593), Arabic & Mandarin (Beginner)`,
+**Languages:** Indonesian (Native), English (TOEFL ITP 593), Arabic & Mandarin (Beginner, HSK 1)`,
     quickReplies: [
       { label: 'Work Experience', value: 'What is your work experience?' },
       { label: 'Certifications', value: 'What certifications do you have?' }
     ]
   },
   experience: {
-    patterns: ['experience', 'work', 'job', 'career', 'ministry', 'consulting', 'startup'],
+    patterns: ['experience', 'work', 'job', 'career', 'ministry', 'consulting', 'startup', 'kerja', 'pengalaman'],
     response: `**Work Experience:**
 
 1. **Civil Servant (ASN)** - Ministry of Housing & Settlement Areas
    - Aug 2024 - Present
    - Managing IT projects: HUB PKP, SIBARU, SIMONI
+   - Evaluate procurement proposals >IDR 10B
 
 2. **Founder & CEO** - Virtus Futura Consulting
    - Jul 2021 - Jul 2024
    - Managed portfolio >IDR 1T (~USD 71M)
+   - Hospital feasibility, healthcare turnaround, F&B scale-up
 
-3. **Founder & CEO** - CV Solusi Automasi Indonesia
+3. **Founder & CEO** - Automate All (CV Solusi Automasi Indonesia)
    - Aug 2020 - Aug 2022
-   - Built RPA solutions for 50+ clients
+   - Built 100+ RPA bots, 50+ clients
+   - Achieved IDR 1B valuation
 
 4. **Independent Crypto Investor**
    - Jul 2021 - Present
    - $68K-100K cumulative futures volume`,
     quickReplies: [
-      { label: 'Projects', value: 'What projects has he worked on?' },
-      { label: 'Skills', value: 'What are his skills?' }
+      { label: 'Virtus Consulting', value: 'Tell me about Virtus Futura' },
+      { label: 'Automate All', value: 'Tell me about Automate All startup' }
+    ]
+  },
+  virtusfutura: {
+    patterns: ['virtus', 'futura', 'consulting', 'consultant', 'konsultan'],
+    response: `**Virtus Futura Consulting** (Jul 2021 - Jul 2024)
+
+Project-based consulting firm in strategy, operations, and digital transformation.
+
+**Key Achievements:**
+- Managed portfolio >IDR 1T (~USD 71M)
+- Hospital feasibility studies (IDR 331B project)
+- Healthcare turnaround management
+- Multi-clinic governance models
+- F&B scale-up: IDR 100M to IDR 1B/month revenue
+
+**Sectors:** Healthcare, F&B, Retail, Real Estate
+
+The company was wound down when Ibnu joined the government as a Civil Servant.`,
+    quickReplies: [
+      { label: 'Automate All', value: 'Tell me about Automate All startup' },
+      { label: 'Current Work', value: 'What are you doing now?' }
+    ]
+  },
+  automateall: {
+    patterns: ['automate all', 'automate', 'rpa', 'automation', 'robot', 'solusi automasi'],
+    response: `**Automate All - CV Solusi Automasi Indonesia** (Aug 2020 - Aug 2022)
+
+RPA (Robotic Process Automation) startup founded during college.
+
+**Achievements:**
+- Built 100+ automation bots for 10+ clients
+- Served 50+ total clients
+- Achieved IDR 1B valuation through pre-seed efforts
+- Top 100 Startup - Startup4Industry 2021 (Ministry of Industry)
+- Top 100 Startup - ASMI 2021 (Kemendikbud/Dikti)
+- Top 45 - Bandung Startup Pitching Day (SBM ITB)
+- Top 20 - BLOCK71 Community Open Incubation (NUS Enterprise)
+
+**Services:** Document automation, data extraction, workflow automation, custom bots`,
+    quickReplies: [
+      { label: 'Awards', value: 'What awards has he won?' },
+      { label: 'Current Role', value: 'What are you doing now?' }
     ]
   },
   projects: {
-    patterns: ['project', 'hub pkp', 'sibaru', 'simoni', 'portfolio', 'work on', 'built', 'develop'],
+    patterns: ['project', 'portfolio', 'work on', 'built', 'develop', 'proyek'],
     response: `**Key Projects:**
 
 1. **HUB PKP (Klinik Rumah)** - In Development
    - Digital platform for Indonesia's self-built housing program
-   - AI-powered design consultation, permit processing, material marketplace
+   - AI-powered design, permits, marketplace
 
 2. **SIBARU** - Active
-   - Enterprise information system for ministry operations
+   - Enterprise information system for ministry
 
 3. **SIMONI** - Active
-   - Monitoring and evaluation system for housing programs
+   - Housing program monitoring system
 
-4. **RPA Solutions** - Completed
-   - 100+ automation bots for 10+ clients
+4. **RPA Solutions** - 100+ bots for 10+ clients
 
-5. **ICP Token dApp** - Completed
-   - Web3 application on Internet Computer`,
+5. **ICP Token dApp** - Web3 app on Internet Computer
+
+6. **This Portfolio** - Next.js 15, AI chatbot, Terminal emulator`,
     quickReplies: [
       { label: 'HUB PKP Details', value: 'Tell me more about HUB PKP project' },
       { label: 'Tech Stack', value: 'What technologies do you use?' }
     ]
   },
   hubpkp: {
-    patterns: ['hub pkp', 'klinik rumah', 'housing platform', 'rumah', 'housing'],
+    patterns: ['hub pkp', 'klinik rumah', 'housing platform', 'rumah', 'housing', 'perumahan'],
     response: `**HUB PKP - Klinik Rumah**
 
 The flagship digital platform for Indonesia's self-built housing ecosystem.
@@ -127,62 +172,68 @@ The flagship digital platform for Indonesia's self-built housing ecosystem.
 - AI-powered house design consultation
 - Integrated permit processing (PBG/SIMBG)
 - Material marketplace with price comparison
-- Certified worker facilitation
+- Certified worker/contractor facilitation
 - Housing finance integration with banks
 - Construction monitoring system
 
 **Impact:**
 Streamlines housing construction for 84% of Indonesian homes built through self-construction (swadaya).
 
-**Technologies:** React, TypeScript, Node.js, PostgreSQL, AWS, SIMBG API`,
+**Technologies:** React, TypeScript, Node.js, PostgreSQL, AWS, SIMBG API integration`,
     quickReplies: [
       { label: 'Other Projects', value: 'What other projects have you worked on?' },
       { label: 'Tech Stack', value: 'What technologies do you use?' }
     ]
   },
   skills: {
-    patterns: ['skill', 'technology', 'tech stack', 'programming', 'framework', 'tools', 'expertise'],
+    patterns: ['skill', 'technology', 'tech stack', 'programming', 'framework', 'tools', 'expertise', 'kemampuan', 'keahlian'],
     response: `**Technical Skills:**
 
 **Programming:** Python (90%), JavaScript (85%), TypeScript (80%), SQL (85%), Solidity (70%)
 
 **Frameworks:** React/Next.js (85%), Node.js (80%), FastAPI (70%), LangChain (75%), TailwindCSS (85%)
 
-**AI/ML:** LLM Workflows (85%), Prompt Engineering (90%), Agentic AI (80%)
+**AI/ML:** LLM Workflows (85%), Prompt Engineering (90%), Agentic AI (80%), RAG Systems (75%)
 
 **Blockchain:** DeFi Protocols (80%), Smart Contracts (70%), On-chain Analysis (75%)
 
-**Cloud:** AWS (80%), Docker (70%), Linux (80%), Git (90%)`,
+**Cloud & DevOps:** AWS (80%), Docker (70%), Linux (80%), Git (90%)
+
+**Soft Skills:** Project Management, Strategic Planning, Team Leadership, Public Speaking`,
     quickReplies: [
       { label: 'Certifications', value: 'What certifications do you have?' },
       { label: 'AI Skills', value: 'Tell me about your AI experience' }
     ]
   },
   interests: {
-    patterns: ['interest', 'passion', 'focus', 'specialization', 'ai', 'blockchain', 'cybersecurity', 'crypto'],
+    patterns: ['interest', 'passion', 'focus', 'specialization', 'minat', 'passion'],
     response: `**Three Core Interests:**
 
 1. **Artificial Intelligence**
    - Agentic AI & Multi-Agent Systems
    - LLM Workflows & Prompt Engineering
    - AI for Government Documentation
+   - RAG Systems & Knowledge Bases
 
 2. **Crypto & Blockchain**
    - Portfolio Management & DeFi
    - On-chain Analysis & Research
    - Smart Contract Development
+   - Token Economics
 
 3. **Cybersecurity**
    - Defensive Security & OPSEC
    - OSINT & Threat Intelligence
-   - Web Application Security`,
+   - Web Application Security
+   - Privacy & Anonymity`,
     quickReplies: [
       { label: 'AI Details', value: 'Tell me more about your AI work' },
-      { label: 'Crypto Trading', value: 'Tell me about your crypto experience' }
+      { label: 'Crypto Trading', value: 'Tell me about your crypto experience' },
+      { label: 'Cybersecurity', value: 'Tell me about cybersecurity' }
     ]
   },
   ai: {
-    patterns: ['artificial intelligence', 'machine learning', 'llm', 'langchain', 'gpt', 'claude', 'agentic'],
+    patterns: ['artificial intelligence', 'machine learning', 'llm', 'langchain', 'gpt', 'claude', 'agentic', 'rag', 'kecerdasan buatan'],
     response: `**AI & Machine Learning:**
 
 I explore agentic AI systems, LLM workflows, and their applications in government and enterprise.
@@ -190,10 +241,11 @@ I explore agentic AI systems, LLM workflows, and their applications in governmen
 **Focus Areas:**
 - Agentic AI & Multi-Agent Systems
 - RAG (Retrieval Augmented Generation)
-- Prompt Engineering
+- Prompt Engineering & Chain-of-Thought
 - AI for Government Documentation
+- Autonomous Task Completion
 
-**Technologies:** LangChain, LangGraph, AutoGen, CrewAI, RAG systems
+**Technologies:** LangChain, LangGraph, AutoGen, CrewAI, OpenAI, Claude, Ollama, HuggingFace
 
 **Vision:** AI will revolutionize government service delivery through autonomous document processing and intelligent citizen assistance.`,
     quickReplies: [
@@ -202,90 +254,268 @@ I explore agentic AI systems, LLM workflows, and their applications in governmen
     ]
   },
   crypto: {
-    patterns: ['crypto', 'bitcoin', 'trading', 'defi', 'web3', 'futures', 'portfolio'],
+    patterns: ['crypto', 'bitcoin', 'trading', 'defi', 'web3', 'futures', 'altcoin', 'memecoin'],
     response: `**Crypto & Trading Experience:**
 
 **Portfolio Allocation:**
-- 70% Bitcoin (BTC)
-- 15% Strong Altcoins
-- 10% Memecoin
-- 5% DEX Coins
+- 70% Bitcoin (BTC) - Core holding
+- 15% Strong Altcoins - ETH, SOL, etc.
+- 10% Memecoin - High risk, high reward
+- 5% DEX Coins - Liquidity provision
 
 **Trading Stats:**
 - $68K-100K cumulative futures volume
 - Thesis-driven, risk-controlled approach
 - Spot and CEX/DEX derivatives
+- Active on Binance, Bybit, Jupiter, GMX
 
-**Skills:** DeFi protocols, On-chain analysis, Smart contracts, Portfolio management`,
+**Skills:** DeFi protocols, On-chain analysis, Smart contracts, Portfolio management, MEV research`,
     quickReplies: [
       { label: 'Web3 Projects', value: 'Have you built any Web3 projects?' },
-      { label: 'Cybersecurity', value: 'Tell me about cybersecurity' }
+      { label: 'DeFi Details', value: 'Tell me about DeFi' }
+    ]
+  },
+  defi: {
+    patterns: ['defi', 'decentralized finance', 'yield', 'liquidity', 'swap', 'lending'],
+    response: `**DeFi Experience:**
+
+**Protocols Used:**
+- DEXs: Uniswap, Jupiter, Raydium, GMX
+- Lending: Aave, Compound, Kamino
+- Derivatives: GMX, dYdX, Hyperliquid
+- Yield: Convex, Yearn, Marinade
+
+**Skills:**
+- Liquidity provision & yield farming
+- Perpetual futures trading
+- On-chain analysis (Dune, Arkham, DefiLlama)
+- MEV protection strategies
+- Bridge & cross-chain operations
+
+**Philosophy:** DeFi enables financial sovereignty and removes intermediaries from finance.`,
+    quickReplies: [
+      { label: 'Crypto Portfolio', value: 'Tell me about your crypto portfolio' },
+      { label: 'Web3 Projects', value: 'Have you built Web3 projects?' }
+    ]
+  },
+  cybersecurity: {
+    patterns: ['cybersecurity', 'security', 'hacking', 'pentest', 'osint', 'opsec', 'keamanan', 'cyber'],
+    response: `**Cybersecurity Focus:**
+
+**Areas of Interest:**
+- Defensive Security & Hardening
+- OPSEC (Operational Security)
+- OSINT (Open Source Intelligence)
+- Threat Intelligence & Analysis
+- Web Application Security
+- Privacy & Anonymity
+
+**Tools & Frameworks:**
+- Burp Suite, OWASP ZAP
+- Nmap, Wireshark
+- Maltego, theHarvester
+- Linux security hardening
+
+**Certifications:** Google Cybersecurity Professional, IBM Cybersecurity Analyst
+
+**Philosophy:** Security is a mindset, not just tools. Defense-in-depth and zero trust.`,
+    quickReplies: [
+      { label: 'Certifications', value: 'What security certifications?' },
+      { label: 'AI Security', value: 'AI and security?' }
     ]
   },
   certifications: {
-    patterns: ['certification', 'certificate', 'credential', 'course', 'harvard', 'stanford', 'google', 'ibm', 'mckinsey'],
+    patterns: ['certification', 'certificate', 'credential', 'course', 'harvard', 'stanford', 'google', 'ibm', 'mckinsey', 'sertifikat'],
     response: `**50+ Certifications from:**
 
 **Elite Universities:**
 - Leadership (Harvard)
 - Machine Learning (Stanford)
-- Finance (Cambridge)
-- Web3 (INSEAD)
+- Finance (Cambridge Judge)
+- Web3 & Blockchain (INSEAD)
+- Business Strategy (Wharton)
 
 **Tech Giants:**
-- Cybersecurity, BI, PM (Google)
+- Cybersecurity Professional (Google)
+- Business Intelligence (Google)
+- Project Management (Google)
 - AI & Data Engineering (IBM)
-- AWS Fundamentals (Amazon)
+- AWS Cloud Fundamentals (Amazon)
 
 **Consulting Firms:**
 - Forward Program (McKinsey)
-- Strategy (BCG, Deloitte, Accenture)
-- Audit & Finance (PwC, EY, KPMG)`,
+- Strategy Consulting (BCG, Deloitte)
+- Audit & Finance (PwC, EY, KPMG)
+
+Visit **/certifications** to see all credentials!`,
     quickReplies: [
-      { label: 'View All', value: 'How can I see all certifications?' },
+      { label: 'View All Certs', value: 'How can I see all certifications?' },
       { label: 'Skills', value: 'What skills do you have?' }
     ]
   },
+  awards: {
+    patterns: ['award', 'achievement', 'penghargaan', 'prestasi', 'trophy', 'winner'],
+    response: `**Awards & Achievements:**
+
+**Academic:**
+- 2nd Best Outstanding Graduate (Innovation & Entrepreneurship) - Telkom University 2022
+
+**Startup Competitions:**
+- Top 100 Startup - Startup4Industry 2021 (Ministry of Industry)
+- Top 100 Startup - ASMI 2021 (Kemendikbud/Dikti)
+- Top 45 - Bandung Startup Pitching Day (SBM ITB / LPIK ITB)
+- Top 20 - BLOCK71 Community Open Incubation (NUS Enterprise Singapore)
+
+**Business:**
+- Achieved IDR 1B startup valuation (Automate All)
+- Managed IDR 1T+ consulting portfolio (Virtus Futura)`,
+    quickReplies: [
+      { label: 'Automate All', value: 'Tell me about Automate All' },
+      { label: 'Virtus Consulting', value: 'Tell me about Virtus Futura' }
+    ]
+  },
+  organizations: {
+    patterns: ['organization', 'membership', 'member', 'cfa', 'hipmi', 'kadin', 'komunitas', 'organisasi'],
+    response: `**Professional Memberships:**
+
+1. **CFA Institute** - Member
+   - ID: 200530563
+   - Since 2024
+
+2. **KADIN Indonesia** - Member
+   - ID: 20203-2132274685
+   - Chamber of Commerce
+
+3. **BPD HIPMI JAYA** - Member
+   - DKI Jakarta Young Entrepreneurs
+   - Since 2021
+
+4. **Akademi Crypto** - Lifetime Member
+   - Indonesian crypto community
+   - Since 2023
+
+These networks help me stay connected with business and tech communities.`,
+    quickReplies: [
+      { label: 'Contact', value: 'How can I contact you?' },
+      { label: 'LinkedIn', value: 'What is your LinkedIn?' }
+    ]
+  },
   contact: {
-    patterns: ['contact', 'email', 'reach', 'hire', 'connect', 'work together', 'collaborate'],
+    patterns: ['contact', 'email', 'reach', 'hire', 'connect', 'work together', 'collaborate', 'hubungi', 'kontak'],
     response: `**Let's Connect!**
 
+**Contact Info:**
 - Email: hi@heyibnu.com
 - GitHub: github.com/subkhanibnuaji
 - LinkedIn: linkedin.com/in/subkhanibnuaji
+- Twitter: @subkhanibnuaji
 - Location: Jakarta, Indonesia
 
-I'm open to:
+**Open For:**
 - Project Collaboration
 - Consulting Opportunities
 - Speaking Engagements
 - Advisory Roles
+- Technical Discussions
 
-Visit the **Contact** page to send a message!`,
+Visit the **Contact** page to send a message directly!`,
     quickReplies: [
-      { label: 'Go to Contact', value: 'How do I go to the contact page?' }
+      { label: 'Go to Contact', value: 'Navigate to contact page' },
+      { label: 'Download Resume', value: 'How can I download your resume?' }
+    ]
+  },
+  resume: {
+    patterns: ['resume', 'cv', 'curriculum vitae', 'download cv', 'download resume'],
+    response: `**Resume / CV**
+
+You can download Ibnu's resume from the **About** page!
+
+**What's Included:**
+- Complete work experience
+- Education details
+- Technical skills
+- Certifications summary
+- Contact information
+
+**Quick Stats:**
+- 5+ Years Experience
+- 50+ Projects
+- 2 Degrees (MBA + S.Kom)
+- 50+ Certifications
+
+Visit **/about** and scroll to the Resume section to download!`,
+    quickReplies: [
+      { label: 'Go to About', value: 'Navigate to about page' },
+      { label: 'Experience', value: 'Tell me about your experience' }
+    ]
+  },
+  newsletter: {
+    patterns: ['newsletter', 'subscribe', 'update', 'langganan', 'berlangganan'],
+    response: `**Newsletter Subscription**
+
+Stay updated with Ibnu's latest:
+- Tech articles and insights
+- Project updates
+- AI/Blockchain/Cybersecurity content
+- Career tips
+
+**How to Subscribe:**
+Look for the newsletter form in the website footer, or visit the blog page!
+
+**Topics Covered:**
+Tech, AI/ML, Web3, Career, Projects
+
+No spam, unsubscribe anytime.`,
+    quickReplies: [
+      { label: 'Blog', value: 'Where is the blog?' },
+      { label: 'Contact', value: 'How can I contact you?' }
+    ]
+  },
+  languages: {
+    patterns: ['language', 'bahasa', 'english', 'indonesian', 'mandarin', 'arabic', 'toefl'],
+    response: `**Language Proficiency:**
+
+1. **Indonesian** - Native Speaker
+   - First language
+
+2. **English** - Advanced (C1)
+   - TOEFL ITP: 593
+   - Professional working proficiency
+
+3. **Arabic** - Beginner
+   - Basic reading (Quran)
+
+4. **Mandarin** - Beginner
+   - HSK Level 1 certified
+
+Currently focused on improving English for international opportunities and Mandarin for business in Asia.`,
+    quickReplies: [
+      { label: 'Education', value: 'Tell me about your education' },
+      { label: 'Certifications', value: 'What certifications?' }
     ]
   },
   navigation: {
-    patterns: ['page', 'navigate', 'go to', 'where', 'find', 'see all'],
+    patterns: ['page', 'navigate', 'go to', 'where', 'find', 'see all', 'halaman'],
     response: `**Website Navigation:**
 
-- **/about** - Timeline, education, experience
+- **/about** - Timeline, education, experience, resume
 - **/projects** - All projects showcase
 - **/interests** - AI, Blockchain, Cybersecurity deep-dive
 - **/certifications** - 50+ credentials
 - **/contact** - Send me a message
+- **/blog** - Articles and insights
 
 **Keyboard Shortcuts:**
 - Press **Cmd+K** (or Ctrl+K) to open command palette
-- Press **T** to open terminal emulator`,
+- Press **T** to open terminal emulator
+- Press **Esc** to close modals`,
     quickReplies: [
       { label: 'About Page', value: 'What can I find on the About page?' },
       { label: 'Terminal', value: 'How do I use the terminal?' }
     ]
   },
   terminal: {
-    patterns: ['terminal', 'command', 'cli', 'shell'],
+    patterns: ['terminal', 'command', 'cli', 'shell', 'console'],
     response: `**Interactive Terminal**
 
 Press **T** or click the Terminal button to open an interactive terminal emulator!
@@ -296,16 +526,135 @@ Press **T** or click the Terminal button to open an interactive terminal emulato
 - \`skills\` - List all skills
 - \`projects\` - View projects
 - \`crypto\` - Crypto portfolio info
+- \`contact\` - Contact info
 - \`neofetch\` - System info ASCII art
 - \`matrix\` - Fun easter egg!
+- \`clear\` - Clear screen
 
 Try typing \`help\` in the terminal for a full list of 40+ commands.`,
     quickReplies: [
       { label: 'Open Terminal', value: 'How do I open the terminal?' }
     ]
   },
+  website: {
+    patterns: ['website', 'portfolio', 'built with', 'stack', 'next.js', 'this site', 'web ini'],
+    response: `**This Portfolio Website**
+
+Built with modern technologies:
+
+**Frontend:**
+- Next.js 15 (App Router)
+- React 18
+- TypeScript
+- Tailwind CSS
+- Framer Motion (animations)
+
+**Features:**
+- AI Chatbot (you're using it now!)
+- Interactive Terminal Emulator
+- Command Palette (Cmd+K)
+- Dark Theme
+- Responsive Design
+- Newsletter Subscription
+- Contact Form with Email
+
+**Backend:**
+- Prisma ORM
+- PostgreSQL (Neon)
+- NextAuth.js
+- Resend (emails)
+
+Fully open source!`,
+    quickReplies: [
+      { label: 'Skills', value: 'What are your skills?' },
+      { label: 'GitHub', value: 'Where is the source code?' }
+    ]
+  },
+  funfacts: {
+    patterns: ['fun fact', 'interesting', 'hobi', 'hobby', 'free time', 'waktu luang', 'menarik'],
+    response: `**Fun Facts About Ibnu:**
+
+- Started coding at 16, built first website in high school
+- Founded a startup while still in university
+- Can read Arabic (basic) and learning Mandarin
+- Crypto enthusiast since 2021 bull run
+- Love exploring new AI tools and frameworks
+- Terminal and CLI enthusiast (hence the terminal feature!)
+- Believe in "learn by building" philosophy
+- Coffee > Tea (definitely)
+- Based in Jakarta, Indonesia
+
+**Motto:** "Technology should serve humanity, not the other way around."`,
+    quickReplies: [
+      { label: 'About', value: 'Tell me more about Ibnu' },
+      { label: 'Interests', value: 'What are your interests?' }
+    ]
+  },
+  thanks: {
+    patterns: ['thank', 'thanks', 'terima kasih', 'makasih', 'appreciate', 'helpful'],
+    response: `You're welcome! I'm glad I could help.
+
+Feel free to ask more questions about:
+- Ibnu's background and experience
+- Projects and technical work
+- Skills and certifications
+- Contact information
+
+Or explore the website:
+- Use **Cmd+K** for quick navigation
+- Press **T** for the terminal
+- Check out the **Projects** page
+
+Is there anything else you'd like to know?`,
+    quickReplies: [
+      { label: 'Contact', value: 'How can I contact you?' },
+      { label: 'Projects', value: 'Show me the projects' }
+    ]
+  },
+  bye: {
+    patterns: ['bye', 'goodbye', 'see you', 'sampai jumpa', 'dadah', 'later'],
+    response: `Goodbye! Thanks for chatting with me.
+
+**Before you go:**
+- Subscribe to the newsletter for updates
+- Connect on LinkedIn: /in/subkhanibnuaji
+- Check out the Projects page
+- Download the resume from About page
+
+Feel free to come back anytime! The chat will be here.
+
+Have a great day!`,
+    quickReplies: [
+      { label: 'Stay', value: 'Actually, I have more questions' },
+      { label: 'Newsletter', value: 'How do I subscribe?' }
+    ]
+  },
+  currentrole: {
+    patterns: ['current', 'now', 'sekarang', 'saat ini', 'hari ini', 'present'],
+    response: `**Current Role (Aug 2024 - Present)**
+
+**Civil Servant (ASN)** at Ministry of Housing & Settlement Areas (Kementerian PKP)
+
+**Responsibilities:**
+- Managing end-to-end delivery of enterprise IT applications
+- Lead development of HUB PKP digital housing ecosystem
+- Coordinate vendor delivery and user adoption
+- Support ministerial policy drafting
+- Evaluate procurement proposals >IDR 10B
+
+**Key Projects:**
+- HUB PKP (Klinik Rumah) - Digital housing platform
+- SIBARU - Enterprise information system
+- SIMONI - Monitoring & evaluation system
+
+Located in Jakarta, Indonesia.`,
+    quickReplies: [
+      { label: 'HUB PKP', value: 'Tell me about HUB PKP' },
+      { label: 'Previous Jobs', value: 'What did you do before?' }
+    ]
+  },
   default: {
-    response: "I'm not sure about that specific topic, but I can help you with information about Ibnu's background, projects, skills, interests (AI, Blockchain, Cybersecurity), certifications, and more. What would you like to know?",
+    response: "I'm not sure about that specific topic. I can help you with information about:\n\n- **Background** - Education, experience, skills\n- **Projects** - HUB PKP, RPA solutions, Web3\n- **Interests** - AI, Blockchain, Cybersecurity\n- **Certifications** - 50+ credentials\n- **Contact** - How to reach Ibnu\n\nWhat would you like to know?",
     quickReplies: [
       { label: 'About Ibnu', value: 'Tell me about Ibnu' },
       { label: 'Projects', value: 'What projects has he worked on?' },

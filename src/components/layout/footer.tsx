@@ -1,5 +1,8 @@
+'use client'
+
 import Link from 'next/link'
 import { Github, Linkedin, Twitter, Mail } from 'lucide-react'
+import { FooterNewsletter } from '@/components/newsletter/newsletter-form'
 
 const FOOTER_LINKS = {
   pages: [
@@ -27,9 +30,9 @@ export function Footer() {
   return (
     <footer className="relative border-t border-border bg-card/30">
       <div className="container py-12 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-10">
           {/* Brand */}
-          <div className="md:col-span-2">
+          <div className="md:col-span-1">
             <Link href="/" className="inline-flex items-center gap-2 text-2xl font-bold">
               <span className="gradient-text">IBNU</span>
               <span className="w-2 h-2 rounded-full bg-cyber-cyan" />
@@ -86,6 +89,11 @@ export function Footer() {
                 </li>
               ))}
             </ul>
+          </div>
+
+          {/* Newsletter */}
+          <div className="md:col-span-2">
+            <FooterNewsletter />
           </div>
         </div>
 
