@@ -13,6 +13,10 @@ import { ScrollProgress } from '@/components/effects/scroll-progress'
 import { AIChatbot } from '@/components/chat/ai-chatbot'
 import { Terminal } from '@/components/terminal/terminal'
 import { CommandPalette } from '@/components/layout/command-palette'
+import { StatsCounter } from '@/components/stats/stats-counter'
+import { TestimonialsSection } from '@/components/testimonials/testimonials-section'
+import { BackToTop } from '@/components/ui/back-to-top'
+import { KeyboardShortcuts } from '@/components/ui/keyboard-shortcuts'
 
 export default function HomePage() {
   return (
@@ -28,9 +32,11 @@ export default function HomePage() {
       {/* Main Content */}
       <main className="relative z-10">
         <HeroSection />
+        <StatsCounter />
         <InterestsSection />
         <FeaturedProjectSection />
         <SkillsSection />
+        <TestimonialsSection />
         <CredentialsSection />
         <ContactCTASection />
       </main>
@@ -43,6 +49,8 @@ export default function HomePage() {
         <AIChatbot />
         <Terminal />
         <CommandPalette />
+        <BackToTop />
+        <KeyboardShortcuts />
       </Suspense>
     </>
   )
