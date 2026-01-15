@@ -1,0 +1,49 @@
+import { Suspense } from 'react'
+import { HeroSection } from '@/components/sections/hero'
+import { InterestsSection } from '@/components/sections/interests'
+import { FeaturedProjectSection } from '@/components/sections/featured-project'
+import { SkillsSection } from '@/components/sections/skills'
+import { CredentialsSection } from '@/components/sections/credentials'
+import { ContactCTASection } from '@/components/sections/contact-cta'
+import { Navbar } from '@/components/layout/navbar'
+import { Footer } from '@/components/layout/footer'
+import { ParticleBackground } from '@/components/effects/particle-background'
+import { CustomCursor } from '@/components/effects/custom-cursor'
+import { ScrollProgress } from '@/components/effects/scroll-progress'
+import { AIChatbot } from '@/components/chat/ai-chatbot'
+import { Terminal } from '@/components/terminal/terminal'
+import { CommandPalette } from '@/components/layout/command-palette'
+
+export default function HomePage() {
+  return (
+    <>
+      {/* Background Effects */}
+      <ParticleBackground />
+      <CustomCursor />
+      <ScrollProgress />
+
+      {/* Navigation */}
+      <Navbar />
+
+      {/* Main Content */}
+      <main className="relative z-10">
+        <HeroSection />
+        <InterestsSection />
+        <FeaturedProjectSection />
+        <SkillsSection />
+        <CredentialsSection />
+        <ContactCTASection />
+      </main>
+
+      {/* Footer */}
+      <Footer />
+
+      {/* Floating Components */}
+      <Suspense fallback={null}>
+        <AIChatbot />
+        <Terminal />
+        <CommandPalette />
+      </Suspense>
+    </>
+  )
+}
