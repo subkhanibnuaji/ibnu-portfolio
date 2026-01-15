@@ -2,21 +2,30 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { ArrowRight, Sparkles, Terminal, Download, Github, Linkedin, Mail } from 'lucide-react'
+import { ArrowRight, Sparkles, Terminal, Github, Linkedin, Mail, Shield, Cpu, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 
 const roles = [
-  { text: 'Artificial Intelligence', color: 'text-cyber-cyan' },
-  { text: 'Blockchain & Crypto', color: 'text-cyber-orange' },
-  { text: 'Cybersecurity', color: 'text-cyber-green' },
+  { text: 'Artificial Intelligence', color: 'text-cyber-cyan dark:text-cyber-cyan', icon: Cpu },
+  { text: 'Blockchain & Crypto', color: 'text-cyber-orange dark:text-cyber-orange', icon: TrendingUp },
+  { text: 'Cybersecurity', color: 'text-cyber-green dark:text-cyber-green', icon: Shield },
 ]
 
 const stats = [
-  { value: '50+', label: 'Certifications', icon: '🎓' },
-  { value: '$68-100K', label: 'Trading Volume', icon: '📈' },
-  { value: 'MBA + S.Kom', label: 'Education', icon: '🎯' },
+  { value: '50+', label: 'Certifications', icon: Shield },
+  { value: '$68-100K', label: 'Trading Volume', icon: TrendingUp },
+  { value: 'MBA + S.Kom', label: 'Education', icon: Cpu },
 ]
+
+// Unsplash images for cyber/trading/AI theme
+const heroImages = {
+  main: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=800&q=80', // Blockchain/Crypto
+  ai: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&q=80', // AI
+  security: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400&q=80', // Cybersecurity
+  trading: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&q=80', // Trading
+}
 
 export function HeroSection() {
   const [roleIndex, setRoleIndex] = useState(0)
@@ -28,14 +37,29 @@ export function HeroSection() {
     return () => clearInterval(interval)
   }, [])
 
+  const CurrentIcon = roles[roleIndex].icon
+
   return (
     <section className="relative min-h-screen flex items-center justify-center py-20 px-4 overflow-hidden">
-      {/* Grid Background */}
-      <div className="absolute inset-0 grid-pattern opacity-50" />
+      {/* Background Image with Overlay */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src={heroImages.main}
+          alt="Cyber Background"
+          fill
+          className="object-cover opacity-10 dark:opacity-20"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/90 to-background" />
+      </div>
 
-      {/* Gradient Orbs */}
-      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-cyber-cyan/20 rounded-full blur-[128px]" />
-      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-cyber-purple/20 rounded-full blur-[128px]" />
+      {/* Grid Background */}
+      <div className="absolute inset-0 grid-pattern opacity-30 dark:opacity-50" />
+
+      {/* Animated Gradient Orbs */}
+      <div className="absolute top-1/4 -left-32 w-96 h-96 bg-cyber-cyan/10 dark:bg-cyber-cyan/20 rounded-full blur-[128px] animate-pulse-glow" />
+      <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-cyber-purple/10 dark:bg-cyber-purple/20 rounded-full blur-[128px] animate-pulse-glow animation-delay-1000" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyber-green/5 dark:bg-cyber-green/10 rounded-full blur-[150px]" />
 
       <div className="container relative z-10">
         <div className="max-w-4xl mx-auto text-center">
@@ -72,7 +96,8 @@ export function HeroSection() {
             className="text-xl md:text-2xl lg:text-3xl mb-8"
           >
             <span className="text-muted-foreground">I explore the future of</span>{' '}
-            <span className={`font-semibold ${roles[roleIndex].color} transition-colors duration-500`}>
+            <span className={`font-semibold ${roles[roleIndex].color} transition-colors duration-500 inline-flex items-center gap-2`}>
+              <CurrentIcon className="h-6 w-6 md:h-7 md:w-7" />
               {roles[roleIndex].text}
             </span>
           </motion.div>
@@ -100,12 +125,12 @@ export function HeroSection() {
             className="flex flex-wrap justify-center gap-6 md:gap-10 mb-10"
           >
             {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-2xl md:text-3xl font-bold gradient-text">
+              <div key={index} className="text-center group">
+                <div className="text-2xl md:text-3xl font-bold gradient-text group-hover:scale-105 transition-transform">
                   {stat.value}
                 </div>
-                <div className="text-sm text-muted-foreground flex items-center gap-1 justify-center">
-                  <span>{stat.icon}</span>
+                <div className="text-sm text-muted-foreground flex items-center gap-1.5 justify-center">
+                  <stat.icon className="h-4 w-4 text-primary" />
                   {stat.label}
                 </div>
               </div>
