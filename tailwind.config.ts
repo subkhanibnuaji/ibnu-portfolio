@@ -50,13 +50,40 @@ const config: Config = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
-        // Custom portfolio colors
+        // Custom Cyber/Crypto/AI Theme Colors
         cyber: {
           cyan: '#00d4ff',
-          purple: '#8b5cf6',
-          green: '#10b981',
+          'cyan-dark': '#0099cc',
+          purple: '#a855f7',
+          'purple-dark': '#7c3aed',
+          green: '#00ff88',
+          'green-dark': '#10b981',
           orange: '#f7931a',
+          'orange-dark': '#d97706',
           pink: '#ec4899',
+          'pink-dark': '#db2777',
+          red: '#ff3366',
+          blue: '#3b82f6',
+          yellow: '#fbbf24',
+        },
+        // Semantic colors for crypto/trading
+        trading: {
+          profit: '#00ff88',
+          loss: '#ff3366',
+          neutral: '#fbbf24',
+        },
+        // AI theme colors
+        ai: {
+          primary: '#00d4ff',
+          secondary: '#a855f7',
+          neural: '#6366f1',
+        },
+        // Security theme colors
+        security: {
+          safe: '#00ff88',
+          warning: '#fbbf24',
+          danger: '#ff3366',
+          locked: '#6366f1',
         },
       },
       borderRadius: {
@@ -117,6 +144,42 @@ const config: Config = {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0' },
         },
+        'pulse-glow': {
+          '0%, 100%': {
+            boxShadow: '0 0 20px rgba(0, 212, 255, 0.3), 0 0 40px rgba(0, 212, 255, 0.1)'
+          },
+          '50%': {
+            boxShadow: '0 0 30px rgba(0, 212, 255, 0.5), 0 0 60px rgba(0, 212, 255, 0.2)'
+          },
+        },
+        'cyber-flicker': {
+          '0%, 100%': { opacity: '1' },
+          '92%': { opacity: '1' },
+          '93%': { opacity: '0.8' },
+          '94%': { opacity: '1' },
+          '96%': { opacity: '0.9' },
+          '97%': { opacity: '1' },
+        },
+        'scan-line': {
+          '0%': { transform: 'translateY(-100%)' },
+          '100%': { transform: 'translateY(100%)' },
+        },
+        'matrix-rain': {
+          '0%': { transform: 'translateY(-100%)', opacity: '1' },
+          '100%': { transform: 'translateY(100vh)', opacity: '0' },
+        },
+        'border-flow': {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
+        'bounce-subtle': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-5px)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -131,14 +194,26 @@ const config: Config = {
         'gradient-x': 'gradient-x 3s ease infinite',
         'typing': 'typing 2s steps(20) forwards',
         'blink': 'blink 1s step-end infinite',
+        'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+        'cyber-flicker': 'cyber-flicker 4s ease-in-out infinite',
+        'scan-line': 'scan-line 3s linear infinite',
+        'matrix-rain': 'matrix-rain 5s linear infinite',
+        'border-flow': 'border-flow 3s ease infinite',
+        'shimmer': 'shimmer 2s linear infinite',
+        'bounce-subtle': 'bounce-subtle 2s ease-in-out infinite',
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
-        'cyber-gradient': 'linear-gradient(135deg, #00d4ff 0%, #8b5cf6 50%, #ec4899 100%)',
-        'ai-gradient': 'linear-gradient(135deg, #00d4ff 0%, #06b6d4 100%)',
-        'crypto-gradient': 'linear-gradient(135deg, #f7931a 0%, #fbbf24 100%)',
-        'cyber-security-gradient': 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+        'cyber-gradient': 'linear-gradient(135deg, #00d4ff 0%, #a855f7 50%, #ec4899 100%)',
+        'ai-gradient': 'linear-gradient(135deg, #00d4ff 0%, #6366f1 50%, #a855f7 100%)',
+        'crypto-gradient': 'linear-gradient(135deg, #f7931a 0%, #fbbf24 50%, #f59e0b 100%)',
+        'cyber-security-gradient': 'linear-gradient(135deg, #00ff88 0%, #10b981 50%, #059669 100%)',
+        'trading-gradient': 'linear-gradient(135deg, #00ff88 0%, #00d4ff 100%)',
+        'neural-gradient': 'linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%)',
+        'matrix-gradient': 'linear-gradient(180deg, transparent 0%, #00ff88 50%, transparent 100%)',
+        'dark-gradient': 'linear-gradient(180deg, hsl(222 47% 4%) 0%, hsl(222 47% 8%) 100%)',
+        'light-gradient': 'linear-gradient(180deg, hsl(210 20% 98%) 0%, hsl(210 20% 94%) 100%)',
       },
     },
   },

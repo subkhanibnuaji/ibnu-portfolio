@@ -15,8 +15,9 @@ export function ContactCTASection() {
   return (
     <section className="py-24 px-4 relative overflow-hidden">
       {/* Background Effects */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 to-transparent" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-[128px]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/5 dark:via-primary/10 to-transparent" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 dark:bg-primary/15 rounded-full blur-[128px] animate-pulse-glow" />
+      <div className="absolute inset-0 hex-pattern opacity-30 dark:opacity-50" />
 
       <div className="container relative z-10">
         <motion.div
@@ -63,7 +64,7 @@ export function ContactCTASection() {
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="w-12 h-12 rounded-xl bg-muted/50 border border-border flex items-center justify-center text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all"
+                className="w-12 h-12 rounded-xl bg-muted/50 dark:bg-muted/30 border border-border dark:border-border/50 flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/50 hover:bg-primary/10 dark:hover:bg-primary/20 transition-all duration-300 hover:scale-110"
               >
                 <social.icon className="h-5 w-5" />
               </motion.a>
