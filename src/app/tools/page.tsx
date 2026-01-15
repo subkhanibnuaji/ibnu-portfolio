@@ -9,7 +9,8 @@ import {
   Braces, StickyNote, Scale, Globe, Sparkles, Hourglass,
   QrCode, Type, AlignLeft, BookOpen, Grid3X3,
   Binary, Regex, Brain, SquareStack, Cake, Banknote, Square, Smile,
-  DollarSign, Receipt, LayoutGrid, Hash, Shuffle, Grid2X2, Wallet
+  DollarSign, Receipt, LayoutGrid, Hash, Shuffle, Grid2X2, Wallet,
+  CircleDot, Bomb, ListChecks, Disc, ShoppingCart
 } from 'lucide-react'
 
 const TOOLS = [
@@ -390,6 +391,51 @@ const TOOLS = [
     bgColor: 'bg-green-500/10',
     textColor: 'text-green-500',
     category: 'Finance'
+  },
+  {
+    slug: 'connect-four',
+    name: 'Connect Four',
+    description: 'Drop discs to connect 4 in a row! Play vs friend or AI.',
+    icon: CircleDot,
+    bgColor: 'bg-red-500/10',
+    textColor: 'text-red-500',
+    category: 'Game'
+  },
+  {
+    slug: 'minesweeper',
+    name: 'Minesweeper',
+    description: 'Classic puzzle game - clear the board without hitting mines!',
+    icon: Bomb,
+    bgColor: 'bg-gray-500/10',
+    textColor: 'text-gray-500',
+    category: 'Game'
+  },
+  {
+    slug: 'checklist',
+    name: 'Checklist',
+    description: 'Create multiple lists with priorities and due dates.',
+    icon: ListChecks,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Productivity'
+  },
+  {
+    slug: 'simon-says',
+    name: 'Simon Says',
+    description: 'Memory game - repeat the color pattern as it grows!',
+    icon: Disc,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Game'
+  },
+  {
+    slug: 'unit-price-calculator',
+    name: 'Unit Price Calculator',
+    description: 'Compare product prices to find the best deal.',
+    icon: ShoppingCart,
+    bgColor: 'bg-orange-500/10',
+    textColor: 'text-orange-500',
+    category: 'Calculator'
   }
 ]
 
