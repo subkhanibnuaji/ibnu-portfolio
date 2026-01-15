@@ -4,7 +4,7 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-export const db =
+export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
     log:
@@ -13,6 +13,7 @@ export const db =
         : ['error'],
   })
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 
-export default db
+export const db = prisma
+export default prisma
