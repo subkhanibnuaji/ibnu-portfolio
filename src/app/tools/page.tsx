@@ -8,7 +8,8 @@ import {
   Cloud, Blocks, FileText, Palette, Timer as StopwatchIcon, Key, Target,
   Braces, StickyNote, Scale, Globe, Sparkles, Hourglass,
   QrCode, Type, AlignLeft, BookOpen, Grid3X3,
-  Binary, Regex, Brain, SquareStack, Cake, Banknote, Square, Smile
+  Binary, Regex, Brain, SquareStack, Cake, Banknote, Square, Smile,
+  DollarSign, Receipt, LayoutGrid, Hash, Shuffle, Grid2X2, Wallet
 } from 'lucide-react'
 
 const TOOLS = [
@@ -326,6 +327,69 @@ const TOOLS = [
     bgColor: 'bg-yellow-500/10',
     textColor: 'text-yellow-500',
     category: 'Utility'
+  },
+  {
+    slug: 'currency-converter',
+    name: 'Currency Converter',
+    description: 'Convert between 24 world currencies instantly.',
+    icon: DollarSign,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Finance'
+  },
+  {
+    slug: 'invoice-generator',
+    name: 'Invoice Generator',
+    description: 'Create professional invoices with itemized billing.',
+    icon: Receipt,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Business'
+  },
+  {
+    slug: 'brick-breaker',
+    name: 'Brick Breaker',
+    description: 'Classic arcade game - break all the bricks with the ball!',
+    icon: LayoutGrid,
+    bgColor: 'bg-red-500/10',
+    textColor: 'text-red-500',
+    category: 'Game'
+  },
+  {
+    slug: 'sudoku',
+    name: 'Sudoku',
+    description: 'Classic number puzzle with multiple difficulty levels.',
+    icon: Hash,
+    bgColor: 'bg-indigo-500/10',
+    textColor: 'text-indigo-500',
+    category: 'Game'
+  },
+  {
+    slug: 'word-scramble',
+    name: 'Word Scramble',
+    description: 'Unscramble letters to find hidden words in 6 categories.',
+    icon: Shuffle,
+    bgColor: 'bg-emerald-500/10',
+    textColor: 'text-emerald-500',
+    category: 'Game'
+  },
+  {
+    slug: 'pixel-art-editor',
+    name: 'Pixel Art Editor',
+    description: 'Create beautiful pixel art with multiple tools and colors.',
+    icon: Grid2X2,
+    bgColor: 'bg-pink-500/10',
+    textColor: 'text-pink-500',
+    category: 'Creative'
+  },
+  {
+    slug: 'expense-tracker',
+    name: 'Expense Tracker',
+    description: 'Track income and expenses with charts and categories.',
+    icon: Wallet,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Finance'
   }
 ]
 
