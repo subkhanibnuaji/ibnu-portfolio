@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
+import { CanvasFixProvider } from '@/components/providers/canvas-fix-provider'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { SessionProvider } from '@/components/providers/session-provider'
 import { Toaster } from '@/components/ui/sonner'
@@ -97,17 +98,19 @@ export default function RootLayout({
       className={`${GeistSans.variable} ${GeistMono.variable}`}
     >
       <body className="min-h-screen bg-background font-sans antialiased">
-        <SessionProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="dark"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-            <Toaster richColors position="bottom-right" />
-          </ThemeProvider>
-        </SessionProvider>
+        <CanvasFixProvider>
+          <SessionProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="dark"
+              enableSystem
+              disableTransitionOnChange
+            >
+              {children}
+              <Toaster richColors position="bottom-right" />
+            </ThemeProvider>
+          </SessionProvider>
+        </CanvasFixProvider>
         <Analytics />
         <SpeedInsights />
       </body>
