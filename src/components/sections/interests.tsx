@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Brain, Bitcoin, Shield, ArrowRight, Cpu, Wallet, Lock } from 'lucide-react'
+import { Brain, ArrowRight, Bot, Wallet, Shield, Zap, Target, Code2 } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
@@ -9,17 +9,20 @@ import { cn } from '@/lib/utils'
 const INTERESTS = [
   {
     id: 'ai',
-    icon: Cpu,
+    icon: Bot,
     title: 'Artificial Intelligence',
     description:
       'From LLMs to autonomous agents, AI is becoming the most transformative technology in human history. I research agentic AI systems for government documentation and build practical solutions.',
     tags: ['LangChain', 'AutoGen', 'LLMs', 'RAG'],
     color: 'cyber-cyan',
     textColor: 'text-cyber-cyan',
-    bgColor: 'bg-cyber-cyan/10 dark:bg-cyber-cyan/20',
+    bgColor: 'bg-cyber-cyan/10',
+    borderColor: 'border-cyber-cyan/30 hover:border-cyber-cyan/60',
+    glowColor: 'hover:shadow-cyber-cyan/20',
     gradient: 'from-cyber-cyan to-blue-500',
     image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&q=80',
     why: 'AI will augment human capabilities exponentially, automating complex tasks and enabling breakthroughs in science, medicine, and governance.',
+    stats: { value: 'GPT-4', label: 'Level' },
   },
   {
     id: 'crypto',
@@ -30,10 +33,13 @@ const INTERESTS = [
     tags: ['DeFi', 'Web3', 'Trading', 'Smart Contracts'],
     color: 'cyber-orange',
     textColor: 'text-cyber-orange',
-    bgColor: 'bg-cyber-orange/10 dark:bg-cyber-orange/20',
+    bgColor: 'bg-cyber-orange/10',
+    borderColor: 'border-cyber-orange/30 hover:border-cyber-orange/60',
+    glowColor: 'hover:shadow-cyber-orange/20',
     gradient: 'from-cyber-orange to-yellow-500',
     image: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=600&q=80',
     why: 'Blockchain enables trustless systems, programmable money, and true digital ownership. It will transform finance and governance.',
+    stats: { value: '$68-100K', label: 'Volume' },
   },
   {
     id: 'cyber',
@@ -44,18 +50,27 @@ const INTERESTS = [
     tags: ['OSINT', 'Threat Intel', 'Forensics', 'OPSEC'],
     color: 'cyber-green',
     textColor: 'text-cyber-green',
-    bgColor: 'bg-cyber-green/10 dark:bg-cyber-green/20',
+    bgColor: 'bg-cyber-green/10',
+    borderColor: 'border-cyber-green/30 hover:border-cyber-green/60',
+    glowColor: 'hover:shadow-cyber-green/20',
     gradient: 'from-cyber-green to-emerald-500',
     image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=600&q=80',
     why: 'Cyber threats evolve faster than defenses. Security professionals will be the guardians of our digital civilization.',
+    stats: { value: 'ACTIVE', label: 'Status' },
   },
 ]
 
 export function InterestsSection() {
   return (
-    <section className="py-24 px-4 relative overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 grid-pattern opacity-20 dark:opacity-40" />
+    <section className="py-24 px-4 relative overflow-hidden bg-[#0a0a0f]">
+      {/* Background Effects */}
+      <div className="absolute inset-0 grid-pattern opacity-30" />
+      <div className="absolute inset-0 scanlines opacity-10 pointer-events-none" />
+
+      {/* Animated orbs */}
+      <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyber-cyan/10 rounded-full blur-[150px] animate-pulse-glow" />
+      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyber-orange/10 rounded-full blur-[150px] animate-pulse-glow" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-cyber-green/5 rounded-full blur-[100px]" />
 
       <div className="container relative z-10">
         {/* Header */}
@@ -66,16 +81,18 @@ export function InterestsSection() {
           transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass text-sm font-medium text-primary uppercase tracking-wider mb-4">
-            <Brain className="h-4 w-4" />
-            Core Focus Areas
+          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[#0a0a0f]/80 backdrop-blur-sm border border-cyber-green/30 text-sm font-mono mb-4">
+            <Target className="h-4 w-4 text-cyber-green" />
+            <span className="text-cyber-green">$</span>
+            <span className="text-cyber-cyan">focus</span>
+            <span className="text-foreground">--areas</span>
           </span>
-          <h2 className="text-3xl md:text-4xl font-bold mt-2 mb-4">
-            Three Pillars of the <span className="gradient-text">Future</span>
+          <h2 className="text-3xl md:text-5xl font-bold mt-4 mb-4">
+            <span className="text-muted-foreground">Three Pillars of the</span>{' '}
+            <span className="gradient-text text-glow">Future</span>
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
-            These technologies will fundamentally reshape how we live, work, and interact.
-            I&apos;m deeply invested in understanding and building with them.
+          <p className="text-muted-foreground max-w-2xl mx-auto font-mono text-sm">
+            // Technologies that will fundamentally reshape how we live, work, and interact
           </p>
         </motion.div>
 
@@ -87,45 +104,75 @@ export function InterestsSection() {
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
+              transition={{ duration: 0.5, delay: index * 0.15 }}
               className="group relative"
             >
               <div
                 className={cn(
-                  'h-full rounded-2xl border border-border overflow-hidden',
-                  'bg-card/50 dark:bg-card/30 backdrop-blur-sm',
-                  'transition-all duration-300',
-                  'hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10',
-                  'hover:-translate-y-1'
+                  'h-full rounded-2xl border overflow-hidden',
+                  'bg-[#0a0a0f]/60 backdrop-blur-sm',
+                  'transition-all duration-500',
+                  interest.borderColor,
+                  'hover:shadow-lg',
+                  interest.glowColor,
+                  'hover:-translate-y-2'
                 )}
               >
-                {/* Image Header */}
-                <div className="relative h-40 overflow-hidden">
+                {/* Image Header with cyber overlay */}
+                <div className="relative h-48 overflow-hidden">
                   <Image
                     src={interest.image}
                     alt={interest.title}
                     fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    className="object-cover transition-transform duration-700 group-hover:scale-110 grayscale-[30%] group-hover:grayscale-0"
                   />
+                  {/* Cyber overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0f] via-[#0a0a0f]/60 to-transparent" />
                   <div className={cn(
-                    'absolute inset-0 bg-gradient-to-t from-card via-card/50 to-transparent'
+                    'absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity',
+                    `bg-gradient-to-br ${interest.gradient}`
                   )} />
+
+                  {/* Icon badge */}
                   <div className={cn(
-                    'absolute top-4 left-4 w-12 h-12 rounded-xl flex items-center justify-center',
-                    interest.bgColor
+                    'absolute top-4 left-4 w-14 h-14 rounded-xl flex items-center justify-center',
+                    interest.bgColor,
+                    'border',
+                    interest.borderColor.split(' ')[0],
+                    'group-hover:scale-110 transition-transform'
                   )}>
-                    <interest.icon className={cn('h-6 w-6', interest.textColor)} />
+                    <interest.icon className={cn('h-7 w-7', interest.textColor)} />
                   </div>
+
+                  {/* Stats badge */}
+                  <div className="absolute top-4 right-4">
+                    <div className={cn(
+                      'px-3 py-1.5 rounded-lg backdrop-blur-sm border',
+                      interest.bgColor,
+                      interest.borderColor.split(' ')[0]
+                    )}>
+                      <div className={cn('text-sm font-mono font-bold', interest.textColor)}>
+                        {interest.stats.value}
+                      </div>
+                      <div className="text-[10px] text-muted-foreground uppercase">
+                        {interest.stats.label}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Corner accents */}
+                  <div className={cn('absolute bottom-0 left-0 w-12 h-12 border-b-2 border-l-2 opacity-50', interest.borderColor.split(' ')[0])} />
+                  <div className={cn('absolute bottom-0 right-0 w-12 h-12 border-b-2 border-r-2 opacity-50', interest.borderColor.split(' ')[0])} />
                 </div>
 
                 <div className="p-6">
                   {/* Title */}
-                  <h3 className={cn('text-xl font-bold mb-2', interest.textColor)}>
+                  <h3 className={cn('text-xl font-bold mb-3 font-mono', interest.textColor)}>
                     {interest.title}
                   </h3>
 
                   {/* Description */}
-                  <p className="text-muted-foreground text-sm mb-4">
+                  <p className="text-muted-foreground text-sm mb-4 leading-relaxed">
                     {interest.description}
                   </p>
 
@@ -135,9 +182,10 @@ export function InterestsSection() {
                       <span
                         key={tag}
                         className={cn(
-                          'px-2.5 py-1 text-xs rounded-full',
+                          'px-2.5 py-1 text-xs rounded-lg font-mono border',
                           interest.bgColor,
-                          interest.textColor
+                          interest.textColor,
+                          interest.borderColor.split(' ')[0]
                         )}
                       >
                         {tag}
@@ -146,10 +194,13 @@ export function InterestsSection() {
                   </div>
 
                   {/* Why Section */}
-                  <div className="pt-4 border-t border-border dark:border-border/50">
-                    <h4 className={cn('text-xs font-semibold uppercase tracking-wider mb-2', interest.textColor)}>
-                      Why It Matters
-                    </h4>
+                  <div className={cn('pt-4 border-t', interest.borderColor.split(' ')[0])}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Zap className={cn('h-3 w-3', interest.textColor)} />
+                      <h4 className={cn('text-xs font-semibold uppercase tracking-wider font-mono', interest.textColor)}>
+                        WHY_IT_MATTERS
+                      </h4>
+                    </div>
                     <p className="text-sm text-muted-foreground">
                       {interest.why}
                     </p>
@@ -159,11 +210,12 @@ export function InterestsSection() {
                   <Link
                     href={`/interests#${interest.id}`}
                     className={cn(
-                      'inline-flex items-center gap-2 mt-4 text-sm font-medium hover:gap-3 transition-all',
+                      'inline-flex items-center gap-2 mt-4 text-sm font-mono font-medium',
+                      'hover:gap-3 transition-all',
                       interest.textColor
                     )}
                   >
-                    Deep Dive
+                    ./deep_dive
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </div>
