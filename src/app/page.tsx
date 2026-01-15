@@ -5,6 +5,7 @@ import { FeaturedProjectSection } from '@/components/sections/featured-project'
 import { SkillsSection } from '@/components/sections/skills'
 import { CredentialsSection } from '@/components/sections/credentials'
 import { ContactCTASection } from '@/components/sections/contact-cta'
+import { NetworkingGallery } from '@/components/sections/networking-gallery'
 import { Navbar } from '@/components/layout/navbar'
 import { Footer } from '@/components/layout/footer'
 import { ParticleBackground } from '@/components/effects/particle-background'
@@ -37,6 +38,7 @@ export default function HomePage() {
         <FeaturedProjectSection />
         <SkillsSection />
         <TestimonialsSection />
+        <NetworkingGallery />
         <CredentialsSection />
         <ContactCTASection />
       </main>
