@@ -10,7 +10,7 @@ import {
   QrCode, Type, AlignLeft, BookOpen, Grid3X3,
   Binary, Regex, Brain, SquareStack, Cake, Banknote, Square, Smile,
   DollarSign, Receipt, LayoutGrid, Hash, Shuffle, Grid2X2, Wallet,
-  CircleDot, Bomb, ListChecks, Disc, ShoppingCart
+  CircleDot, Bomb, ListChecks, Disc, ShoppingCart, User, Zap, Dices
 } from 'lucide-react'
 
 const TOOLS = [
@@ -436,6 +436,33 @@ const TOOLS = [
     bgColor: 'bg-orange-500/10',
     textColor: 'text-orange-500',
     category: 'Calculator'
+  },
+  {
+    slug: 'hangman',
+    name: 'Hangman',
+    description: 'Classic word guessing game with 6 categories.',
+    icon: User,
+    bgColor: 'bg-indigo-500/10',
+    textColor: 'text-indigo-500',
+    category: 'Game'
+  },
+  {
+    slug: 'reaction-test',
+    name: 'Reaction Time Test',
+    description: 'Test how fast you can react! Track your best times.',
+    icon: Zap,
+    bgColor: 'bg-yellow-500/10',
+    textColor: 'text-yellow-500',
+    category: 'Game'
+  },
+  {
+    slug: 'dice-roller',
+    name: 'Dice Roller',
+    description: 'Roll any combination of RPG dice (d4, d6, d8, d10, d12, d20, d100).',
+    icon: Dices,
+    bgColor: 'bg-red-500/10',
+    textColor: 'text-red-500',
+    category: 'Utility'
   }
 ]
 
