@@ -5,7 +5,8 @@ import { motion } from 'framer-motion'
 import {
   Wrench, ArrowRight, Keyboard, Calculator, Gamepad2, Music,
   Ruler, Clock, Timer, ArrowRightLeft, Code, Quote, Paintbrush,
-  Cloud, Blocks, FileText, Palette, Timer as StopwatchIcon, Key, Target
+  Cloud, Blocks, FileText, Palette, Timer as StopwatchIcon, Key, Target,
+  Braces, StickyNote, Scale, Globe, Sparkles, Hourglass
 } from 'lucide-react'
 
 const TOOLS = [
@@ -152,6 +153,60 @@ const TOOLS = [
     bgColor: 'bg-green-500/10',
     textColor: 'text-green-500',
     category: 'Productivity'
+  },
+  {
+    slug: 'json-formatter',
+    name: 'JSON Formatter',
+    description: 'Format, validate, and minify JSON data with syntax highlighting.',
+    icon: Braces,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Developer'
+  },
+  {
+    slug: 'notes-app',
+    name: 'Notes',
+    description: 'Quick notes with tags, colors, and search. Data saved locally.',
+    icon: StickyNote,
+    bgColor: 'bg-yellow-500/10',
+    textColor: 'text-yellow-500',
+    category: 'Productivity'
+  },
+  {
+    slug: 'bmi-calculator',
+    name: 'BMI Calculator',
+    description: 'Calculate your Body Mass Index with health recommendations.',
+    icon: Scale,
+    bgColor: 'bg-lime-500/10',
+    textColor: 'text-lime-500',
+    category: 'Health'
+  },
+  {
+    slug: 'world-clock',
+    name: 'World Clock',
+    description: 'Track time across multiple time zones around the world.',
+    icon: Globe,
+    bgColor: 'bg-indigo-500/10',
+    textColor: 'text-indigo-500',
+    category: 'Utility'
+  },
+  {
+    slug: 'gradient-generator',
+    name: 'Gradient Generator',
+    description: 'Create beautiful CSS gradients with live preview and code export.',
+    icon: Sparkles,
+    bgColor: 'bg-fuchsia-500/10',
+    textColor: 'text-fuchsia-500',
+    category: 'Design'
+  },
+  {
+    slug: 'countdown-timer',
+    name: 'Countdown Timer',
+    description: 'Track important dates and events with beautiful countdown cards.',
+    icon: Hourglass,
+    bgColor: 'bg-rose-500/10',
+    textColor: 'text-rose-500',
+    category: 'Utility'
   }
 ]
 
