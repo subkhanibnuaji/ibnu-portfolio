@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import Link from 'next/link'
 import { PageLayout } from '@/components/layout/page-layout'
 import {
   ExternalLink,
@@ -11,7 +12,8 @@ import {
   Heart,
   Bot,
   Blocks,
-  Filter
+  Filter,
+  ArrowRight
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -236,13 +238,20 @@ export default function ProjectsPage() {
                     </ul>
                   </div>
 
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 mb-6">
                     {featuredProject.technologies.map((tech, i) => (
                       <span key={i} className="px-3 py-1 rounded-full bg-muted text-xs">
                         {tech}
                       </span>
                     ))}
                   </div>
+
+                  <Link href={`/projects/${featuredProject.id}`}>
+                    <Button variant="gradient">
+                      View Project Details
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </Button>
+                  </Link>
                 </div>
 
                 <div className="flex flex-col justify-center">
@@ -302,64 +311,67 @@ export default function ProjectsPage() {
                 key={project.id}
                 variants={itemVariants}
                 layout
-                className="glass rounded-xl p-6 flex flex-col h-full group hover:border-cyber-cyan/30 transition-colors"
               >
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <span className={cn(
-                      'px-2 py-1 rounded text-xs font-medium',
-                      project.status === 'Active'
-                        ? 'bg-cyber-green/20 text-cyber-green'
-                        : project.status === 'In Development'
-                        ? 'bg-cyber-cyan/20 text-cyber-cyan'
-                        : 'bg-muted text-muted-foreground'
-                    )}>
-                      {project.status}
-                    </span>
-                  </div>
-                  <div className="flex gap-2">
-                    {project.githubUrl && (
-                      <a
-                        href={project.githubUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 rounded-lg hover:bg-muted transition-colors"
-                      >
-                        <Github className="h-4 w-4" />
-                      </a>
-                    )}
-                    {project.liveUrl && (
-                      <a
-                        href={project.liveUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="p-2 rounded-lg hover:bg-muted transition-colors"
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                      </a>
-                    )}
-                  </div>
-                </div>
+                <Link href={`/projects/${project.id}`} className="block h-full">
+                  <div className="glass rounded-xl p-6 flex flex-col h-full group hover:border-cyber-cyan/30 transition-colors">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <span className={cn(
+                          'px-2 py-1 rounded text-xs font-medium',
+                          project.status === 'Active'
+                            ? 'bg-cyber-green/20 text-cyber-green'
+                            : project.status === 'In Development'
+                            ? 'bg-cyber-cyan/20 text-cyber-cyan'
+                            : 'bg-muted text-muted-foreground'
+                        )}>
+                          {project.status}
+                        </span>
+                      </div>
+                      <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                        {project.githubUrl && (
+                          <a
+                            href={project.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 rounded-lg hover:bg-muted transition-colors"
+                          >
+                            <Github className="h-4 w-4" />
+                          </a>
+                        )}
+                        {project.liveUrl && (
+                          <a
+                            href={project.liveUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="p-2 rounded-lg hover:bg-muted transition-colors"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
 
-                <h3 className="text-lg font-bold mb-2 group-hover:text-cyber-cyan transition-colors">
-                  {project.title}
-                </h3>
-                <p className="text-sm text-muted-foreground mb-4 flex-1">
-                  {project.description}
-                </p>
+                    <h3 className="text-lg font-bold mb-2 group-hover:text-cyber-cyan transition-colors">
+                      {project.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4 flex-1">
+                      {project.description}
+                    </p>
 
-                <div className="flex flex-wrap gap-1.5 mt-auto">
-                  {project.technologies.slice(0, 4).map((tech, i) => (
-                    <span key={i} className="px-2 py-0.5 rounded-full bg-muted text-xs">
-                      {tech}
-                    </span>
-                  ))}
-                  {project.technologies.length > 4 && (
-                    <span className="px-2 py-0.5 rounded-full bg-muted text-xs">
-                      +{project.technologies.length - 4}
-                    </span>
-                  )}
-                </div>
+                    <div className="flex flex-wrap gap-1.5 mt-auto">
+                      {project.technologies.slice(0, 4).map((tech, i) => (
+                        <span key={i} className="px-2 py-0.5 rounded-full bg-muted text-xs">
+                          {tech}
+                        </span>
+                      ))}
+                      {project.technologies.length > 4 && (
+                        <span className="px-2 py-0.5 rounded-full bg-muted text-xs">
+                          +{project.technologies.length - 4}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </Link>
               </motion.div>
             ))}
           </motion.div>

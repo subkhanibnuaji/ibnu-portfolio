@@ -11,11 +11,13 @@ import {
   ExternalLink,
   Languages,
   Trophy,
-  Github
+  Github,
+  FileText
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { GitHubStats } from '@/components/github/github-stats'
+import { ResumeDownload } from '@/components/resume/resume-download'
 
 const education = [
   {
@@ -397,6 +399,24 @@ export default function AboutPage() {
           </div>
 
           <GitHubStats username="subkhanibnuaji" showRepos maxRepos={4} />
+        </motion.section>
+
+        {/* Resume Download Section */}
+        <motion.section
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="mb-20"
+        >
+          <div className="flex items-center gap-3 mb-8">
+            <div className="p-2 rounded-lg bg-cyber-cyan/10 text-cyber-cyan">
+              <FileText className="h-6 w-6" />
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold">Resume / CV</h2>
+          </div>
+
+          <ResumeDownload variant="card" />
         </motion.section>
 
         {/* CTA */}
