@@ -74,18 +74,38 @@ npm run ios
 npm run web
 \`\`\`
 
-#### Building for Production
+#### Building APK for Android
 
-\`\`\`bash
-# Build for Android
+**Prerequisites:**
+1. Create an Expo account at https://expo.dev/signup
+2. Install EAS CLI: `npm install -g eas-cli`
+3. Login: `eas login`
+
+**Build APK:**
+```bash
+# Initialize EAS (first time only)
+eas init
+
+# Build APK (installable file)
+npm run build:apk
+
+# Or build App Bundle (for Play Store)
 npm run build:android
+```
 
-# Build for iOS
+The APK will be built in Expo's cloud (~10-15 mins). Download link will be provided after build completes.
+
+#### Building for iOS
+
+```bash
 npm run build:ios
+```
 
-# Build for Web (static export)
+#### Building for Web (static export)
+
+```bash
 npm run build:web
-\`\`\`
+```
 
 ## Project Structure
 
