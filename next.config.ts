@@ -37,7 +37,28 @@ const nextConfig: NextConfig = {
           { key: 'Access-Control-Allow-Headers', value: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version' },
         ],
       },
+      {
+        source: '/mobile-app/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
     ]
+  },
+  async rewrites() {
+    return {
+      beforeFiles: [
+        // Serve mobile app from /mobile-app path
+        {
+          source: '/mobile-app',
+          destination: '/mobile-app/index.html',
+        },
+        {
+          source: '/mobile-app/:path*',
+          destination: '/mobile-app/:path*',
+        },
+      ],
+    }
   },
 }
 
