@@ -25,8 +25,8 @@ const viewModes: { mode: ViewMode; icon: typeof Smartphone; label: string; width
   { mode: 'desktop', icon: Monitor, label: 'Desktop', width: '100%' }
 ]
 
-// URL untuk Expo web app - served from same domain
-const MOBILE_APP_URL = '/mobile-app'
+// URL untuk Expo web app - served from same domain as static HTML
+const MOBILE_APP_URL = '/mobile-app/index.html'
 
 export default function MobilePreviewPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('mobile')
