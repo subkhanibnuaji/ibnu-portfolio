@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, Command, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { cn } from '@/lib/utils'
 
 const NAV_LINKS = [
@@ -75,6 +76,9 @@ export function Navbar() {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
             {/* Command Palette Trigger */}
             <Button
               variant="outline"

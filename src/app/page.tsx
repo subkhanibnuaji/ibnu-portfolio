@@ -16,6 +16,7 @@ import { CommandPalette } from '@/components/layout/command-palette'
 import { StatsCounter } from '@/components/stats/stats-counter'
 import { TestimonialsSection } from '@/components/testimonials/testimonials-section'
 import { BackToTop } from '@/components/ui/back-to-top'
+import { KeyboardShortcuts } from '@/components/ui/keyboard-shortcuts'
 
 export default function HomePage() {
   return (
@@ -49,6 +50,7 @@ export default function HomePage() {
         <Terminal />
         <CommandPalette />
         <BackToTop />
+        <KeyboardShortcuts />
       </Suspense>
     </>
   )
