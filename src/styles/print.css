@@ -1,0 +1,241 @@
+/* Print styles for Resume/CV */
+@media print {
+  /* Reset and base styles */
+  *,
+  *::before,
+  *::after {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Page setup */
+  @page {
+    margin: 1.5cm;
+    size: A4;
+  }
+
+  body {
+    font-size: 11pt;
+    line-height: 1.4;
+    font-family: 'Georgia', 'Times New Roman', serif;
+  }
+
+  /* Hide non-essential elements */
+  nav,
+  footer,
+  .ai-chatbot,
+  .terminal,
+  .command-palette,
+  .back-to-top,
+  .keyboard-shortcuts,
+  .particle-background,
+  .custom-cursor,
+  .scroll-progress,
+  button:not(.print-show),
+  .no-print,
+  [data-no-print],
+  .glass::before,
+  .glass::after {
+    display: none !important;
+  }
+
+  /* Show print-only elements */
+  .print-only {
+    display: block !important;
+  }
+
+  /* Container adjustments */
+  .container {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Typography */
+  h1 {
+    font-size: 24pt;
+    margin-bottom: 0.5cm;
+    border-bottom: 2pt solid black;
+    padding-bottom: 0.3cm;
+  }
+
+  h2 {
+    font-size: 14pt;
+    margin-top: 0.8cm;
+    margin-bottom: 0.3cm;
+    border-bottom: 1pt solid #666;
+    padding-bottom: 0.2cm;
+  }
+
+  h3 {
+    font-size: 12pt;
+    margin-top: 0.5cm;
+    margin-bottom: 0.2cm;
+  }
+
+  p {
+    margin-bottom: 0.3cm;
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Links */
+  a {
+    text-decoration: none;
+  }
+
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    color: #666 !important;
+  }
+
+  /* Lists */
+  ul, ol {
+    padding-left: 1cm;
+    margin-bottom: 0.3cm;
+  }
+
+  li {
+    margin-bottom: 0.1cm;
+  }
+
+  /* Cards and sections */
+  .glass,
+  .card,
+  [class*="rounded"] {
+    border: 1pt solid #ddd !important;
+    border-radius: 0 !important;
+    padding: 0.3cm !important;
+    margin-bottom: 0.3cm !important;
+    background: white !important;
+  }
+
+  /* Skills */
+  .skill-bar {
+    border: 1pt solid #999;
+    height: 8pt;
+  }
+
+  .skill-bar-fill {
+    background: #333 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Timeline */
+  .timeline-item {
+    border-left: 2pt solid #333;
+    padding-left: 0.5cm;
+    margin-left: 0.3cm;
+    margin-bottom: 0.5cm;
+  }
+
+  /* Page breaks */
+  h2, h3 {
+    page-break-after: avoid;
+  }
+
+  .section,
+  article,
+  .experience-item,
+  .education-item {
+    page-break-inside: avoid;
+  }
+
+  /* Images */
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+
+  /* Tables */
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th, td {
+    border: 1pt solid #ddd;
+    padding: 0.2cm;
+    text-align: left;
+  }
+
+  th {
+    background: #f5f5f5 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Resume specific */
+  .resume-header {
+    text-align: center;
+    margin-bottom: 0.5cm;
+  }
+
+  .resume-contact {
+    display: flex;
+    justify-content: center;
+    gap: 1cm;
+    font-size: 10pt;
+    margin-bottom: 0.5cm;
+  }
+
+  .resume-section {
+    margin-bottom: 0.5cm;
+  }
+
+  .experience-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .experience-company {
+    font-weight: bold;
+  }
+
+  .experience-date {
+    font-style: italic;
+    font-size: 10pt;
+  }
+
+  /* Certifications grid */
+  .certifications-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.3cm;
+  }
+
+  .certification-item {
+    font-size: 10pt;
+    padding: 0.2cm;
+    border: 1pt solid #ddd;
+  }
+
+  /* Footer for print */
+  .print-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 9pt;
+    color: #666 !important;
+    border-top: 1pt solid #ddd;
+    padding-top: 0.2cm;
+  }
+}
+
+/* Print preview button styles */
+.print-button {
+  cursor: pointer;
+}
+
+@media screen {
+  .print-only {
+    display: none !important;
+  }
+}

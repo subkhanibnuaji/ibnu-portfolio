@@ -116,12 +116,37 @@ build-apk.bat
 
 ```bash
 # Build Android App Bundle (for Play Store)
+#### Building APK for Android
+
+**Prerequisites:**
+1. Create an Expo account at https://expo.dev/signup
+2. Install EAS CLI: `npm install -g eas-cli`
+3. Login: `eas login`
+
+**Build APK:**
+```bash
+# Initialize EAS (first time only)
+eas init
+
+# Build APK (installable file)
+npm run build:apk
+
+# Or build App Bundle (for Play Store)
 npm run build:android
+```
 
 # Build for iOS (App Store)
-npm run build:ios
+The APK will be built in Expo's cloud (~10-15 mins). Download link will be provided after build completes.
 
-# Build for Web (static export)
+#### Building for iOS
+
+```bash
+npm run build:ios
+```
+
+#### Building for Web (static export)
+
+```bash
 npm run build:web
 ```
 

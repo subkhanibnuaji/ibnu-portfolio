@@ -6,12 +6,14 @@ import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Menu, X, Command, Search } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ThemeToggle } from '@/components/ui/theme-toggle'
 import { cn } from '@/lib/utils'
 
 const NAV_LINKS = [
   { href: '/', label: 'Home' },
-  { href: '/interests', label: 'Interests' },
   { href: '/projects', label: 'Projects' },
+  { href: '/ai-tools', label: 'AI Tools' },
+  { href: '/tools', label: 'Tools' },
   { href: '/certifications', label: 'Credentials' },
   { href: '/about', label: 'About' },
 ]
@@ -40,7 +42,7 @@ export function Navbar() {
         className={cn(
           'fixed top-0 left-0 right-0 z-40 transition-all duration-300',
           isScrolled
-            ? 'bg-background/80 backdrop-blur-xl border-b border-border/50 py-3'
+            ? 'bg-background/80 dark:bg-background/70 backdrop-blur-xl border-b border-border/50 dark:border-primary/10 py-3 shadow-sm dark:shadow-primary/5'
             : 'bg-transparent py-5'
         )}
       >
@@ -74,6 +76,9 @@ export function Navbar() {
 
           {/* Actions */}
           <div className="flex items-center gap-2">
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
             {/* Command Palette Trigger */}
             <Button
               variant="outline"

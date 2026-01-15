@@ -12,7 +12,8 @@ interface Particle {
   opacity: number
 }
 
-const COLORS = ['#00d4ff', '#8b5cf6', '#10b981', '#f7931a']
+// Cyber/Crypto/AI themed colors
+const COLORS = ['#00d4ff', '#a855f7', '#00ff88', '#f7931a', '#ec4899', '#6366f1']
 
 export function ParticleBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -73,11 +74,19 @@ export function ParticleBackground() {
           const dy = particles[i].y - particles[j].y
           const dist = Math.sqrt(dx * dx + dy * dy)
 
-          if (dist < 120) {
+          if (dist < 150) {
             ctx.beginPath()
             ctx.moveTo(particles[i].x, particles[i].y)
             ctx.lineTo(particles[j].x, particles[j].y)
-            ctx.strokeStyle = `rgba(0, 212, 255, ${0.15 * (1 - dist / 120)})`
+            // Create gradient line effect using particle colors
+            const gradient = ctx.createLinearGradient(
+              particles[i].x, particles[i].y,
+              particles[j].x, particles[j].y
+            )
+            const alpha = 0.2 * (1 - dist / 150)
+            gradient.addColorStop(0, particles[i].color.replace(')', `, ${alpha})`).replace('rgb', 'rgba').replace('#', ''))
+            gradient.addColorStop(1, particles[j].color.replace(')', `, ${alpha})`).replace('rgb', 'rgba').replace('#', ''))
+            ctx.strokeStyle = `rgba(0, 212, 255, ${alpha})`
             ctx.lineWidth = 0.5
             ctx.stroke()
           }

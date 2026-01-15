@@ -284,6 +284,7 @@ model BlogPost {
   excerpt     String?  @db.Text
   content     String   @db.Text // MDX content
   coverImage  String?
+  category    String?  // Simple category field
   published   Boolean  @default(false)
   featured    Boolean  @default(false)
   views       Int      @default(0)
@@ -318,17 +319,19 @@ model BlogTag {
 }
 
 model Comment {
-  id        String   @id @default(cuid())
-  content   String   @db.Text
-  postId    String
-  post      BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  userId    String?
-  user      User?    @relation(fields: [userId], references: [id])
-  authorName String?  // For anonymous comments
-  authorEmail String?
-  approved  Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id @default(cuid())
+  content     String   @db.Text
+  postId      String
+  postSlug    String?
+  post        BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id])
+  name        String?  // For anonymous comments
+  email       String?
+  likes       Int      @default(0)
+  approved    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   parentId  String?
   parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
