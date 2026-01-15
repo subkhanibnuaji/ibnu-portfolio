@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && prisma db push && next build",
-    "vercel-build": "prisma generate && prisma db push && next build",
+    "build:mobile": "cd mobile-app && npm install && npx expo export -p web && cp -r dist ../public/mobile-app",
+    "vercel-build": "prisma generate && prisma db push && npm run build:mobile && next build",
     "start": "next start",
     "lint": "next lint",
     "db:generate": "prisma generate",
