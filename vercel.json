@@ -1,8 +1,0 @@
-{
-  "version": 2,
-  "framework": "nextjs",
-  "buildCommand": "cd v3 && npm install && npm run build",
-  "outputDirectory": "v3/.next",
-  "installCommand": "cd v3 && npm install",
-  "devCommand": "cd v3 && npm run dev"
-}
