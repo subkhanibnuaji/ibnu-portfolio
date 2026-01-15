@@ -55,6 +55,35 @@ export const personalPhotos = {
     // Tambahkan foto lain di sini
   ],
 
+  // Foto organisasi - HIPMI, CFA, dll
+  organizations: [
+    {
+      src: '/images/profile/hipmi-bandung.jpg',
+      alt: 'HIPMI Bandung Event',
+      caption: 'HIPMI Bandung Welcome Event',
+      organization: 'HIPMI Bandung',
+      category: 'hipmi',
+    },
+    {
+      src: '/images/profile/hipmi-jaya.jpg',
+      alt: 'HIPMI Jaya Event',
+      caption: 'HIPMI Jaya Ceremony',
+      organization: 'HIPMI Jaya',
+      category: 'hipmi',
+    },
+  ],
+
+  // Foto presentasi dan public speaking
+  presentations: [
+    {
+      src: '/images/profile/presentation-mandiri.jpg',
+      alt: 'Presentation at Bank Mandiri',
+      caption: 'Presenting at Bank Mandiri',
+      venue: 'Bank Mandiri',
+      category: 'corporate',
+    },
+  ],
+
   // Foto casual untuk Blog atau Contact page
   casual: {
     src: '/images/profile/casual.jpg',
