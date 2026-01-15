@@ -1,13 +1,13 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { ChessKnight, Shield, Code, TrendingUp } from 'lucide-react'
+import { Target, Shield, Code, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
 const SKILL_CATEGORIES = [
   {
-    icon: ChessKnight,
+    icon: Target,
     title: 'Strategic Management',
     skills: [
       'Strategic Planning & Analysis',
