@@ -13,9 +13,9 @@ const NAV_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/interests', label: 'Interests' },
   { href: '/projects', label: 'Projects' },
+  { href: '/ai-tools', label: 'AI Tools' },
   { href: '/certifications', label: 'Credentials' },
   { href: '/about', label: 'About' },
-  { href: '/mobile', label: 'Mobile' },
 ]
 
 export function Navbar() {
