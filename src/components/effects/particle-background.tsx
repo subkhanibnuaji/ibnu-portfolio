@@ -15,6 +15,14 @@ interface Particle {
 // Cyber/Crypto/AI themed colors
 const COLORS = ['#00d4ff', '#a855f7', '#00ff88', '#f7931a', '#ec4899', '#6366f1']
 
+// Helper function to convert hex to rgba
+function hexToRgba(hex: string, alpha: number): string {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
+
 export function ParticleBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const particlesRef = useRef<Particle[]>([])
@@ -84,9 +92,9 @@ export function ParticleBackground() {
               particles[j].x, particles[j].y
             )
             const alpha = 0.2 * (1 - dist / 150)
-            gradient.addColorStop(0, particles[i].color.replace(')', `, ${alpha})`).replace('rgb', 'rgba').replace('#', ''))
-            gradient.addColorStop(1, particles[j].color.replace(')', `, ${alpha})`).replace('rgb', 'rgba').replace('#', ''))
-            ctx.strokeStyle = `rgba(0, 212, 255, ${alpha})`
+            gradient.addColorStop(0, hexToRgba(particles[i].color, alpha))
+            gradient.addColorStop(1, hexToRgba(particles[j].color, alpha))
+            ctx.strokeStyle = gradient
             ctx.lineWidth = 0.5
             ctx.stroke()
           }
