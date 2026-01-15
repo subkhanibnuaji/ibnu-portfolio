@@ -215,13 +215,13 @@ export function HeroSection() {
                 {/* Cyber frame */}
                 <div className="absolute inset-0 rounded-2xl rotate-45 border-2 border-cyber-cyan/20 scale-[0.7]" />
 
-                {/* Main image container - Humanoid Robot / AI Avatar */}
+                {/* Main image container - Profile Photo */}
                 <div className={`relative w-full h-full rounded-full overflow-hidden border-2 border-cyber-cyan/50 shadow-2xl shadow-cyber-cyan/20 ${glitchActive ? 'animate-cyber-flicker' : ''}`}>
                   <Image
-                    src={cyberImages.humanoid}
-                    alt="AI Avatar"
+                    src="/images/profile/ibnu-profile.jpg"
+                    alt="Subkhan Ibnu Aji"
                     fill
-                    className="object-cover grayscale hover:grayscale-0 transition-all duration-500"
+                    className="object-cover object-top transition-all duration-500"
                     priority
                   />
                   {/* Cyber overlay */}
