@@ -49,6 +49,3 @@ next-env.d.ts
 *.pem
 *.log
 .cache
-
-# Generated mobile app
-public/mobile-app
