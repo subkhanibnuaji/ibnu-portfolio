@@ -72,12 +72,25 @@ export default function ContactPage() {
     e.preventDefault()
     setStatus('loading')
 
-    // Simulate form submission (replace with actual API call later)
-    await new Promise(resolve => setTimeout(resolve, 1500))
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      })
 
-    // For now, just show success message
-    setStatus('success')
-    setFormData({ name: '', email: '', subject: '', message: '' })
+      if (!response.ok) {
+        throw new Error('Failed to send message')
+      }
+
+      setStatus('success')
+      setFormData({ name: '', email: '', subject: '', message: '' })
+    } catch (error) {
+      console.error('Error sending message:', error)
+      setStatus('error')
+    }
 
     // Reset status after 5 seconds
     setTimeout(() => setStatus('idle'), 5000)
