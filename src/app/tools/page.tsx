@@ -6,7 +6,8 @@ import {
   Wrench, ArrowRight, Keyboard, Calculator, Gamepad2, Music,
   Ruler, Clock, Timer, ArrowRightLeft, Code, Quote, Paintbrush,
   Cloud, Blocks, FileText, Palette, Timer as StopwatchIcon, Key, Target,
-  Braces, StickyNote, Scale, Globe, Sparkles, Hourglass
+  Braces, StickyNote, Scale, Globe, Sparkles, Hourglass,
+  QrCode, Type, AlignLeft, BookOpen, Grid3X3
 } from 'lucide-react'
 
 const TOOLS = [
@@ -207,6 +208,51 @@ const TOOLS = [
     bgColor: 'bg-rose-500/10',
     textColor: 'text-rose-500',
     category: 'Utility'
+  },
+  {
+    slug: 'qr-generator',
+    name: 'QR Code Generator',
+    description: 'Generate QR codes for text, URLs, email, phone, or WiFi.',
+    icon: QrCode,
+    bgColor: 'bg-cyan-500/10',
+    textColor: 'text-cyan-500',
+    category: 'Utility'
+  },
+  {
+    slug: 'text-converter',
+    name: 'Text Case Converter',
+    description: 'Convert text to uppercase, lowercase, title case, and more.',
+    icon: Type,
+    bgColor: 'bg-violet-500/10',
+    textColor: 'text-violet-500',
+    category: 'Developer'
+  },
+  {
+    slug: 'lorem-generator',
+    name: 'Lorem Ipsum Generator',
+    description: 'Generate placeholder text for your designs and mockups.',
+    icon: AlignLeft,
+    bgColor: 'bg-amber-500/10',
+    textColor: 'text-amber-500',
+    category: 'Developer'
+  },
+  {
+    slug: 'flashcards',
+    name: 'Flashcards',
+    description: 'Create and study flashcards with decks and spaced repetition.',
+    icon: BookOpen,
+    bgColor: 'bg-emerald-500/10',
+    textColor: 'text-emerald-500',
+    category: 'Learning'
+  },
+  {
+    slug: 'tic-tac-toe',
+    name: 'Tic Tac Toe',
+    description: 'Classic game with AI opponent at multiple difficulty levels.',
+    icon: Grid3X3,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Game'
   }
 ]
 
