@@ -2,7 +2,7 @@
 // Change this to your production URL when deploying
 export const API_BASE_URL = __DEV__
   ? 'http://localhost:3000'
-  : 'https://ibnuaji.com';
+  : 'https://ibnu-portfolio-ashen.vercel.app';
 
 export const API_ENDPOINTS = {
   summary: '/api/mobile/summary',
