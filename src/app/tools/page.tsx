@@ -4,7 +4,8 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
   Wrench, ArrowRight, Keyboard, Calculator, Gamepad2, Music,
-  Ruler, Clock, Timer, ArrowRightLeft
+  Ruler, Clock, Timer, ArrowRightLeft, Code, Quote, Paintbrush,
+  Cloud, Blocks, FileText, Palette, Timer as StopwatchIcon, Key, Target
 } from 'lucide-react'
 
 const TOOLS = [
@@ -61,6 +62,96 @@ const TOOLS = [
     bgColor: 'bg-cyan-500/10',
     textColor: 'text-cyan-500',
     category: 'Utility'
+  },
+  {
+    slug: 'code-playground',
+    name: 'Code Playground',
+    description: 'Write and run JavaScript, HTML, or CSS code directly in your browser.',
+    icon: Code,
+    bgColor: 'bg-emerald-500/10',
+    textColor: 'text-emerald-500',
+    category: 'Developer'
+  },
+  {
+    slug: 'quote-generator',
+    name: 'Quote Generator',
+    description: 'Get inspired with random quotes from famous people across various categories.',
+    icon: Quote,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Inspiration'
+  },
+  {
+    slug: 'drawing-canvas',
+    name: 'Drawing Canvas',
+    description: 'Express your creativity with a full-featured drawing canvas and tools.',
+    icon: Paintbrush,
+    bgColor: 'bg-pink-500/10',
+    textColor: 'text-pink-500',
+    category: 'Creative'
+  },
+  {
+    slug: 'weather-widget',
+    name: 'Weather Widget',
+    description: 'Check weather conditions for cities around the world.',
+    icon: Cloud,
+    bgColor: 'bg-sky-500/10',
+    textColor: 'text-sky-500',
+    category: 'Widget'
+  },
+  {
+    slug: 'tetris-game',
+    name: 'Tetris',
+    description: 'Classic Tetris game with score tracking and increasing difficulty.',
+    icon: Blocks,
+    bgColor: 'bg-violet-500/10',
+    textColor: 'text-violet-500',
+    category: 'Game'
+  },
+  {
+    slug: 'markdown-editor',
+    name: 'Markdown Editor',
+    description: 'Write markdown with live preview. Perfect for documentation.',
+    icon: FileText,
+    bgColor: 'bg-orange-500/10',
+    textColor: 'text-orange-500',
+    category: 'Developer'
+  },
+  {
+    slug: 'color-picker',
+    name: 'Color Picker',
+    description: 'Pick colors and get them in HEX, RGB, and HSL formats.',
+    icon: Palette,
+    bgColor: 'bg-indigo-500/10',
+    textColor: 'text-indigo-500',
+    category: 'Design'
+  },
+  {
+    slug: 'stopwatch',
+    name: 'Stopwatch',
+    description: 'Precise stopwatch with lap times and split tracking.',
+    icon: StopwatchIcon,
+    bgColor: 'bg-teal-500/10',
+    textColor: 'text-teal-500',
+    category: 'Utility'
+  },
+  {
+    slug: 'password-generator',
+    name: 'Password Generator',
+    description: 'Generate secure, random passwords with customizable options.',
+    icon: Key,
+    bgColor: 'bg-rose-500/10',
+    textColor: 'text-rose-500',
+    category: 'Security'
+  },
+  {
+    slug: 'habit-tracker',
+    name: 'Habit Tracker',
+    description: 'Track your daily habits and build consistency over time.',
+    icon: Target,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Productivity'
   }
 ]
 
