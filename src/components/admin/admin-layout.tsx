@@ -14,6 +14,7 @@ import {
   Mail,
   FileText,
   Settings,
+  Wrench,
   LogOut,
   Menu,
   X,
@@ -33,6 +34,7 @@ const sidebarItems = [
   { icon: FileText, label: 'Blog', href: '/admin/dashboard/blog' },
   { icon: Mail, label: 'Messages', href: '/admin/dashboard/messages' },
   { icon: Settings, label: 'Settings', href: '/admin/dashboard/settings' },
+  { icon: Wrench, label: 'Setup Guide', href: '/admin/dashboard/setup' },
 ]
 
 interface AdminLayoutProps {

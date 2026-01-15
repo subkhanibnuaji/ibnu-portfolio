@@ -10,10 +10,12 @@ import {
   Calendar,
   ExternalLink,
   Languages,
-  Trophy
+  Trophy,
+  Github
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { GitHubStats } from '@/components/github/github-stats'
 
 const education = [
   {
@@ -377,6 +379,24 @@ export default function AboutPage() {
               </motion.div>
             ))}
           </div>
+        </motion.section>
+
+        {/* GitHub Section */}
+        <motion.section
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="mb-20"
+        >
+          <div className="flex items-center gap-3 mb-8">
+            <div className="p-2 rounded-lg bg-muted text-foreground">
+              <Github className="h-6 w-6" />
+            </div>
+            <h2 className="text-2xl md:text-3xl font-bold">GitHub Activity</h2>
+          </div>
+
+          <GitHubStats username="subkhanibnuaji" showRepos maxRepos={4} />
         </motion.section>
 
         {/* CTA */}

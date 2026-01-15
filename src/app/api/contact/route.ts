@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { auth } from '@/lib/auth'
+import { sendContactNotification } from '@/lib/email'
 
 // POST submit contact form
 export async function POST(req: NextRequest) {
@@ -15,19 +16,42 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const submission = await prisma.contactSubmission.create({
-      data: {
-        name,
-        email,
-        subject: subject || 'General Inquiry',
-        message,
-        ip: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip'),
-        userAgent: req.headers.get('user-agent'),
-      },
+    // Save to database (will fail gracefully if DB not connected)
+    let submissionId = null
+    try {
+      const submission = await prisma.contactSubmission.create({
+        data: {
+          name,
+          email,
+          subject: subject || 'General Inquiry',
+          message,
+          ip: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip'),
+          userAgent: req.headers.get('user-agent'),
+        },
+      })
+      submissionId = submission.id
+    } catch (dbError) {
+      console.log('Database not connected, skipping save:', dbError)
+    }
+
+    // Send email notifications (will fail gracefully if Resend not configured)
+    const emailResult = await sendContactNotification({
+      name,
+      email,
+      subject: subject || 'General Inquiry',
+      message,
     })
 
+    if (!emailResult.success) {
+      console.log('Email not sent:', emailResult.error)
+    }
+
     return NextResponse.json(
-      { message: 'Message sent successfully', id: submission.id },
+      {
+        message: 'Message sent successfully',
+        id: submissionId,
+        emailSent: emailResult.success
+      },
       { status: 201 }
     )
   } catch (error) {
