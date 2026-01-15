@@ -7,7 +7,8 @@ import {
   Ruler, Clock, Timer, ArrowRightLeft, Code, Quote, Paintbrush,
   Cloud, Blocks, FileText, Palette, Timer as StopwatchIcon, Key, Target,
   Braces, StickyNote, Scale, Globe, Sparkles, Hourglass,
-  QrCode, Type, AlignLeft, BookOpen, Grid3X3
+  QrCode, Type, AlignLeft, BookOpen, Grid3X3,
+  Binary, Regex, Brain, SquareStack, Cake, Banknote, Square, Smile
 } from 'lucide-react'
 
 const TOOLS = [
@@ -253,6 +254,78 @@ const TOOLS = [
     bgColor: 'bg-blue-500/10',
     textColor: 'text-blue-500',
     category: 'Game'
+  },
+  {
+    slug: 'base64-tool',
+    name: 'Base64 Encoder',
+    description: 'Encode and decode text or files to/from Base64 format.',
+    icon: Binary,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Developer'
+  },
+  {
+    slug: 'regex-tester',
+    name: 'Regex Tester',
+    description: 'Test and debug regular expressions with live highlighting.',
+    icon: Regex,
+    bgColor: 'bg-orange-500/10',
+    textColor: 'text-orange-500',
+    category: 'Developer'
+  },
+  {
+    slug: 'memory-game',
+    name: 'Memory Game',
+    description: 'Test your memory by matching pairs of cards.',
+    icon: Brain,
+    bgColor: 'bg-pink-500/10',
+    textColor: 'text-pink-500',
+    category: 'Game'
+  },
+  {
+    slug: 'game-2048',
+    name: '2048',
+    description: 'Slide tiles and combine numbers to reach 2048!',
+    icon: SquareStack,
+    bgColor: 'bg-amber-500/10',
+    textColor: 'text-amber-500',
+    category: 'Game'
+  },
+  {
+    slug: 'age-calculator',
+    name: 'Age Calculator',
+    description: 'Calculate your exact age with zodiac signs and fun facts.',
+    icon: Cake,
+    bgColor: 'bg-pink-500/10',
+    textColor: 'text-pink-500',
+    category: 'Calculator'
+  },
+  {
+    slug: 'loan-calculator',
+    name: 'Loan Calculator',
+    description: 'Calculate monthly payments and total interest for loans.',
+    icon: Banknote,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Finance'
+  },
+  {
+    slug: 'box-shadow-generator',
+    name: 'Box Shadow Generator',
+    description: 'Create CSS box shadows with live preview and presets.',
+    icon: Square,
+    bgColor: 'bg-violet-500/10',
+    textColor: 'text-violet-500',
+    category: 'Design'
+  },
+  {
+    slug: 'emoji-picker',
+    name: 'Emoji Picker',
+    description: 'Browse and copy emojis organized by category.',
+    icon: Smile,
+    bgColor: 'bg-yellow-500/10',
+    textColor: 'text-yellow-500',
+    category: 'Utility'
   }
 ]
 
