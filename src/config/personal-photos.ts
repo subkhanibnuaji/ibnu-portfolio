@@ -4,7 +4,7 @@
 export const personalPhotos = {
   // Foto utama untuk Hero section (foto formal/profesional)
   hero: {
-    src: '/images/profile/graduation-ugm.jpg', // Foto wisuda UGM - profesional
+    src: '/images/profile/formal-ugm.jpg', // Foto dengan jas formal di wisuda
     alt: 'Subkhan Ibnu Aji',
     caption: 'MBA Graduate - UGM',
   },
@@ -12,9 +12,9 @@ export const personalPhotos = {
   // Foto untuk About page - Education section
   education: {
     ugm: {
-      src: '/images/profile/graduation-ugm.jpg',
+      src: '/images/profile/graduation-ugm.jpg', // Foto penerimaan ijazah dari Dekan
       alt: 'Wisuda MBA UGM',
-      caption: 'MBA Graduation - Universitas Gadjah Mada 2024',
+      caption: 'MBA Graduation - Universitas Gadjah Mada 2025',
     },
     telkom: {
       src: '/images/profile/graduation-telkom.jpg', // Tambahkan foto wisuda Telkom jika ada
@@ -23,29 +23,39 @@ export const personalPhotos = {
     },
   },
 
-  // Foto untuk section lain (bisa ditambahkan)
-  presentations: {
-    // Foto saat presentasi - cocok untuk Projects atau Experience
-    main: {
-      src: '/images/profile/presentation.jpg',
-      alt: 'Presentasi',
-      caption: 'Speaking at Tech Conference',
+  // Foto untuk Experience/Achievements - Pitching, presentasi, dll
+  achievements: {
+    pitching: {
+      src: '/images/profile/pitching-nicko.jpg', // Screenshot pitching dengan Nicko Widjaja
+      alt: 'Pitching Session with Nicko Widjaja',
+      caption: 'Startup Pitching - Nicko Widjaja (East Ventures)',
+      person: 'Nicko Widjaja',
+      role: 'Managing Partner, East Ventures',
     },
   },
 
-  // Foto dengan tokoh penting
-  networking: {
-    // Foto dengan orang-orang penting - cocok untuk Testimonials atau Gallery
-    featured: [
-      {
-        src: '/images/profile/networking-1.jpg',
-        alt: 'Networking Event',
-        caption: 'Meeting with industry leaders',
-      },
-    ],
-  },
+  // Foto dengan tokoh penting - Networking Gallery
+  networking: [
+    {
+      src: '/images/profile/with-raymond-chin.jpg',
+      alt: 'With Raymond Chin',
+      caption: 'Meeting with Raymond Chin',
+      person: 'Raymond Chin',
+      role: 'Founder, Ternak Uang',
+      category: 'finance',
+    },
+    {
+      src: '/images/profile/networking-porsche.jpg',
+      alt: 'Networking Event',
+      caption: 'Startup Community Meetup',
+      person: '',
+      role: '',
+      category: 'startup',
+    },
+    // Tambahkan foto lain di sini
+  ],
 
-  // Foto candid/casual untuk Blog atau Contact page
+  // Foto casual untuk Blog atau Contact page
   casual: {
     src: '/images/profile/casual.jpg',
     alt: 'Ibnu',
@@ -53,11 +63,14 @@ export const personalPhotos = {
   },
 }
 
-// Helper function to get photo with fallback
-export function getPhoto(category: keyof typeof personalPhotos, subKey?: string) {
-  const categoryPhotos = personalPhotos[category]
-  if (subKey && typeof categoryPhotos === 'object' && subKey in categoryPhotos) {
-    return (categoryPhotos as Record<string, unknown>)[subKey]
+// Helper function to get photo
+export function getPhoto(category: keyof typeof personalPhotos, key?: string | number) {
+  const photos = personalPhotos[category]
+  if (Array.isArray(photos) && typeof key === 'number') {
+    return photos[key]
   }
-  return categoryPhotos
+  if (typeof photos === 'object' && !Array.isArray(photos) && key && typeof key === 'string') {
+    return (photos as Record<string, unknown>)[key]
+  }
+  return photos
 }
