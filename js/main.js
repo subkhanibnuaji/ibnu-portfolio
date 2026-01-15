@@ -560,6 +560,248 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   });
 });
 
+/* ============================================
+   PAGE-SPECIFIC GLOBAL FUNCTIONS
+   These are used by onclick handlers in HTML
+   ============================================ */
+
+// Toggle mobile menu (for pages that use onclick)
+function toggleMobileMenu() {
+  const navMenu = document.getElementById('navMenu');
+  const toggle = document.querySelector('.mobile-toggle, .nav-btn.mobile-toggle');
+
+  if (navMenu) {
+    navMenu.classList.toggle('active');
+  }
+  if (toggle) {
+    toggle.classList.toggle('active');
+  }
+  document.body.classList.toggle('nav-open');
+}
+
+// Open command palette
+function openCommandPalette() {
+  const palette = document.getElementById('commandPalette');
+  const input = document.getElementById('commandInput');
+
+  if (palette) {
+    palette.classList.add('active');
+    if (input) {
+      input.value = '';
+      input.focus();
+    }
+  }
+}
+
+// Close command palette
+function closeCommandPalette(event) {
+  if (event && event.target.classList.contains('command-palette')) return;
+
+  const palette = document.getElementById('commandPalette');
+  if (palette) {
+    palette.classList.remove('active');
+  }
+}
+
+// Filter commands in command palette
+function filterCommands() {
+  const input = document.getElementById('commandInput');
+  const items = document.querySelectorAll('.command-item');
+
+  if (!input || !items.length) return;
+
+  const query = input.value.toLowerCase();
+
+  items.forEach(item => {
+    const label = item.querySelector('.command-label')?.textContent.toLowerCase() || '';
+    if (label.includes(query) || query === '') {
+      item.style.display = '';
+    } else {
+      item.style.display = 'none';
+    }
+  });
+}
+
+// Execute command from command palette
+function executeCommand(action) {
+  closeCommandPalette();
+
+  const pages = {
+    'home': '../index.html',
+    'interests': 'interests.html',
+    'projects': 'projects.html',
+    'credentials': 'certifications.html',
+    'contact': 'contact.html',
+    'about': 'about.html',
+  };
+
+  // Check if we're on the main page
+  const isMainPage = window.location.pathname.endsWith('index.html') ||
+                     window.location.pathname === '/' ||
+                     !window.location.pathname.includes('/pages/');
+
+  switch(action) {
+    case 'home':
+      window.location.href = isMainPage ? 'index.html' : '../index.html';
+      break;
+    case 'interests':
+    case 'projects':
+    case 'credentials':
+    case 'contact':
+    case 'about':
+      window.location.href = isMainPage ? `pages/${pages[action]}` : pages[action];
+      break;
+    case 'chatbot':
+      toggleChatbot();
+      break;
+    case 'terminal':
+      openTerminal();
+      break;
+    default:
+      if (pages[action]) {
+        window.location.href = isMainPage ? `pages/${pages[action]}` : pages[action];
+      }
+  }
+}
+
+// Toggle chatbot
+function toggleChatbot() {
+  const chatWindow = document.getElementById('chatbotWindow');
+  const chatInput = document.getElementById('chatInput');
+
+  if (chatWindow) {
+    chatWindow.classList.toggle('active');
+    if (chatWindow.classList.contains('active') && chatInput) {
+      chatInput.focus();
+    }
+  }
+}
+
+// Open terminal
+function openTerminal() {
+  const terminalOverlay = document.getElementById('terminalOverlay');
+  const terminalInput = document.getElementById('terminalInput');
+
+  if (terminalOverlay) {
+    terminalOverlay.classList.add('active');
+    if (terminalInput) {
+      terminalInput.focus();
+    }
+  } else if (window.terminal) {
+    window.terminal.open();
+  }
+}
+
+// Close terminal
+function closeTerminal(event) {
+  if (event && event.target.classList.contains('terminal-window')) return;
+
+  const terminalOverlay = document.getElementById('terminalOverlay');
+  if (terminalOverlay) {
+    terminalOverlay.classList.remove('active');
+  } else if (window.terminal) {
+    window.terminal.close();
+  }
+}
+
+// Handle chat keypress
+function handleChatKeypress(event) {
+  if (event.key === 'Enter') {
+    sendMessage();
+  }
+}
+
+// Send chat message
+function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const messages = document.getElementById('chatbotMessages');
+
+  if (!input || !messages || !input.value.trim()) return;
+
+  const text = input.value.trim();
+  input.value = '';
+
+  // Add user message
+  const userMsg = document.createElement('div');
+  userMsg.className = 'message user';
+  userMsg.innerHTML = `<p>${text}</p>`;
+  messages.appendChild(userMsg);
+
+  // Get AI response using ChatbotAPI if available
+  setTimeout(() => {
+    const botMsg = document.createElement('div');
+    botMsg.className = 'message bot';
+
+    let response = "I'm not sure how to respond to that. Try asking about Ibnu's interests, projects, or background!";
+
+    if (window.ChatbotAPI && window.ChatbotAPI.getResponse) {
+      response = window.ChatbotAPI.getResponse(text);
+    }
+
+    botMsg.innerHTML = `<p>${response.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}</p>`;
+    messages.appendChild(botMsg);
+    messages.scrollTop = messages.scrollHeight;
+  }, 500);
+
+  messages.scrollTop = messages.scrollHeight;
+}
+
+// Ask predefined question
+function askQuestion(question) {
+  const input = document.getElementById('chatInput');
+  if (input) {
+    input.value = question;
+    sendMessage();
+  }
+}
+
+// Handle terminal keypress
+function handleTerminalKeypress(event) {
+  if (event.key === 'Enter') {
+    const input = document.getElementById('terminalInput');
+    if (input && window.terminal) {
+      window.terminal.executeCommand(input.value);
+      input.value = '';
+    }
+  }
+}
+
+// Keyboard shortcut for command palette (Ctrl+K)
+document.addEventListener('keydown', function(e) {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    e.preventDefault();
+
+    // Try the command palette overlay first (for pages)
+    const paletteOverlay = document.getElementById('commandPalette');
+    if (paletteOverlay) {
+      openCommandPalette();
+    } else {
+      // Fall back to the cmd-palette modal (for index)
+      const cmdPalette = document.getElementById('cmdPalette');
+      if (cmdPalette) {
+        cmdPalette.classList.add('active');
+        document.getElementById('cmdInput')?.focus();
+      }
+    }
+  }
+
+  // Escape to close modals
+  if (e.key === 'Escape') {
+    closeCommandPalette();
+    closeTerminal();
+
+    const chatWindow = document.getElementById('chatbotWindow');
+    if (chatWindow) {
+      chatWindow.classList.remove('active');
+    }
+
+    const cmdPalette = document.getElementById('cmdPalette');
+    if (cmdPalette) {
+      cmdPalette.classList.remove('active');
+    }
+  }
+});
+
 // Console easter egg
 console.log(`
 %c
