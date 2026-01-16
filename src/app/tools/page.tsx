@@ -10,7 +10,7 @@ import {
   QrCode, Type, AlignLeft, BookOpen, Grid3X3,
   Binary, Regex, Brain, SquareStack, Cake, Banknote, Square, Smile,
   DollarSign, Receipt, LayoutGrid, Hash, Shuffle, Grid2X2, Wallet,
-  CircleDot, Bomb, ListChecks, Disc, ShoppingCart, User, Zap, Dices
+  CircleDot, Bomb, ListChecks, Disc, ShoppingCart, User, Zap, Dices, Percent
 } from 'lucide-react'
 
 const TOOLS = [
@@ -463,6 +463,33 @@ const TOOLS = [
     bgColor: 'bg-red-500/10',
     textColor: 'text-red-500',
     category: 'Utility'
+  },
+  {
+    slug: 'timer',
+    name: 'Timer',
+    description: 'Set custom timers with presets and alarm sounds.',
+    icon: Clock,
+    bgColor: 'bg-cyan-500/10',
+    textColor: 'text-cyan-500',
+    category: 'Utility'
+  },
+  {
+    slug: 'color-palette',
+    name: 'Color Palette Generator',
+    description: 'Generate harmonious color palettes with various modes.',
+    icon: Palette,
+    bgColor: 'bg-pink-500/10',
+    textColor: 'text-pink-500',
+    category: 'Design'
+  },
+  {
+    slug: 'percentage-calculator',
+    name: 'Percentage Calculator',
+    description: 'Calculate percentages, changes, and more.',
+    icon: Percent,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Calculator'
   }
 ]
 
