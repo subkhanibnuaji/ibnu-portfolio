@@ -12,6 +12,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout repository
@@ -50,12 +52,47 @@ jobs:
           chmod +x ./gradlew
           ./gradlew assembleRelease --no-daemon
 
-      - name: Upload APK
+      - name: Rename APK
+        run: |
+          mv mobile-app/android/app/build/outputs/apk/release/app-release.apk mobile-app/android/app/build/outputs/apk/release/ibnu-portfolio.apk
+
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: ibnu-portfolio-apk
-          path: mobile-app/android/app/build/outputs/apk/release/*.apk
-          retention-days: 30
+          path: mobile-app/android/app/build/outputs/apk/release/ibnu-portfolio.apk
+          retention-days: 90
+
+      - name: Get version
+        id: version
+        run: |
+          VERSION=$(node -p "require('./mobile-app/app.json').expo.version")
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "date=$(date +'%Y%m%d-%H%M')" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: mobile-v${{ steps.version.outputs.version }}-${{ steps.version.outputs.date }}
+          name: Mobile App v${{ steps.version.outputs.version }}
+          body: |
+            ## Ibnu Portfolio - Android App
+
+            Download and install the APK on your Android device.
+
+            ### Installation
+            1. Download `ibnu-portfolio.apk`
+            2. Open the file on your Android device
+            3. Allow installation from unknown sources if prompted
+            4. Install and enjoy!
+
+            ### Requirements
+            - Android 6.0 (API 23) or higher
+          files: mobile-app/android/app/build/outputs/apk/release/ibnu-portfolio.apk
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get APK info
         run: |
