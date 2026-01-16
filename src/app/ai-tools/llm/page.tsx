@@ -13,14 +13,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChatMessage, ChatInput, StopButton, ModelSelector } from '@/components/ai';
 import { GROQ_MODELS, AI_DEFAULTS, type GroqModelId } from '@/lib/ai/config';
 
-// Simple message type for chat
-interface ChatMessageType {
+// Simple message interface for this page
+interface Message {
   role: 'user' | 'assistant';
   content: string;
 }
 
 export default function LLMChatPage() {
-  const [messages, setMessages] = useState<ChatMessageType[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [model, setModel] = useState<GroqModelId>(AI_DEFAULTS.model);
   const [error, setError] = useState<string | null>(null);
@@ -43,11 +43,11 @@ export default function LLMChatPage() {
     }
   }, []);
 
-  const handleSubmit = useCallback(
+  const handleSend = useCallback(
     async (message: string) => {
       if (!message.trim() || isLoading) return;
 
-      const userMessage: ChatMessageType = { role: 'user', content: message.trim() };
+      const userMessage: Message = { role: 'user', content: message.trim() };
       const newMessages = [...messages, userMessage];
       setMessages(newMessages);
       setError(null);
@@ -191,7 +191,7 @@ export default function LLMChatPage() {
               ].map((suggestion) => (
                 <button
                   key={suggestion}
-                  onClick={() => handleSubmit(suggestion)}
+                  onClick={() => handleSend(suggestion)}
                   className="rounded-full bg-gray-700/50 px-4 py-2 text-sm text-gray-300 transition-colors hover:bg-gray-700"
                 >
                   {suggestion}
@@ -245,7 +245,7 @@ export default function LLMChatPage() {
           </div>
         ) : (
           <ChatInput
-            onSend={handleSubmit}
+            onSend={handleSend}
             placeholder="Type your message..."
             disabled={isLoading}
           />

@@ -61,7 +61,7 @@ export default function AgentPage() {
     }
   }, []);
 
-  const handleSubmit = useCallback(
+  const handleSend = useCallback(
     async (message: string) => {
       if (!message.trim() || isLoading) return;
 
@@ -251,7 +251,7 @@ export default function AgentPage() {
                 ].map((suggestion) => (
                   <button
                     key={suggestion}
-                    onClick={() => handleSubmit(suggestion)}
+                    onClick={() => handleSend(suggestion)}
                     className="rounded-full bg-gray-700/50 px-4 py-2 text-sm text-gray-300 transition-colors hover:bg-gray-700"
                   >
                     {suggestion}
@@ -287,6 +287,7 @@ export default function AgentPage() {
                       id={`msg-${index}`}
                       role={message.role}
                       content={message.content}
+                      isStreaming={false}
                     />
                   </motion.div>
                 ))}
@@ -347,7 +348,7 @@ export default function AgentPage() {
             </div>
           ) : (
             <ChatInput
-              onSend={handleSubmit}
+              onSend={handleSend}
               placeholder="Ask the agent to do something..."
               disabled={isLoading}
             />

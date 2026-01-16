@@ -20,14 +20,14 @@ import {
 } from '@/components/ai';
 import { GROQ_MODELS, AI_DEFAULTS, type GroqModelId } from '@/lib/ai/config';
 
-// Simple message type for chat
-interface ChatMessageType {
+// Simple message interface for this page
+interface Message {
   role: 'user' | 'assistant';
   content: string;
 }
 
 export default function RAGPage() {
-  const [messages, setMessages] = useState<ChatMessageType[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [model, setModel] = useState<GroqModelId>(AI_DEFAULTS.model);
   const [error, setError] = useState<string | null>(null);
@@ -77,15 +77,16 @@ export default function RAGPage() {
         }
 
         const result = await response.json();
-        const newDoc: UploadedDocument = {
+        const uploadedDoc: UploadedDocument = {
           id: result.document.id,
           name: result.document.name,
           size: result.document.size,
           type: result.document.type || 'text/plain',
-          status: 'ready' as const,
+          status: 'ready',
           chunks: result.document.chunks,
         };
-        setDocuments((prev) => [...prev, newDoc]);
+
+        setDocuments(prev => [...prev, uploadedDoc]);
       }
     },
     [sessionId]
@@ -108,11 +109,11 @@ export default function RAGPage() {
     [sessionId]
   );
 
-  const handleSubmit = useCallback(
+  const handleSend = useCallback(
     async (message: string) => {
       if (!message.trim() || isLoading) return;
 
-      const userMessage: ChatMessageType = { role: 'user', content: message.trim() };
+      const userMessage: Message = { role: 'user', content: message.trim() };
       const newMessages = [...messages, userMessage];
       setMessages(newMessages);
       setError(null);
@@ -294,7 +295,7 @@ export default function RAGPage() {
                   ].map((suggestion) => (
                     <button
                       key={suggestion}
-                      onClick={() => handleSubmit(suggestion)}
+                      onClick={() => handleSend(suggestion)}
                       className="rounded-full bg-gray-700/50 px-4 py-2 text-sm text-gray-300 transition-colors hover:bg-gray-700"
                     >
                       {suggestion}
@@ -349,7 +350,7 @@ export default function RAGPage() {
             </div>
           ) : (
             <ChatInput
-              onSend={handleSubmit}
+              onSend={handleSend}
               placeholder={
                 documents.length > 0
                   ? 'Ask about your documents...'
