@@ -19,7 +19,7 @@ import {
   File,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { AI_FEATURES } from '@/lib/ai/config';
+import { AI_FEATURES, RATE_LIMITS } from '@/lib/ai/config';
 
 // ============================================
 // TYPES
@@ -29,16 +29,17 @@ export interface UploadedDocument {
   id: string;
   name: string;
   size: number;
-  type: string;
-  status: 'uploading' | 'processing' | 'ready' | 'error';
+  type?: string;
+  status?: 'uploading' | 'processing' | 'ready' | 'error';
   error?: string;
   chunks?: number;
 }
 
 export interface DocumentUploadProps {
   documents: UploadedDocument[];
-  onUpload: (files: File[]) => Promise<void>;
+  onUpload: (files: File[]) => Promise<void> | Promise<UploadedDocument | UploadedDocument[] | void>;
   onRemove: (documentId: string) => void;
+  onDocumentsChange?: (docs: UploadedDocument[]) => void;
   disabled?: boolean;
   maxDocuments?: number;
   className?: string;
@@ -53,7 +54,7 @@ export function DocumentUpload({
   onUpload,
   onRemove,
   disabled = false,
-  maxDocuments = AI_FEATURES.rag.maxDocumentsPerUser,
+  maxDocuments = RATE_LIMITS.rag.maxDocumentsPerUser,
   className,
 }: DocumentUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
@@ -74,7 +75,7 @@ export function DocumentUpload({
         const file = files[i];
         const extension = `.${file.name.split('.').pop()?.toLowerCase()}`;
 
-        if (AI_FEATURES.rag.supportedFormats.includes(extension)) {
+        if ((AI_FEATURES.rag.supportedFormats as readonly string[]).includes(extension)) {
           validFiles.push(file);
         }
       }
@@ -138,6 +139,7 @@ export function DocumentUpload({
       case 'processing':
         return <Loader2 className="h-4 w-4 animate-spin text-yellow-400" />;
       case 'ready':
+      case undefined:
         return <CheckCircle className="h-4 w-4 text-green-400" />;
       case 'error':
         return <AlertCircle className="h-4 w-4 text-red-400" />;
@@ -192,7 +194,7 @@ export function DocumentUpload({
             </p>
             <p className="text-xs text-muted-foreground">
               Supported: {AI_FEATURES.rag.supportedFormats.join(', ')} •
-              Max {AI_FEATURES.rag.maxDocumentSizeMB}MB per file
+              Max {RATE_LIMITS.rag.maxDocumentSizeMB}MB per file
             </p>
           </>
         )}
@@ -242,7 +244,7 @@ export function DocumentUpload({
               {getStatusIcon(doc.status)}
 
               {/* Remove Button */}
-              {doc.status === 'ready' && (
+              {(doc.status === 'ready' || doc.status === undefined) && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();

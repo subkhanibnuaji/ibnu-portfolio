@@ -65,16 +65,21 @@ function parseSpecialResult(result: string): ParsedResult {
   return { type: 'text', content: result }
 }
 
-// Handle file generation
-function handleFileGeneration(result: string): boolean {
+// Handle file generation (async for PPT which uses API)
+async function handleFileGeneration(result: string): Promise<boolean> {
   const parsed = parseSpecialResult(result)
   if (parsed.type === 'pdf' && parsed.data) {
     generatePDF(parsed.data as PDFData)
     return true
   }
   if (parsed.type === 'ppt' && parsed.data) {
-    generatePPT(parsed.data as PPTData)
-    return true
+    try {
+      await generatePPT(parsed.data as PPTData)
+      return true
+    } catch (error) {
+      console.error('PPT generation failed:', error)
+      return false
+    }
   }
   return false
 }
@@ -983,8 +988,10 @@ export function AIChatbot() {
                   if (parsedResult.type === 'image' || parsedResult.type === 'qr') {
                     images.push(parsedResult.content)
                   } else if (parsedResult.type === 'pdf' || parsedResult.type === 'ppt') {
-                    // Trigger file download
-                    handleFileGeneration(parsed.result || '')
+                    // Trigger file download (async, don't block)
+                    handleFileGeneration(parsed.result || '').catch(err => {
+                      console.error('File generation error:', err)
+                    })
                   }
 
                   setMessages(prev => {

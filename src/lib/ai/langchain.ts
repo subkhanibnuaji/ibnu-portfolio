@@ -279,7 +279,7 @@ export function truncateMessages(
 
 export {
   HumanMessage,
-  AIMessage,
+  AIMessage as LangChainAIMessage,
   SystemMessage,
   ChatPromptTemplate,
   MessagesPlaceholder,

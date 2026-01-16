@@ -48,35 +48,41 @@ export default function RAGPage() {
   }, []);
 
   const handleDocumentUpload = useCallback(
-    async (file: File): Promise<UploadedDocument> => {
-      const content = await file.text();
+    async (files: File[]): Promise<void> => {
+      const uploadedDocs: UploadedDocument[] = [];
 
-      const response = await fetch('/api/ai/rag', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId,
-          action: 'upload',
-          document: {
-            name: file.name,
-            content,
-            type: file.type || 'text/plain',
-          },
-        }),
-      });
+      for (const file of files) {
+        const content = await file.text();
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Upload failed');
+        const response = await fetch('/api/ai/rag', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId,
+            action: 'upload',
+            document: {
+              name: file.name,
+              content,
+              type: file.type || 'text/plain',
+            },
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Upload failed');
+        }
+
+        const result = await response.json();
+        uploadedDocs.push({
+          id: result.document.id,
+          name: result.document.name,
+          size: result.document.size,
+          chunks: result.document.chunks,
+        });
       }
 
-      const result = await response.json();
-      return {
-        id: result.document.id,
-        name: result.document.name,
-        size: result.document.size,
-        chunks: result.document.chunks,
-      };
+      setDocuments((prev) => [...prev, ...uploadedDocs]);
     },
     [sessionId]
   );

@@ -19,11 +19,12 @@ import { cn } from '@/lib/utils';
 // ============================================
 
 export interface ChatMessageProps {
-  id: string;
+  id?: string;
   role: 'user' | 'assistant' | 'system';
   content: string;
   timestamp?: Date;
   isStreaming?: boolean;
+  isLoading?: boolean; // Alias for isStreaming
   model?: string;
 }
 
@@ -35,7 +36,10 @@ function ChatMessageComponent({
   role,
   content,
   isStreaming = false,
+  isLoading = false,
 }: ChatMessageProps) {
+  // Support both isStreaming and isLoading
+  const streaming = isStreaming || isLoading;
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -135,7 +139,7 @@ function ChatMessageComponent({
             ) : (
               <span className="flex items-center gap-2 text-muted-foreground">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                {isStreaming ? 'Generating...' : 'Thinking...'}
+                {streaming ? 'Generating...' : 'Thinking...'}
               </span>
             )}
           </div>
@@ -144,7 +148,7 @@ function ChatMessageComponent({
         )}
 
         {/* Copy Button */}
-        {content && !isStreaming && (
+        {content && !streaming && (
           <button
             onClick={handleCopy}
             className={cn(
