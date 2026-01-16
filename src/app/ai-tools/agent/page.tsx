@@ -31,6 +31,7 @@ interface ToolExecution {
 }
 
 interface AgentMessage {
+  id: string;
   role: 'user' | 'assistant';
   content: string;
   toolExecutions?: ToolExecution[];
@@ -63,11 +64,15 @@ export default function AgentPage() {
   }, []);
 
   const handleSubmit = useCallback(
-    async (e?: React.FormEvent) => {
-      e?.preventDefault();
-      if (!input.trim() || isLoading) return;
+    async (messageOrEvent?: string | React.FormEvent) => {
+      // Handle both string message and form event
+      const message = typeof messageOrEvent === 'string' ? messageOrEvent : input;
+      if (typeof messageOrEvent !== 'string') {
+        messageOrEvent?.preventDefault?.();
+      }
+      if (!message.trim() || isLoading) return;
 
-      const userMessage: AgentMessage = { role: 'user', content: input.trim() };
+      const userMessage: AgentMessage = { id: `user-${Date.now()}`, role: 'user', content: message.trim() };
       const newMessages = [...messages, userMessage];
       setMessages(newMessages);
       setInput('');
@@ -136,6 +141,7 @@ export default function AgentPage() {
                   setMessages([
                     ...newMessages,
                     {
+                      id: `assistant-${Date.now()}`,
                       role: 'assistant',
                       content: assistantContent,
                       toolExecutions: [...toolExecutions],
@@ -156,6 +162,7 @@ export default function AgentPage() {
           setMessages([
             ...newMessages,
             {
+              id: `assistant-final-${Date.now()}`,
               role: 'assistant',
               content: assistantContent,
               toolExecutions,
@@ -287,9 +294,9 @@ export default function AgentPage() {
                       </div>
                     )}
                     <ChatMessage
+                      id={message.id}
                       role={message.role}
                       content={message.content}
-                      isLoading={false}
                     />
                   </motion.div>
                 ))}
@@ -346,13 +353,11 @@ export default function AgentPage() {
         <div className="mt-4">
           {isLoading ? (
             <div className="flex items-center justify-center">
-              <StopButton onClick={handleStop} />
+              <StopButton onStop={handleStop} />
             </div>
           ) : (
             <ChatInput
-              value={input}
-              onChange={setInput}
-              onSubmit={handleSubmit}
+              onSend={handleSubmit}
               placeholder="Ask the agent to do something..."
               disabled={isLoading}
             />

@@ -19,7 +19,7 @@ import {
   File,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { AI_FEATURES } from '@/lib/ai/config';
+import { AI_FEATURES, RATE_LIMITS } from '@/lib/ai/config';
 
 // ============================================
 // TYPES
@@ -53,7 +53,7 @@ export function DocumentUpload({
   onUpload,
   onRemove,
   disabled = false,
-  maxDocuments = AI_FEATURES.rag.maxDocumentsPerUser,
+  maxDocuments = RATE_LIMITS.rag.maxDocumentsPerUser,
   className,
 }: DocumentUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
@@ -74,7 +74,7 @@ export function DocumentUpload({
         const file = files[i];
         const extension = `.${file.name.split('.').pop()?.toLowerCase()}`;
 
-        if (AI_FEATURES.rag.supportedFormats.includes(extension)) {
+        if ((AI_FEATURES.rag.supportedFormats as readonly string[]).includes(extension)) {
           validFiles.push(file);
         }
       }
@@ -192,7 +192,7 @@ export function DocumentUpload({
             </p>
             <p className="text-xs text-muted-foreground">
               Supported: {AI_FEATURES.rag.supportedFormats.join(', ')} •
-              Max {AI_FEATURES.rag.maxDocumentSizeMB}MB per file
+              Max {RATE_LIMITS.rag.maxDocumentSizeMB}MB per file
             </p>
           </>
         )}

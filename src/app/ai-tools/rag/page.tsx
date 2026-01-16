@@ -18,10 +18,17 @@ import {
   DocumentUpload,
   type UploadedDocument,
 } from '@/components/ai';
-import { GROQ_MODELS, AI_DEFAULTS, type GroqModelId, type AIMessage } from '@/lib/ai/config';
+import { GROQ_MODELS, AI_DEFAULTS, type GroqModelId } from '@/lib/ai/config';
+
+// Simplified message type for this component
+interface ChatMessageType {
+  id?: string;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+}
 
 export default function RAGPage() {
-  const [messages, setMessages] = useState<AIMessage[]>([]);
+  const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [model, setModel] = useState<GroqModelId>(AI_DEFAULTS.model);
@@ -48,35 +55,64 @@ export default function RAGPage() {
   }, []);
 
   const handleDocumentUpload = useCallback(
-    async (file: File): Promise<UploadedDocument> => {
-      const content = await file.text();
+    async (files: File[]): Promise<void> => {
+      for (const file of files) {
+        // Add uploading state
+        const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+        setDocuments(prev => [...prev, {
+          id: tempId,
+          name: file.name,
+          size: file.size,
+          type: file.type || 'text/plain',
+          status: 'uploading' as const,
+        }]);
 
-      const response = await fetch('/api/ai/rag', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId,
-          action: 'upload',
-          document: {
-            name: file.name,
-            content,
-            type: file.type || 'text/plain',
-          },
-        }),
-      });
+        try {
+          const content = await file.text();
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Upload failed');
+          const response = await fetch('/api/ai/rag', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              sessionId,
+              action: 'upload',
+              document: {
+                name: file.name,
+                content,
+                type: file.type || 'text/plain',
+              },
+            }),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Upload failed');
+          }
+
+          const result = await response.json();
+
+          // Update with real data
+          setDocuments(prev => prev.map(doc =>
+            doc.id === tempId
+              ? {
+                  id: result.document.id,
+                  name: result.document.name,
+                  size: result.document.size,
+                  type: result.document.type || 'text/plain',
+                  status: 'ready' as const,
+                  chunks: result.document.chunks,
+                }
+              : doc
+          ));
+        } catch (err) {
+          // Mark as error
+          setDocuments(prev => prev.map(doc =>
+            doc.id === tempId
+              ? { ...doc, status: 'error' as const, error: err instanceof Error ? err.message : 'Upload failed' }
+              : doc
+          ));
+        }
       }
-
-      const result = await response.json();
-      return {
-        id: result.document.id,
-        name: result.document.name,
-        size: result.document.size,
-        chunks: result.document.chunks,
-      };
     },
     [sessionId]
   );
@@ -103,7 +139,7 @@ export default function RAGPage() {
       e?.preventDefault();
       if (!input.trim() || isLoading) return;
 
-      const userMessage: AIMessage = { role: 'user', content: input.trim() };
+      const userMessage: ChatMessageType = { id: `user-${Date.now()}`, role: 'user', content: input.trim() };
       const newMessages = [...messages, userMessage];
       setMessages(newMessages);
       setInput('');
@@ -111,7 +147,8 @@ export default function RAGPage() {
       setIsLoading(true);
 
       // Add placeholder assistant message
-      setMessages([...newMessages, { role: 'assistant', content: '' }]);
+      const assistantId = `assistant-${Date.now()}`;
+      setMessages([...newMessages, { id: assistantId, role: 'assistant', content: '' }]);
 
       abortControllerRef.current = new AbortController();
 
@@ -157,7 +194,7 @@ export default function RAGPage() {
                   assistantContent += parsed.content;
                   setMessages([
                     ...newMessages,
-                    { role: 'assistant', content: assistantContent },
+                    { id: assistantId, role: 'assistant', content: assistantContent },
                   ]);
                 }
                 if (parsed.error) {
@@ -206,7 +243,6 @@ export default function RAGPage() {
           onUpload={handleDocumentUpload}
           onRemove={handleDocumentRemove}
           documents={documents}
-          onDocumentsChange={setDocuments}
         />
         {documents.length > 0 && (
           <div className="mt-4 rounded-lg bg-gray-700/30 p-3">
@@ -307,13 +343,9 @@ export default function RAGPage() {
                   transition={{ duration: 0.2 }}
                 >
                   <ChatMessage
+                    id={message.id || `msg-${index}`}
                     role={message.role}
                     content={message.content}
-                    isLoading={
-                      isLoading &&
-                      index === messages.length - 1 &&
-                      message.role === 'assistant'
-                    }
                   />
                 </motion.div>
               ))}
@@ -337,13 +369,90 @@ export default function RAGPage() {
         <div className="mt-4">
           {isLoading ? (
             <div className="flex items-center justify-center">
-              <StopButton onClick={handleStop} />
+              <StopButton onStop={handleStop} />
             </div>
           ) : (
             <ChatInput
-              value={input}
-              onChange={setInput}
-              onSubmit={handleSubmit}
+              onSend={(message) => {
+                if (!message.trim() || isLoading) return;
+
+                const userMessage: ChatMessageType = { id: `user-${Date.now()}`, role: 'user', content: message.trim() };
+                const newMessages = [...messages, userMessage];
+                setMessages(newMessages);
+                setInput('');
+                setError(null);
+                setIsLoading(true);
+
+                const assistantId = `assistant-${Date.now()}`;
+                setMessages([...newMessages, { id: assistantId, role: 'assistant', content: '' }]);
+
+                const abortController = new AbortController();
+                abortControllerRef.current = abortController;
+
+                fetch('/api/ai/rag', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    sessionId,
+                    messages: newMessages,
+                    model,
+                    action: 'query',
+                  }),
+                  signal: abortController.signal,
+                }).then(async (response) => {
+                  if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Failed to get response');
+                  }
+
+                  const reader = response.body?.getReader();
+                  if (!reader) throw new Error('No response stream');
+
+                  const decoder = new TextDecoder();
+                  let assistantContent = '';
+
+                  while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const chunk = decoder.decode(value);
+                    const lines = chunk.split('\n');
+
+                    for (const line of lines) {
+                      if (line.startsWith('data: ')) {
+                        const data = line.slice(6);
+                        if (data === '[DONE]') continue;
+
+                        try {
+                          const parsed = JSON.parse(data);
+                          if (parsed.content) {
+                            assistantContent += parsed.content;
+                            setMessages([
+                              ...newMessages,
+                              { id: assistantId, role: 'assistant', content: assistantContent },
+                            ]);
+                          }
+                          if (parsed.error) {
+                            throw new Error(parsed.error);
+                          }
+                        } catch {
+                          // Skip invalid JSON lines
+                        }
+                      }
+                    }
+                  }
+                }).catch((err) => {
+                  if (err instanceof Error && err.name === 'AbortError') {
+                    return;
+                  }
+                  console.error('RAG error:', err);
+                  setError(err instanceof Error ? err.message : 'An error occurred');
+                  setMessages(newMessages);
+                }).finally(() => {
+                  setIsLoading(false);
+                  abortControllerRef.current = null;
+                });
+              }}
               placeholder={
                 documents.length > 0
                   ? 'Ask about your documents...'

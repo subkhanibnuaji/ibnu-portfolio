@@ -6,7 +6,6 @@
  */
 
 import { jsPDF } from 'jspdf';
-import PptxGenJS from 'pptxgenjs';
 
 // ============================================
 // PDF GENERATOR
@@ -95,7 +94,16 @@ const THEME_COLORS: Record<string, { primary: string; secondary: string; accent:
   orange: { primary: 'FF6600', secondary: '993300', accent: 'FFAA66' },
 };
 
-export function generatePPT(data: PPTData): void {
+export async function generatePPT(data: PPTData): Promise<void> {
+  // Skip on server-side / during build
+  if (typeof window === 'undefined') {
+    console.warn('PPT generation is only available on the client side');
+    return;
+  }
+
+  // Dynamic import to avoid Node.js module issues at build time
+  // @ts-ignore - dynamic import for pptxgenjs
+  const PptxGenJS = (await import(/* webpackIgnore: true */ 'pptxgenjs')).default;
   const pptx = new PptxGenJS();
   const colors = THEME_COLORS[data.theme || 'blue'] || THEME_COLORS.blue;
 
@@ -206,5 +214,5 @@ export function generatePPT(data: PPTData): void {
   });
 
   // Save
-  pptx.writeFile({ fileName: `${data.title.replace(/[^a-z0-9]/gi, '_')}.pptx` });
+  await pptx.writeFile({ fileName: `${data.title.replace(/[^a-z0-9]/gi, '_')}.pptx` });
 }
