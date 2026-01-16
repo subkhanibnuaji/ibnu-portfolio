@@ -16,6 +16,7 @@ import {
   Sun,
   ArrowUp,
   Search,
+  Sparkles,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
@@ -44,6 +45,7 @@ export function CommandPalette() {
     { id: 'creds', icon: Award, label: 'Go to Credentials', shortcut: 'G C', action: () => router.push('/certifications'), category: 'navigation' },
     { id: 'about', icon: User, label: 'Go to About', shortcut: 'G A', action: () => router.push('/about'), category: 'navigation' },
     { id: 'contact', icon: Mail, label: 'Go to Contact', shortcut: 'G K', action: () => router.push('/contact'), category: 'navigation' },
+    { id: 'simple-llm', icon: Sparkles, label: 'Go to Simple LLM', shortcut: 'G L', action: () => router.push('/simple-llm'), category: 'navigation' },
     // Actions
     { id: 'terminal', icon: Terminal, label: 'Open Terminal', shortcut: 'T', action: () => {
       const event = new KeyboardEvent('keydown', { key: 't' })
