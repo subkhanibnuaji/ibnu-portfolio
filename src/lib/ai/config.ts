@@ -54,6 +54,9 @@ export const AI_MODELS = {
 
 export type GroqModelId = keyof typeof AI_MODELS.groq;
 
+// Alias for backwards compatibility
+export const GROQ_MODELS = AI_MODELS.groq;
+
 // ============================================
 // DEFAULT SETTINGS
 // ============================================
@@ -156,6 +159,8 @@ export const AI_FEATURES = {
     supportedFormats: ['.txt', '.md', '.pdf', '.json'],
     maxChunkSize: 1000,
     chunkOverlap: 200,
+    maxDocumentsPerUser: 10,
+    maxDocumentSizeMB: 10,
   },
   agent: {
     enabled: true,

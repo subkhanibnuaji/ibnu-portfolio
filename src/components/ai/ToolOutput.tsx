@@ -109,12 +109,13 @@ export function ToolOutput({ tool, input, result, isLoading, toolCall, status, c
 
   // Normalize props - support both interfaces
   const toolName = toolCall?.name || tool || 'unknown';
-  const toolArgs = toolCall?.arguments || input || {};
+  const toolArgs: Record<string, unknown> = toolCall?.arguments || input || {};
   const toolResult = toolCall?.result || result;
   const toolError = toolCall?.error;
   const computedStatus = status || (isLoading ? 'running' : (toolResult ? 'success' : 'running'));
 
   const Icon = TOOL_ICONS[toolName] || Wrench;
+  const hasArgs = Object.keys(toolArgs).length > 0;
 
   const getStatusIcon = () => {
     switch (computedStatus) {
@@ -178,20 +179,20 @@ export function ToolOutput({ tool, input, result, isLoading, toolCall, status, c
       </button>
 
       {/* Content */}
-      {isExpanded && (
+      {isExpanded ? (
         <div className="px-4 pb-3 space-y-2">
           {/* Arguments */}
-          {Object.keys(toolArgs).length > 0 && (
+          {hasArgs ? (
             <div>
               <p className="text-xs text-muted-foreground mb-1">Input:</p>
               <pre className="text-xs bg-black/20 rounded p-2 overflow-x-auto">
                 {JSON.stringify(toolArgs, null, 2)}
               </pre>
             </div>
-          )}
+          ) : null}
 
           {/* Result */}
-          {toolResult && (
+          {toolResult !== undefined && toolResult !== null ? (
             <div>
               <p className="text-xs text-muted-foreground mb-1">Output:</p>
               {(() => {
@@ -233,19 +234,19 @@ export function ToolOutput({ tool, input, result, isLoading, toolCall, status, c
                 );
               })()}
             </div>
-          )}
+          ) : null}
 
           {/* Error */}
-          {toolError && (
+          {toolError ? (
             <div>
               <p className="text-xs text-red-400 mb-1">Error:</p>
               <pre className="text-xs bg-red-500/10 text-red-300 rounded p-2">
                 {toolError}
               </pre>
             </div>
-          )}
+          ) : null}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
