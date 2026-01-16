@@ -16,9 +16,12 @@ import {
   Wifi,
   Shield,
   HardDrive,
-  MonitorSmartphone
+  MonitorSmartphone,
+  Loader2,
+  AlertCircle
 } from 'lucide-react'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 
 const features = [
   {
@@ -61,14 +64,56 @@ const techStack = [
   'Reanimated'
 ]
 
-const downloadInfo = {
-  version: '1.0.0',
-  size: '~32 MB',
-  minAndroid: 'Android 6.0+',
-  lastUpdated: 'January 2026'
+interface ReleaseInfo {
+  version: string
+  downloadUrl: string
+  size: string
+  publishedAt: string
 }
 
 export default function MobilePage() {
+  const [release, setRelease] = useState<ReleaseInfo | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+
+  useEffect(() => {
+    async function fetchLatestRelease() {
+      try {
+        const res = await fetch('https://api.github.com/repos/subkhanibnuaji/ibnu-portfolio/releases/latest')
+        if (res.ok) {
+          const data = await res.json()
+          const apkAsset = data.assets?.find((a: { name: string }) => a.name.endsWith('.apk'))
+          if (apkAsset) {
+            setRelease({
+              version: data.tag_name?.replace('mobile-v', '').split('-')[0] || '1.0.0',
+              downloadUrl: apkAsset.browser_download_url,
+              size: `${(apkAsset.size / (1024 * 1024)).toFixed(1)} MB`,
+              publishedAt: new Date(data.published_at).toLocaleDateString('id-ID', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+              })
+            })
+          }
+        }
+      } catch (e) {
+        setError(true)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchLatestRelease()
+  }, [])
+
+  const downloadInfo = {
+    version: release?.version || '1.0.1',
+    size: release?.size || '~32 MB',
+    minAndroid: 'Android 6.0+',
+    lastUpdated: release?.publishedAt || 'Coming Soon'
+  }
+
+  const downloadUrl = release?.downloadUrl || 'https://github.com/subkhanibnuaji/ibnu-portfolio/releases'
+
   return (
     <PageLayout
       title="Mobile App"
@@ -88,10 +133,22 @@ export default function MobilePage() {
               {/* Left - Download Info */}
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <span className="px-3 py-1 rounded-full bg-cyber-green/20 text-cyber-green text-sm font-medium flex items-center gap-1">
-                    <Sparkles className="h-3 w-3" />
-                    Available Now
-                  </span>
+                  {release ? (
+                    <span className="px-3 py-1 rounded-full bg-cyber-green/20 text-cyber-green text-sm font-medium flex items-center gap-1">
+                      <Sparkles className="h-3 w-3" />
+                      Available Now
+                    </span>
+                  ) : loading ? (
+                    <span className="px-3 py-1 rounded-full bg-cyber-cyan/20 text-cyber-cyan text-sm font-medium flex items-center gap-1">
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                      Checking...
+                    </span>
+                  ) : (
+                    <span className="px-3 py-1 rounded-full bg-yellow-500/20 text-yellow-500 text-sm font-medium flex items-center gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      Building...
+                    </span>
+                  )}
                   <span className="px-3 py-1 rounded-full bg-cyber-purple/20 text-cyber-purple text-sm font-medium">
                     v{downloadInfo.version}
                   </span>
@@ -127,16 +184,33 @@ export default function MobilePage() {
 
                 {/* Download Button */}
                 <div className="flex flex-wrap gap-3 mb-6">
-                  <a
-                    href="https://github.com/subkhanibnuaji/ibnu-portfolio/releases/latest/download/ibnu-portfolio.apk"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Button variant="gradient" size="lg" className="gap-2 text-lg px-8">
-                      <Download className="h-5 w-5" />
-                      Download APK
-                    </Button>
-                  </a>
+                  {release ? (
+                    <a
+                      href={downloadUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button variant="gradient" size="lg" className="gap-2 text-lg px-8">
+                        <Download className="h-5 w-5" />
+                        Download APK
+                      </Button>
+                    </a>
+                  ) : (
+                    <a
+                      href="https://github.com/subkhanibnuaji/ibnu-portfolio/actions/workflows/build-android.yml"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button variant="gradient" size="lg" className="gap-2 text-lg px-8">
+                        {loading ? (
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                        ) : (
+                          <Download className="h-5 w-5" />
+                        )}
+                        {loading ? 'Checking...' : 'View Build Status'}
+                      </Button>
+                    </a>
+                  )}
                   <a
                     href="https://github.com/subkhanibnuaji/ibnu-portfolio/releases"
                     target="_blank"
@@ -148,6 +222,18 @@ export default function MobilePage() {
                     </Button>
                   </a>
                 </div>
+
+                {/* Status Message */}
+                {!release && !loading && (
+                  <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-4 mb-4">
+                    <p className="text-yellow-500 text-sm flex items-start gap-2">
+                      <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+                      <span>
+                        APK sedang dalam proses build (~15 menit). Refresh halaman ini untuk cek status terbaru, atau klik tombol di atas untuk melihat progress build.
+                      </span>
+                    </p>
+                  </div>
+                )}
 
                 {/* Install Instructions */}
                 <div className="text-sm text-muted-foreground">
