@@ -1,0 +1,63 @@
+name: Build Android APK
+
+on:
+  push:
+    branches:
+      - main
+      - 'claude/*'
+    paths:
+      - 'mobile-app/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: mobile-app/package-lock.json
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install dependencies
+        working-directory: mobile-app
+        run: npm ci
+
+      - name: Generate native code (if needed)
+        working-directory: mobile-app
+        run: |
+          if [ ! -d "android" ]; then
+            npx expo prebuild --platform android --clean
+          fi
+
+      - name: Build APK
+        working-directory: mobile-app/android
+        run: |
+          chmod +x ./gradlew
+          ./gradlew assembleRelease --no-daemon
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: ibnu-portfolio-apk
+          path: mobile-app/android/app/build/outputs/apk/release/*.apk
+          retention-days: 30
+
+      - name: Get APK info
+        run: |
+          echo "APK built successfully!"
+          ls -la mobile-app/android/app/build/outputs/apk/release/

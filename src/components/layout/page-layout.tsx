@@ -41,11 +41,11 @@ export function PageLayout({
         {/* Page Header */}
         <section className="relative py-16 px-4 overflow-hidden">
           {/* Grid Background */}
-          <div className="absolute inset-0 grid-pattern opacity-50" />
+          <div className="absolute inset-0 grid-pattern opacity-30 dark:opacity-50" />
 
-          {/* Gradient Orbs */}
-          <div className="absolute top-1/4 -left-32 w-96 h-96 bg-cyber-cyan/20 rounded-full blur-[128px]" />
-          <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-cyber-purple/20 rounded-full blur-[128px]" />
+          {/* Gradient Orbs - Adaptive for dark/light mode */}
+          <div className="absolute top-1/4 -left-32 w-96 h-96 bg-cyber-cyan/10 dark:bg-cyber-cyan/20 rounded-full blur-[128px] animate-pulse-glow" />
+          <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-cyber-purple/10 dark:bg-cyber-purple/20 rounded-full blur-[128px] animate-pulse-glow animation-delay-1000" />
 
           <div className="container relative z-10">
             <div className="max-w-4xl mx-auto text-center">

@@ -711,6 +711,20 @@ export function AIChatbot() {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
+  // Initialize messages on client-side only to prevent hydration mismatch
+  useEffect(() => {
+    setIsMounted(true)
+    setMessages([
+      {
+        id: '1',
+        role: 'assistant',
+        content: "Hi! I'm Ibnu's portfolio assistant. I can help you learn about his background, projects, skills, and interests in AI, Blockchain, and Cybersecurity. What would you like to know?",
+        timestamp: new Date(),
+        quickReplies: INITIAL_QUICK_REPLIES
+      }
+    ])
+  }, [])
+
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [])

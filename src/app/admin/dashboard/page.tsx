@@ -21,7 +21,8 @@ import {
   BarChart3,
   Eye,
   MessageSquare,
-  TrendingUp
+  TrendingUp,
+  ImageIcon
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -30,6 +31,7 @@ import Link from 'next/link'
 const sidebarItems = [
   { icon: LayoutDashboard, label: 'Overview', href: '/admin/dashboard' },
   { icon: FolderKanban, label: 'Projects', href: '/admin/dashboard/projects' },
+  { icon: ImageIcon, label: 'Photo Gallery', href: '/admin/dashboard/photos' },
   { icon: Award, label: 'Certifications', href: '/admin/dashboard/certifications' },
   { icon: Briefcase, label: 'Experience', href: '/admin/dashboard/experience' },
   { icon: GraduationCap, label: 'Education', href: '/admin/dashboard/education' },
@@ -217,18 +219,18 @@ export default function AdminDashboardPage() {
                   <span className="text-sm">New Project</span>
                 </Link>
                 <Link
+                  href="/admin/dashboard/photos"
+                  className="flex flex-col items-center gap-2 p-4 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
+                >
+                  <ImageIcon className="h-6 w-6 text-cyber-purple" />
+                  <span className="text-sm">Upload Photos</span>
+                </Link>
+                <Link
                   href="/admin/dashboard/certifications/new"
                   className="flex flex-col items-center gap-2 p-4 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
                 >
-                  <Award className="h-6 w-6 text-cyber-purple" />
+                  <Award className="h-6 w-6 text-cyber-green" />
                   <span className="text-sm">Add Certification</span>
-                </Link>
-                <Link
-                  href="/admin/dashboard/experience/new"
-                  className="flex flex-col items-center gap-2 p-4 rounded-lg bg-muted hover:bg-muted/80 transition-colors"
-                >
-                  <Briefcase className="h-6 w-6 text-cyber-green" />
-                  <span className="text-sm">Add Experience</span>
                 </Link>
                 <Link
                   href="/admin/dashboard/messages"

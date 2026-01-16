@@ -49,11 +49,11 @@ A React Native / Expo mobile application for the Ibnu Portfolio, featuring cross
    npm install
    \`\`\`
 
-3. Configure the API URL in \`constants/config.ts\`:
+3. The API is pre-configured in \`constants/config.ts\`:
    \`\`\`typescript
    export const API_BASE_URL = __DEV__
      ? 'http://localhost:3000'  // Your local Next.js server
-     : 'https://your-production-url.com';
+     : 'https://ibnu-portfolio-ashen.vercel.app';  // Production
    \`\`\`
 
 ### Running the App
@@ -74,18 +74,81 @@ npm run ios
 npm run web
 \`\`\`
 
-#### Building for Production
+#### Building Android APK (Easy Method)
 
-\`\`\`bash
-# Build for Android
+**Option 1: Use the build script**
+
+```bash
+# Linux/macOS
+./build-apk.sh
+
+# Windows
+build-apk.bat
+```
+
+**Option 2: Manual steps**
+
+1. **Create Expo Account**: Sign up at https://expo.dev/signup
+
+2. **Install EAS CLI**:
+   ```bash
+   npm install -g eas-cli
+   ```
+
+3. **Login to Expo**:
+   ```bash
+   eas login
+   ```
+
+4. **Initialize EAS** (first time only):
+   ```bash
+   eas init
+   ```
+
+5. **Build APK**:
+   ```bash
+   npm run build:apk
+   ```
+
+6. **Wait for build**: The APK builds in Expo's cloud (~10-15 minutes). Download link will be provided when complete.
+
+#### Building for Production (Google Play Store)
+
+```bash
+# Build Android App Bundle (for Play Store)
+#### Building APK for Android
+
+**Prerequisites:**
+1. Create an Expo account at https://expo.dev/signup
+2. Install EAS CLI: `npm install -g eas-cli`
+3. Login: `eas login`
+
+**Build APK:**
+```bash
+# Initialize EAS (first time only)
+eas init
+
+# Build APK (installable file)
+npm run build:apk
+
+# Or build App Bundle (for Play Store)
 npm run build:android
+```
 
-# Build for iOS
+# Build for iOS (App Store)
+The APK will be built in Expo's cloud (~10-15 mins). Download link will be provided after build completes.
+
+#### Building for iOS
+
+```bash
 npm run build:ios
+```
 
-# Build for Web (static export)
+#### Building for Web (static export)
+
+```bash
 npm run build:web
-\`\`\`
+```
 
 ## Project Structure
 
