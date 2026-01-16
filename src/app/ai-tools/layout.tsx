@@ -2,10 +2,10 @@ import { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'AI Tools - Ibnu Portfolio',
-  description: 'Explore AI-powered tools running entirely in your browser. Object detection, pose estimation, background removal, and more.',
+  description: 'Explore AI-powered tools - browser-based ML models and LangChain-powered LLM applications.',
   openGraph: {
     title: 'AI Tools - Ibnu Portfolio',
-    description: 'Explore AI-powered tools running entirely in your browser.',
+    description: 'Explore AI-powered tools running in your browser and LangChain LLM applications.',
     type: 'website'
   }
 }

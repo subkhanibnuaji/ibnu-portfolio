@@ -17,7 +17,7 @@ const NAV_LINKS = [
   { href: '/certifications', label: 'Credentials' },
   { href: '/about', label: 'About' },
   { href: '/mobile', label: 'Mobile' },
-  { href: '/simple-llm', label: 'Simple LLM' },
+  { href: '/ai-tools', label: 'AI Tools' },
 ]
 
 export function Navbar() {

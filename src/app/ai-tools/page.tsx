@@ -7,7 +7,42 @@ import {
   Brain, ArrowRight, Shield, Zap, Code, Tag, Hand, QrCode, Volume2
 } from 'lucide-react'
 
-const AI_TOOLS = [
+// LangChain-powered LLM Tools
+const LLM_TOOLS = [
+  {
+    slug: 'llm',
+    name: 'LLM Chat',
+    description: 'Interactive chat with AI powered by Groq LLMs. Multiple models available.',
+    icon: MessageSquare,
+    color: 'from-blue-500 to-cyan-500',
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    model: 'Groq LLMs'
+  },
+  {
+    slug: 'rag',
+    name: 'RAG System',
+    description: 'Upload documents and chat with AI that has context from your files.',
+    icon: Tag,
+    color: 'from-purple-500 to-pink-500',
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    model: 'LangChain RAG'
+  },
+  {
+    slug: 'agent',
+    name: 'AI Agent',
+    description: 'AI with tool-use capabilities. Calculations, time, weather, and more.',
+    icon: Brain,
+    color: 'from-orange-500 to-red-500',
+    bgColor: 'bg-orange-500/10',
+    textColor: 'text-orange-500',
+    model: 'Agent Tools'
+  }
+]
+
+// Browser-based ML Tools
+const BROWSER_TOOLS = [
   {
     slug: 'background-removal',
     name: 'Background Removal',
@@ -124,17 +159,17 @@ const features = [
   {
     icon: Shield,
     title: 'Privacy First',
-    description: 'All processing happens locally in your browser. No data is sent to servers.'
+    description: 'Browser ML runs locally. LLM tools use secure API calls.'
   },
   {
     icon: Zap,
     title: 'Real-time Performance',
-    description: 'Optimized for fast inference using WebGL and WASM acceleration.'
+    description: 'Optimized for fast inference using WebGL, WASM, and Edge Runtime.'
   },
   {
     icon: Code,
-    title: 'Open Source Models',
-    description: 'Built with TensorFlow.js and open-source machine learning models.'
+    title: 'Open Source',
+    description: 'Built with TensorFlow.js, LangChain, and open-source models.'
   }
 ]
 
@@ -150,15 +185,15 @@ export default function AIToolsPage() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
             <Brain className="w-4 h-4" />
-            Machine Learning in Browser
+            AI Tools Playground
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             AI Tools
-            <span className="gradient-text"> Playground</span>
+            <span className="gradient-text"> Collection</span>
           </h1>
           <p className="text-lg text-muted-foreground mb-8">
-            Explore powerful AI capabilities running entirely in your browser.
-            No server uploads, no API costs — just pure client-side machine learning.
+            Browser-based ML models and LangChain-powered LLM applications.
+            Explore the future of AI right in your browser.
           </p>
         </motion.div>
 
@@ -184,16 +219,67 @@ export default function AIToolsPage() {
         </motion.div>
       </section>
 
-      {/* Tools Grid */}
-      <section className="container">
-        <h2 className="text-2xl font-bold mb-8 text-center">Available Tools</h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {AI_TOOLS.map((tool, index) => (
+      {/* LangChain LLM Tools */}
+      <section className="container mb-16">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="p-2 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500">
+            <Sparkles className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold">LangChain LLM Tools</h2>
+            <p className="text-sm text-muted-foreground">Powered by Groq (FREE API)</p>
+          </div>
+        </div>
+        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {LLM_TOOLS.map((tool, index) => (
             <motion.div
               key={tool.slug}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 * index }}
+            >
+              <Link href={`/ai-tools/${tool.slug}`}>
+                <div className="group h-full p-6 rounded-xl border border-border bg-card hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/5">
+                  <div className={`w-12 h-12 rounded-xl ${tool.bgColor} flex items-center justify-center mb-4`}>
+                    <tool.icon className={`w-6 h-6 ${tool.textColor}`} />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">
+                    {tool.name}
+                  </h3>
+                  <p className="text-muted-foreground text-sm mb-4">
+                    {tool.description}
+                  </p>
+                  <div className="flex items-center justify-between">
+                    <span className={`text-xs px-2 py-1 rounded-full ${tool.bgColor} ${tool.textColor}`}>
+                      {tool.model}
+                    </span>
+                    <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* Browser ML Tools */}
+      <section className="container">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="p-2 rounded-lg bg-gradient-to-br from-green-500 to-emerald-500">
+            <Brain className="w-5 h-5 text-white" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold">Browser ML Tools</h2>
+            <p className="text-sm text-muted-foreground">Runs entirely in your browser</p>
+          </div>
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {BROWSER_TOOLS.map((tool, index) => (
+            <motion.div
+              key={tool.slug}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.05 * index }}
             >
               <Link href={`/ai-tools/${tool.slug}`}>
                 <div className="group h-full p-6 rounded-xl border border-border bg-card hover:border-primary/50 transition-all hover:shadow-lg hover:shadow-primary/5">
@@ -225,27 +311,24 @@ export default function AIToolsPage() {
           <h2 className="text-xl font-bold mb-6 text-center">Powered By</h2>
           <div className="flex flex-wrap justify-center gap-4">
             <div className="px-4 py-2 rounded-lg bg-background border border-border text-sm font-medium">
+              LangChain
+            </div>
+            <div className="px-4 py-2 rounded-lg bg-background border border-border text-sm font-medium">
+              Groq API
+            </div>
+            <div className="px-4 py-2 rounded-lg bg-background border border-border text-sm font-medium">
               TensorFlow.js
             </div>
             <div className="px-4 py-2 rounded-lg bg-background border border-border text-sm font-medium">
               WebGL
             </div>
             <div className="px-4 py-2 rounded-lg bg-background border border-border text-sm font-medium">
-              WASM
-            </div>
-            <div className="px-4 py-2 rounded-lg bg-background border border-border text-sm font-medium">
               MediaPipe
             </div>
             <div className="px-4 py-2 rounded-lg bg-background border border-border text-sm font-medium">
-              Canvas API
-            </div>
-            <div className="px-4 py-2 rounded-lg bg-background border border-border text-sm font-medium">
-              WebRTC
+              Next.js Edge
             </div>
           </div>
-          <p className="text-center text-sm text-muted-foreground mt-6">
-            All models are loaded on-demand and cached locally for faster subsequent use.
-          </p>
         </div>
       </section>
 
