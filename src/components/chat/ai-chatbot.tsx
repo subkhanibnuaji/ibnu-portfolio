@@ -1079,7 +1079,7 @@ export function AIChatbot() {
   const getWelcomeMessage = (chatMode: ChatMode) => {
     switch (chatMode) {
       case 'agent':
-        return "Hi! I'm IbnuGPT Agent with superpowers! I can:\n• Generate images from text\n• Generate QR codes\n• Create memes\n• Generate PDF documents\n• Create PowerPoint presentations\n• Calculate math & get time\n• Translate text & generate code\n\nTry: \"Generate a QR code for heyibnu.com\" or \"Create a PDF about AI\""
+        return "Hi! I'm IbnuGPT Agent with 21 superpowers! 🚀\n\n📸 **Generate:** Images, QR codes, Memes, PDFs, Presentations, Color Palettes, Passwords, Hashtags\n📚 **Knowledge:** Wikipedia search, Dictionary, Random facts, Crypto prices\n🔧 **Utility:** Calculator, Unit converter, Code generator, Text analysis, Translate\n\nTry: \"What's the price of Bitcoin?\" or \"Generate hashtags for tech\" or \"Define serendipity\""
       case 'ai':
         return "Hi! I'm IbnuGPT powered by Llama 3.3 (via Groq). I can answer any questions with AI intelligence. What would you like to know?"
       default:
