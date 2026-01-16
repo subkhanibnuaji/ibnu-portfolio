@@ -10,7 +10,9 @@ import {
   QrCode, Type, AlignLeft, BookOpen, Grid3X3,
   Binary, Regex, Brain, SquareStack, Cake, Banknote, Square, Smile,
   DollarSign, Receipt, LayoutGrid, Hash, Shuffle, Grid2X2, Wallet,
-  CircleDot, Bomb, ListChecks, Disc, ShoppingCart, User, Zap, Dices, Percent, Monitor
+  CircleDot, Bomb, ListChecks, Disc, ShoppingCart, User, Zap, Dices, Percent, Monitor,
+  Radio, Coins, PiggyBank, Moon, Link2, LetterText, Fingerprint, BadgePercent, Languages, Flame, Atom,
+  Thermometer, GraduationCap, Lightbulb, Pipette, Car, CalendarDays, MapPin, Footprints, Scaling, Dice6, Database
 } from 'lucide-react'
 
 const TOOLS = [
@@ -517,6 +519,222 @@ const TOOLS = [
     bgColor: 'bg-purple-500/10',
     textColor: 'text-purple-500',
     category: 'Design'
+  },
+  {
+    slug: 'morse-code',
+    name: 'Morse Code Translator',
+    description: 'Convert text to Morse code and back with audio playback.',
+    icon: Radio,
+    bgColor: 'bg-amber-500/10',
+    textColor: 'text-amber-500',
+    category: 'Utility'
+  },
+  {
+    slug: 'binary-converter',
+    name: 'Number Base Converter',
+    description: 'Convert between decimal, binary, octal, and hexadecimal.',
+    icon: Binary,
+    bgColor: 'bg-cyan-500/10',
+    textColor: 'text-cyan-500',
+    category: 'Developer'
+  },
+  {
+    slug: 'coin-flip',
+    name: 'Coin Flip',
+    description: 'Flip a virtual coin with stats tracking.',
+    icon: Coins,
+    bgColor: 'bg-yellow-500/10',
+    textColor: 'text-yellow-500',
+    category: 'Utility'
+  },
+  {
+    slug: 'savings-calculator',
+    name: 'Savings Goal Calculator',
+    description: 'Plan savings with interest and monthly contributions.',
+    icon: PiggyBank,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Finance'
+  },
+  {
+    slug: 'random-number',
+    name: 'Random Number Generator',
+    description: 'Generate random numbers in any range.',
+    icon: Shuffle,
+    bgColor: 'bg-violet-500/10',
+    textColor: 'text-violet-500',
+    category: 'Utility'
+  },
+  {
+    slug: 'character-counter',
+    name: 'Character Counter',
+    description: 'Count characters and words with platform limits.',
+    icon: LetterText,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Utility'
+  },
+  {
+    slug: 'url-encoder',
+    name: 'URL Encoder/Decoder',
+    description: 'Encode and decode URLs for web development.',
+    icon: Link2,
+    bgColor: 'bg-cyan-500/10',
+    textColor: 'text-cyan-500',
+    category: 'Developer'
+  },
+  {
+    slug: 'sleep-calculator',
+    name: 'Sleep Calculator',
+    description: 'Calculate optimal sleep and wake times based on sleep cycles.',
+    icon: Moon,
+    bgColor: 'bg-indigo-500/10',
+    textColor: 'text-indigo-500',
+    category: 'Health'
+  },
+  {
+    slug: 'hash-generator',
+    name: 'Hash Generator',
+    description: 'Generate MD5, SHA-1, SHA-256, SHA-384, SHA-512 hashes.',
+    icon: Fingerprint,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Developer'
+  },
+  {
+    slug: 'discount-calculator',
+    name: 'Discount Calculator',
+    description: 'Calculate discounts, savings, and final prices.',
+    icon: BadgePercent,
+    bgColor: 'bg-red-500/10',
+    textColor: 'text-red-500',
+    category: 'Calculator'
+  },
+  {
+    slug: 'roman-numeral',
+    name: 'Roman Numeral Converter',
+    description: 'Convert between Arabic and Roman numerals.',
+    icon: Languages,
+    bgColor: 'bg-amber-500/10',
+    textColor: 'text-amber-500',
+    category: 'Utility'
+  },
+  {
+    slug: 'bmr-calculator',
+    name: 'BMR Calculator',
+    description: 'Calculate your Basal Metabolic Rate and daily calories.',
+    icon: Flame,
+    bgColor: 'bg-orange-500/10',
+    textColor: 'text-orange-500',
+    category: 'Health'
+  },
+  {
+    slug: 'prime-checker',
+    name: 'Prime Number Checker',
+    description: 'Check if a number is prime and find prime factors.',
+    icon: Atom,
+    bgColor: 'bg-cyan-500/10',
+    textColor: 'text-cyan-500',
+    category: 'Calculator'
+  },
+  {
+    slug: 'temperature-converter',
+    name: 'Temperature Converter',
+    description: 'Convert between Celsius, Fahrenheit, and Kelvin.',
+    icon: Thermometer,
+    bgColor: 'bg-red-500/10',
+    textColor: 'text-red-500',
+    category: 'Utility'
+  },
+  {
+    slug: 'gpa-calculator',
+    name: 'GPA Calculator',
+    description: 'Calculate your Grade Point Average.',
+    icon: GraduationCap,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Calculator'
+  },
+  {
+    slug: 'electricity-calculator',
+    name: 'Electricity Calculator',
+    description: 'Calculate electricity usage and cost.',
+    icon: Lightbulb,
+    bgColor: 'bg-yellow-500/10',
+    textColor: 'text-yellow-500',
+    category: 'Calculator'
+  },
+  {
+    slug: 'color-converter',
+    name: 'Color Converter',
+    description: 'Convert colors between HEX, RGB, HSL, and CMYK.',
+    icon: Pipette,
+    bgColor: 'bg-pink-500/10',
+    textColor: 'text-pink-500',
+    category: 'Design'
+  },
+  {
+    slug: 'fuel-calculator',
+    name: 'Fuel Calculator',
+    description: 'Calculate fuel costs, consumption, and range.',
+    icon: Car,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Calculator'
+  },
+  {
+    slug: 'date-difference',
+    name: 'Date Difference',
+    description: 'Calculate the difference between two dates.',
+    icon: CalendarDays,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Calculator'
+  },
+  {
+    slug: 'timezone-converter',
+    name: 'Timezone Converter',
+    description: 'Convert time between different time zones.',
+    icon: MapPin,
+    bgColor: 'bg-indigo-500/10',
+    textColor: 'text-indigo-500',
+    category: 'Utility'
+  },
+  {
+    slug: 'pace-calculator',
+    name: 'Pace Calculator',
+    description: 'Calculate running pace, time, or distance.',
+    icon: Footprints,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Health'
+  },
+  {
+    slug: 'px-to-rem',
+    name: 'PX to REM Converter',
+    description: 'Convert between pixels and rem units.',
+    icon: Scaling,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Developer'
+  },
+  {
+    slug: 'probability-calculator',
+    name: 'Probability Calculator',
+    description: 'Calculate probabilities for various scenarios.',
+    icon: Dice6,
+    bgColor: 'bg-pink-500/10',
+    textColor: 'text-pink-500',
+    category: 'Calculator'
+  },
+  {
+    slug: 'data-size-converter',
+    name: 'Data Size Converter',
+    description: 'Convert between bytes, KB, MB, GB, TB.',
+    icon: Database,
+    bgColor: 'bg-cyan-500/10',
+    textColor: 'text-cyan-500',
+    category: 'Developer'
   }
 ]
 
