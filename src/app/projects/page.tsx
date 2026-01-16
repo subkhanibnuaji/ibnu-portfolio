@@ -20,6 +20,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
+// Last updated: 2026-01-16
 const projects = [
   {
     id: 'mobile-app',
