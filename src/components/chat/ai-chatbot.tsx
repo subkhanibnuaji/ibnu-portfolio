@@ -3,9 +3,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
-import { Bot, X, Send, User, Trash2, Sparkles, Brain, Zap, Loader2, Wand2, ImageIcon, Calculator, Clock, Languages, Code } from 'lucide-react'
+import { Bot, X, Send, User, Trash2, Sparkles, Brain, Zap, Loader2, Wand2, ImageIcon, Calculator, Clock, Languages, Code, QrCode, FileDown, Presentation, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { generatePDF, generatePPT, type PDFData, type PPTData } from '@/lib/ai/file-generators'
 
 type ChatMode = 'quick' | 'ai' | 'agent'
 
@@ -26,13 +27,56 @@ interface Message {
   images?: string[]
 }
 
-// Parse special results (like images)
-function parseSpecialResult(result: string): { type: 'text' | 'image'; content: string; meta?: string } {
+// Parse special results (images, QR codes, files)
+type ResultType = 'text' | 'image' | 'qr' | 'pdf' | 'ppt'
+
+interface ParsedResult {
+  type: ResultType
+  content: string
+  meta?: string
+  data?: PDFData | PPTData
+}
+
+function parseSpecialResult(result: string): ParsedResult {
   if (result.startsWith('IMAGE_GENERATED:')) {
     const parts = result.replace('IMAGE_GENERATED:', '').split('|')
     return { type: 'image', content: parts[0], meta: parts[1] }
   }
+  if (result.startsWith('QR_GENERATED:')) {
+    const parts = result.replace('QR_GENERATED:', '').split('|')
+    return { type: 'qr', content: parts[0], meta: parts[1] }
+  }
+  if (result.startsWith('PDF_GENERATE:')) {
+    try {
+      const data = JSON.parse(result.replace('PDF_GENERATE:', ''))
+      return { type: 'pdf', content: '', data }
+    } catch {
+      return { type: 'text', content: result }
+    }
+  }
+  if (result.startsWith('PPT_GENERATE:')) {
+    try {
+      const data = JSON.parse(result.replace('PPT_GENERATE:', ''))
+      return { type: 'ppt', content: '', data }
+    } catch {
+      return { type: 'text', content: result }
+    }
+  }
   return { type: 'text', content: result }
+}
+
+// Handle file generation
+function handleFileGeneration(result: string): boolean {
+  const parsed = parseSpecialResult(result)
+  if (parsed.type === 'pdf' && parsed.data) {
+    generatePDF(parsed.data as PDFData)
+    return true
+  }
+  if (parsed.type === 'ppt' && parsed.data) {
+    generatePPT(parsed.data as PPTData)
+    return true
+  }
+  return false
 }
 
 interface QuickReply {
@@ -934,10 +978,13 @@ export function AIChatbot() {
                   lastExecution.result = parsed.result
                   lastExecution.isLoading = false
 
-                  // Check if it's an image result
+                  // Check result type and handle accordingly
                   const parsedResult = parseSpecialResult(parsed.result || '')
-                  if (parsedResult.type === 'image') {
+                  if (parsedResult.type === 'image' || parsedResult.type === 'qr') {
                     images.push(parsedResult.content)
+                  } else if (parsedResult.type === 'pdf' || parsedResult.type === 'ppt') {
+                    // Trigger file download
+                    handleFileGeneration(parsed.result || '')
                   }
 
                   setMessages(prev => {
@@ -1032,7 +1079,7 @@ export function AIChatbot() {
   const getWelcomeMessage = (chatMode: ChatMode) => {
     switch (chatMode) {
       case 'agent':
-        return "Hi! I'm IbnuGPT Agent with superpowers! I can:\n• Generate images from text\n• Calculate math\n• Get current time\n• Check weather\n• Translate text\n• Generate code\n• Analyze text\n\nTry: \"Generate an image of a cyberpunk city at night\""
+        return "Hi! I'm IbnuGPT Agent with superpowers! I can:\n• Generate images from text\n• Generate QR codes\n• Create memes\n• Generate PDF documents\n• Create PowerPoint presentations\n• Calculate math & get time\n• Translate text & generate code\n\nTry: \"Generate a QR code for heyibnu.com\" or \"Create a PDF about AI\""
       case 'ai':
         return "Hi! I'm IbnuGPT powered by Llama 3.3 (via Groq). I can answer any questions with AI intelligence. What would you like to know?"
       default:

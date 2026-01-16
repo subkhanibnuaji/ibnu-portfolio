@@ -25,6 +25,11 @@ import {
   Laugh,
   Code,
   Download,
+  QrCode,
+  Smile,
+  FileDown,
+  Presentation,
+  Type,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { AIToolCall } from '@/lib/ai/config';
@@ -55,13 +60,42 @@ const TOOL_ICONS: Record<string, React.ElementType> = {
   translate: Languages,
   tell_joke: Laugh,
   generate_code: Code,
+  generate_qr: QrCode,
+  generate_meme: Smile,
+  generate_pdf: FileDown,
+  generate_ppt: Presentation,
+  generate_lorem: Type,
 };
 
-// Parse special results (like images)
-function parseSpecialResult(result: string): { type: 'text' | 'image'; content: string; meta?: string } {
+// Parse special results (images, QR codes, PDFs, PPTs)
+type ResultType = 'text' | 'image' | 'qr' | 'pdf' | 'ppt';
+
+function parseSpecialResult(result: string): { type: ResultType; content: string; meta?: string; data?: unknown } {
   if (result.startsWith('IMAGE_GENERATED:')) {
     const parts = result.replace('IMAGE_GENERATED:', '').split('|');
     return { type: 'image', content: parts[0], meta: parts[1] };
+  }
+  if (result.startsWith('QR_GENERATED:')) {
+    const parts = result.replace('QR_GENERATED:', '').split('|');
+    return { type: 'qr', content: parts[0], meta: parts[1] };
+  }
+  if (result.startsWith('PDF_GENERATE:')) {
+    const jsonData = result.replace('PDF_GENERATE:', '');
+    try {
+      const data = JSON.parse(jsonData);
+      return { type: 'pdf', content: '', data };
+    } catch {
+      return { type: 'text', content: result };
+    }
+  }
+  if (result.startsWith('PPT_GENERATE:')) {
+    const jsonData = result.replace('PPT_GENERATE:', '');
+    try {
+      const data = JSON.parse(jsonData);
+      return { type: 'ppt', content: '', data };
+    } catch {
+      return { type: 'text', content: result };
+    }
   }
   return { type: 'text', content: result };
 }

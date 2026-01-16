@@ -297,6 +297,204 @@ const textAnalysisTool: Tool = {
 };
 
 // ============================================
+// PDF GENERATOR TOOL (Client-side generation)
+// ============================================
+
+const pdfGeneratorTool: Tool = {
+  name: 'generate_pdf',
+  description: 'Generate a PDF document from text content. Creates downloadable PDF files.',
+  parameters: {
+    type: 'object',
+    properties: {
+      title: {
+        type: 'string',
+        description: 'Title of the PDF document',
+      },
+      content: {
+        type: 'string',
+        description: 'Main content/body text for the PDF',
+      },
+      author: {
+        type: 'string',
+        description: 'Author name (optional)',
+      },
+    },
+    required: ['title', 'content'],
+  },
+  execute: async (args) => {
+    const title = args.title as string;
+    const content = args.content as string;
+    const author = (args.author as string) || 'IbnuGPT Agent';
+
+    // Return data for client-side PDF generation
+    return `PDF_GENERATE:${JSON.stringify({ title, content, author })}`;
+  },
+};
+
+// ============================================
+// PPT GENERATOR TOOL (Client-side generation)
+// ============================================
+
+const pptGeneratorTool: Tool = {
+  name: 'generate_ppt',
+  description: 'Generate a PowerPoint presentation. Creates downloadable PPTX files with slides.',
+  parameters: {
+    type: 'object',
+    properties: {
+      title: {
+        type: 'string',
+        description: 'Title of the presentation',
+      },
+      slides: {
+        type: 'string',
+        description: 'Slide contents separated by "---". Each slide should have a title on first line and bullet points on following lines.',
+      },
+      theme: {
+        type: 'string',
+        description: 'Color theme: blue, green, red, purple, orange (optional, default: blue)',
+      },
+    },
+    required: ['title', 'slides'],
+  },
+  execute: async (args) => {
+    const title = args.title as string;
+    const slides = args.slides as string;
+    const theme = (args.theme as string) || 'blue';
+
+    // Return data for client-side PPT generation
+    return `PPT_GENERATE:${JSON.stringify({ title, slides, theme })}`;
+  },
+};
+
+// ============================================
+// QR CODE GENERATOR TOOL (FREE)
+// ============================================
+
+const qrCodeTool: Tool = {
+  name: 'generate_qr',
+  description: 'Generate a QR code from text or URL. Creates scannable QR code images.',
+  parameters: {
+    type: 'object',
+    properties: {
+      data: {
+        type: 'string',
+        description: 'Text or URL to encode in the QR code',
+      },
+      size: {
+        type: 'string',
+        description: 'Size of QR code: small (150), medium (300), large (500). Default: medium',
+      },
+    },
+    required: ['data'],
+  },
+  execute: async (args) => {
+    const data = args.data as string;
+    const sizeMap: Record<string, number> = { small: 150, medium: 300, large: 500 };
+    const size = sizeMap[(args.size as string) || 'medium'] || 300;
+
+    // Use QR Server API (FREE, no key needed)
+    const encodedData = encodeURIComponent(data);
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodedData}`;
+
+    return `QR_GENERATED:${qrUrl}|${data}`;
+  },
+};
+
+// ============================================
+// MEME GENERATOR TOOL (FREE)
+// ============================================
+
+const memeGeneratorTool: Tool = {
+  name: 'generate_meme',
+  description: 'Generate a meme image with custom text. Creates funny meme images.',
+  parameters: {
+    type: 'object',
+    properties: {
+      template: {
+        type: 'string',
+        description: 'Meme template: drake, distracted, button, change-my-mind, two-buttons, expanding-brain, uno-draw, surprised-pikachu',
+      },
+      topText: {
+        type: 'string',
+        description: 'Text for top of meme',
+      },
+      bottomText: {
+        type: 'string',
+        description: 'Text for bottom of meme',
+      },
+    },
+    required: ['template', 'topText'],
+  },
+  execute: async (args) => {
+    const template = args.template as string;
+    const topText = args.topText as string;
+    const bottomText = (args.bottomText as string) || '';
+
+    // Meme template IDs for memegen.link (FREE)
+    const templateMap: Record<string, string> = {
+      'drake': 'drake',
+      'distracted': 'db',
+      'button': 'ntot',
+      'change-my-mind': 'cmm',
+      'two-buttons': 'ds',
+      'expanding-brain': 'eb',
+      'uno-draw': 'ud',
+      'surprised-pikachu': 'pikachu',
+    };
+
+    const templateId = templateMap[template.toLowerCase()] || 'drake';
+    const encodedTop = encodeURIComponent(topText.replace(/ /g, '_'));
+    const encodedBottom = encodeURIComponent((bottomText || '_').replace(/ /g, '_'));
+
+    const memeUrl = `https://api.memegen.link/images/${templateId}/${encodedTop}/${encodedBottom}.png`;
+
+    return `IMAGE_GENERATED:${memeUrl}|Meme: ${topText}`;
+  },
+};
+
+// ============================================
+// LOREM IPSUM GENERATOR TOOL
+// ============================================
+
+const loremIpsumTool: Tool = {
+  name: 'generate_lorem',
+  description: 'Generate placeholder Lorem Ipsum text for mockups and designs.',
+  parameters: {
+    type: 'object',
+    properties: {
+      paragraphs: {
+        type: 'string',
+        description: 'Number of paragraphs to generate (1-10, default: 3)',
+      },
+      type: {
+        type: 'string',
+        description: 'Type: standard, hipster, bacon, or office (default: standard)',
+      },
+    },
+    required: [],
+  },
+  execute: async (args) => {
+    const count = Math.min(10, Math.max(1, parseInt(args.paragraphs as string) || 3));
+
+    const loremParagraphs = [
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+      "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.",
+      "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.",
+      "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+      "Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra.",
+      "Est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida.",
+      "Duis ac tellus et risus vulputate vehicula. Donec lobortis risus a elit. Etiam tempor ultrices risus.",
+      "Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.",
+      "Proin pharetra nonummy pede. Mauris et orci. Aenean nec lorem. In porttitor suspendisse potenti.",
+      "Praesent dapibus, neque id cursus faucibus, tortor neque egestas augue, eu vulputate magna eros eu erat.",
+    ];
+
+    const result = loremParagraphs.slice(0, count).join('\n\n');
+    return `Generated ${count} paragraph(s) of Lorem Ipsum:\n\n${result}`;
+  },
+};
+
+// ============================================
 // AVAILABLE TOOLS
 // ============================================
 
@@ -305,6 +503,11 @@ export const AVAILABLE_TOOLS: Record<string, Tool> = {
   current_time: currentTimeTool,
   weather: weatherTool,
   generate_image: imageGenerationTool,
+  generate_qr: qrCodeTool,
+  generate_meme: memeGeneratorTool,
+  generate_pdf: pdfGeneratorTool,
+  generate_ppt: pptGeneratorTool,
+  generate_lorem: loremIpsumTool,
   translate: translateTool,
   tell_joke: jokeTool,
   generate_code: codeGeneratorTool,
