@@ -54,6 +54,8 @@ export default function RAGPage() {
 
   const handleDocumentUpload = useCallback(
     async (files: File[]): Promise<void> => {
+      const uploadedDocs: UploadedDocument[] = [];
+
       for (const file of files) {
         const content = await file.text();
 
@@ -77,17 +79,15 @@ export default function RAGPage() {
         }
 
         const result = await response.json();
-        const uploadedDoc: UploadedDocument = {
+        uploadedDocs.push({
           id: result.document.id,
           name: result.document.name,
           size: result.document.size,
-          type: result.document.type || 'text/plain',
-          status: 'ready',
           chunks: result.document.chunks,
-        };
-
-        setDocuments(prev => [...prev, uploadedDoc]);
+        });
       }
+
+      setDocuments((prev) => [...prev, ...uploadedDocs]);
     },
     [sessionId]
   );

@@ -54,7 +54,7 @@ export const AI_MODELS = {
 
 export type GroqModelId = keyof typeof AI_MODELS.groq;
 
-// Alias for backwards compatibility
+// Alias for backward compatibility
 export const GROQ_MODELS = AI_MODELS.groq;
 
 // ============================================
@@ -188,10 +188,10 @@ export const AI_ERRORS = {
 // ============================================
 
 export interface AIMessage {
-  id: string;
+  id?: string;
   role: 'user' | 'assistant' | 'system';
   content: string;
-  timestamp: Date;
+  timestamp?: Date;
   model?: string;
   tokens?: number;
 }

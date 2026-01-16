@@ -286,5 +286,5 @@ export {
   StringOutputParser,
 };
 
-// Export AIMessage as LangChainAIMessage to avoid collision
+// Export AIMessage as LangChainAIMessage to avoid collision with config.ts AIMessage type
 export { AIMessage as LangChainAIMessage } from '@langchain/core/messages';

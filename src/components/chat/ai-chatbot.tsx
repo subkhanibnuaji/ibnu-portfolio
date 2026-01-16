@@ -127,7 +127,7 @@ function parseSpecialResult(result: string): ParsedResult {
   return { type: 'text', content: result }
 }
 
-// Handle file generation (async for dynamic imports)
+// Handle file generation (async for PPT which uses API)
 async function handleFileGeneration(result: string): Promise<boolean> {
   const parsed = parseSpecialResult(result)
   if (parsed.type === 'pdf' && parsed.data) {
@@ -135,8 +135,13 @@ async function handleFileGeneration(result: string): Promise<boolean> {
     return true
   }
   if (parsed.type === 'ppt' && parsed.data) {
-    await generatePPT(parsed.data as PPTData)
-    return true
+    try {
+      await generatePPT(parsed.data as PPTData)
+      return true
+    } catch (error) {
+      console.error('PPT generation failed:', error)
+      return false
+    }
   }
   return false
 }
@@ -1229,8 +1234,10 @@ export function AIChatbot() {
                   if (parsedResult.type === 'image' || parsedResult.type === 'qr') {
                     images.push(parsedResult.content)
                   } else if (parsedResult.type === 'pdf' || parsedResult.type === 'ppt') {
-                    // Trigger file download (async, no need to await)
-                    handleFileGeneration(parsed.result || '').catch(console.error)
+                    // Trigger file download (async, don't block)
+                    handleFileGeneration(parsed.result || '').catch(err => {
+                      console.error('File generation error:', err)
+                    })
                   }
 
                   // Use startTransition for non-blocking update
