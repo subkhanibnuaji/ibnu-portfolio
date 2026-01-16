@@ -713,7 +713,6 @@ export function AIChatbot() {
 
   // Initialize messages on client-side only to prevent hydration mismatch
   useEffect(() => {
-    setIsMounted(true)
     setMessages([
       {
         id: '1',

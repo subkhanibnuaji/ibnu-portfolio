@@ -55,7 +55,7 @@ export function processDocument(
 ): AIDocument {
   // Validate file type
   const extension = `.${type.split('/').pop()?.toLowerCase()}`;
-  if (!AI_FEATURES.rag.supportedFormats.includes(extension)) {
+  if (!(AI_FEATURES.rag.supportedFormats as readonly string[]).includes(extension)) {
     throw new Error(AI_ERRORS.UNSUPPORTED_FORMAT);
   }
 

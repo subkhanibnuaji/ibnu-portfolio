@@ -277,10 +277,10 @@ export function truncateMessages(
 // EXPORTS
 // ============================================
 
+// Re-export LangChain utility classes
+// Note: HumanMessage, AIMessage, SystemMessage are not re-exported to avoid
+// conflicts with local interfaces. Import directly from @langchain/core if needed.
 export {
-  HumanMessage,
-  AIMessage,
-  SystemMessage,
   ChatPromptTemplate,
   MessagesPlaceholder,
   StringOutputParser,

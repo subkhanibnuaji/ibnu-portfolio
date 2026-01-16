@@ -18,11 +18,16 @@ import {
   DocumentUpload,
   type UploadedDocument,
 } from '@/components/ai';
-import { GROQ_MODELS, AI_DEFAULTS, type GroqModelId, type AIMessage } from '@/lib/ai/config';
+import { GROQ_MODELS, AI_DEFAULTS, type GroqModelId } from '@/lib/ai/config';
+
+// Simple message type for chat
+interface ChatMessageType {
+  role: 'user' | 'assistant';
+  content: string;
+}
 
 export default function RAGPage() {
-  const [messages, setMessages] = useState<AIMessage[]>([]);
-  const [input, setInput] = useState('');
+  const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [model, setModel] = useState<GroqModelId>(AI_DEFAULTS.model);
   const [error, setError] = useState<string | null>(null);
@@ -48,35 +53,40 @@ export default function RAGPage() {
   }, []);
 
   const handleDocumentUpload = useCallback(
-    async (file: File): Promise<UploadedDocument> => {
-      const content = await file.text();
+    async (files: File[]): Promise<void> => {
+      for (const file of files) {
+        const content = await file.text();
 
-      const response = await fetch('/api/ai/rag', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          sessionId,
-          action: 'upload',
-          document: {
-            name: file.name,
-            content,
-            type: file.type || 'text/plain',
-          },
-        }),
-      });
+        const response = await fetch('/api/ai/rag', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sessionId,
+            action: 'upload',
+            document: {
+              name: file.name,
+              content,
+              type: file.type || 'text/plain',
+            },
+          }),
+        });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Upload failed');
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Upload failed');
+        }
+
+        const result = await response.json();
+        const newDoc: UploadedDocument = {
+          id: result.document.id,
+          name: result.document.name,
+          size: result.document.size,
+          type: result.document.type || 'text/plain',
+          status: 'ready' as const,
+          chunks: result.document.chunks,
+        };
+        setDocuments((prev) => [...prev, newDoc]);
       }
-
-      const result = await response.json();
-      return {
-        id: result.document.id,
-        name: result.document.name,
-        size: result.document.size,
-        chunks: result.document.chunks,
-      };
     },
     [sessionId]
   );
@@ -99,14 +109,12 @@ export default function RAGPage() {
   );
 
   const handleSubmit = useCallback(
-    async (e?: React.FormEvent) => {
-      e?.preventDefault();
-      if (!input.trim() || isLoading) return;
+    async (message: string) => {
+      if (!message.trim() || isLoading) return;
 
-      const userMessage: AIMessage = { role: 'user', content: input.trim() };
+      const userMessage: ChatMessageType = { role: 'user', content: message.trim() };
       const newMessages = [...messages, userMessage];
       setMessages(newMessages);
-      setInput('');
       setError(null);
       setIsLoading(true);
 
@@ -181,7 +189,7 @@ export default function RAGPage() {
         abortControllerRef.current = null;
       }
     },
-    [input, isLoading, messages, model, sessionId]
+    [isLoading, messages, model, sessionId]
   );
 
   const handleClear = useCallback(async () => {
@@ -206,7 +214,6 @@ export default function RAGPage() {
           onUpload={handleDocumentUpload}
           onRemove={handleDocumentRemove}
           documents={documents}
-          onDocumentsChange={setDocuments}
         />
         {documents.length > 0 && (
           <div className="mt-4 rounded-lg bg-gray-700/30 p-3">
@@ -287,7 +294,7 @@ export default function RAGPage() {
                   ].map((suggestion) => (
                     <button
                       key={suggestion}
-                      onClick={() => setInput(suggestion)}
+                      onClick={() => handleSubmit(suggestion)}
                       className="rounded-full bg-gray-700/50 px-4 py-2 text-sm text-gray-300 transition-colors hover:bg-gray-700"
                     >
                       {suggestion}
@@ -307,9 +314,10 @@ export default function RAGPage() {
                   transition={{ duration: 0.2 }}
                 >
                   <ChatMessage
+                    id={`msg-${index}`}
                     role={message.role}
                     content={message.content}
-                    isLoading={
+                    isStreaming={
                       isLoading &&
                       index === messages.length - 1 &&
                       message.role === 'assistant'
@@ -337,13 +345,11 @@ export default function RAGPage() {
         <div className="mt-4">
           {isLoading ? (
             <div className="flex items-center justify-center">
-              <StopButton onClick={handleStop} />
+              <StopButton onStop={handleStop} />
             </div>
           ) : (
             <ChatInput
-              value={input}
-              onChange={setInput}
-              onSubmit={handleSubmit}
+              onSend={handleSubmit}
               placeholder={
                 documents.length > 0
                   ? 'Ask about your documents...'

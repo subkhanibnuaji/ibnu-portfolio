@@ -11,11 +11,16 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChatMessage, ChatInput, StopButton, ModelSelector } from '@/components/ai';
-import { GROQ_MODELS, AI_DEFAULTS, type GroqModelId, type AIMessage } from '@/lib/ai/config';
+import { GROQ_MODELS, AI_DEFAULTS, type GroqModelId } from '@/lib/ai/config';
+
+// Simple message type for chat
+interface ChatMessageType {
+  role: 'user' | 'assistant';
+  content: string;
+}
 
 export default function LLMChatPage() {
-  const [messages, setMessages] = useState<AIMessage[]>([]);
-  const [input, setInput] = useState('');
+  const [messages, setMessages] = useState<ChatMessageType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [model, setModel] = useState<GroqModelId>(AI_DEFAULTS.model);
   const [error, setError] = useState<string | null>(null);
@@ -39,14 +44,12 @@ export default function LLMChatPage() {
   }, []);
 
   const handleSubmit = useCallback(
-    async (e?: React.FormEvent) => {
-      e?.preventDefault();
-      if (!input.trim() || isLoading) return;
+    async (message: string) => {
+      if (!message.trim() || isLoading) return;
 
-      const userMessage: AIMessage = { role: 'user', content: input.trim() };
+      const userMessage: ChatMessageType = { role: 'user', content: message.trim() };
       const newMessages = [...messages, userMessage];
       setMessages(newMessages);
-      setInput('');
       setError(null);
       setIsLoading(true);
 
@@ -118,7 +121,7 @@ export default function LLMChatPage() {
         abortControllerRef.current = null;
       }
     },
-    [input, isLoading, messages, model]
+    [isLoading, messages, model]
   );
 
   const handleClear = useCallback(() => {
@@ -188,7 +191,7 @@ export default function LLMChatPage() {
               ].map((suggestion) => (
                 <button
                   key={suggestion}
-                  onClick={() => setInput(suggestion)}
+                  onClick={() => handleSubmit(suggestion)}
                   className="rounded-full bg-gray-700/50 px-4 py-2 text-sm text-gray-300 transition-colors hover:bg-gray-700"
                 >
                   {suggestion}
@@ -207,9 +210,10 @@ export default function LLMChatPage() {
                 transition={{ duration: 0.2 }}
               >
                 <ChatMessage
+                  id={`msg-${index}`}
                   role={message.role}
                   content={message.content}
-                  isLoading={
+                  isStreaming={
                     isLoading &&
                     index === messages.length - 1 &&
                     message.role === 'assistant'
@@ -237,13 +241,11 @@ export default function LLMChatPage() {
       <div className="mt-4">
         {isLoading ? (
           <div className="flex items-center justify-center">
-            <StopButton onClick={handleStop} />
+            <StopButton onStop={handleStop} />
           </div>
         ) : (
           <ChatInput
-            value={input}
-            onChange={setInput}
-            onSubmit={handleSubmit}
+            onSend={handleSubmit}
             placeholder="Type your message..."
             disabled={isLoading}
           />

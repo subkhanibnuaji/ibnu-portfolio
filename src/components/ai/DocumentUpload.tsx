@@ -74,7 +74,7 @@ export function DocumentUpload({
         const file = files[i];
         const extension = `.${file.name.split('.').pop()?.toLowerCase()}`;
 
-        if (AI_FEATURES.rag.supportedFormats.includes(extension)) {
+        if ((AI_FEATURES.rag.supportedFormats as readonly string[]).includes(extension)) {
           validFiles.push(file);
         }
       }
