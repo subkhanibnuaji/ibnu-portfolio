@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Github, Linkedin, Twitter, Mail } from 'lucide-react'
 import { FooterNewsletter } from '@/components/newsletter/newsletter-form'
@@ -27,6 +28,12 @@ const SOCIAL_LINKS = [
 ]
 
 export function Footer() {
+  const [year, setYear] = useState<number | null>(null)
+
+  useEffect(() => {
+    setYear(new Date().getFullYear())
+  }, [])
+
   return (
     <footer className="relative border-t border-border dark:border-primary/10 bg-card/30 dark:bg-card/20">
       {/* Grid pattern overlay */}
@@ -103,7 +110,7 @@ export function Footer() {
         {/* Bottom */}
         <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} Subkhan Ibnu Aji. All rights reserved.
+            &copy; {year ?? '2024'} Subkhan Ibnu Aji. All rights reserved.
           </p>
           <p className="text-sm text-muted-foreground">
             Built with passion for technology and the future.
