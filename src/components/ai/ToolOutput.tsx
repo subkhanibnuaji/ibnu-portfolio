@@ -8,6 +8,7 @@
  */
 
 import { useState } from 'react';
+import Image from 'next/image';
 import {
   Wrench,
   Calculator,
@@ -19,6 +20,16 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
+  ImageIcon,
+  Languages,
+  Laugh,
+  Code,
+  Download,
+  QrCode,
+  Smile,
+  FileDown,
+  Presentation,
+  Type,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { AIToolCall } from '@/lib/ai/config';
@@ -45,7 +56,49 @@ const TOOL_ICONS: Record<string, React.ElementType> = {
   current_time: Clock,
   weather: Cloud,
   text_analysis: FileText,
+  generate_image: ImageIcon,
+  translate: Languages,
+  tell_joke: Laugh,
+  generate_code: Code,
+  generate_qr: QrCode,
+  generate_meme: Smile,
+  generate_pdf: FileDown,
+  generate_ppt: Presentation,
+  generate_lorem: Type,
 };
+
+// Parse special results (images, QR codes, PDFs, PPTs)
+type ResultType = 'text' | 'image' | 'qr' | 'pdf' | 'ppt';
+
+function parseSpecialResult(result: string): { type: ResultType; content: string; meta?: string; data?: unknown } {
+  if (result.startsWith('IMAGE_GENERATED:')) {
+    const parts = result.replace('IMAGE_GENERATED:', '').split('|');
+    return { type: 'image', content: parts[0], meta: parts[1] };
+  }
+  if (result.startsWith('QR_GENERATED:')) {
+    const parts = result.replace('QR_GENERATED:', '').split('|');
+    return { type: 'qr', content: parts[0], meta: parts[1] };
+  }
+  if (result.startsWith('PDF_GENERATE:')) {
+    const jsonData = result.replace('PDF_GENERATE:', '');
+    try {
+      const data = JSON.parse(jsonData);
+      return { type: 'pdf', content: '', data };
+    } catch {
+      return { type: 'text', content: result };
+    }
+  }
+  if (result.startsWith('PPT_GENERATE:')) {
+    const jsonData = result.replace('PPT_GENERATE:', '');
+    try {
+      const data = JSON.parse(jsonData);
+      return { type: 'ppt', content: '', data };
+    } catch {
+      return { type: 'text', content: result };
+    }
+  }
+  return { type: 'text', content: result };
+}
 
 // ============================================
 // COMPONENT
@@ -141,11 +194,44 @@ export function ToolOutput({ tool, input, result, isLoading, toolCall, status, c
           {toolResult && (
             <div>
               <p className="text-xs text-muted-foreground mb-1">Output:</p>
-              <pre className="text-xs bg-black/20 rounded p-2 overflow-x-auto whitespace-pre-wrap">
-                {typeof toolResult === 'string'
-                  ? toolResult
-                  : JSON.stringify(toolResult, null, 2)}
-              </pre>
+              {(() => {
+                const resultStr = typeof toolResult === 'string' ? toolResult : JSON.stringify(toolResult, null, 2);
+                const parsed = parseSpecialResult(resultStr);
+
+                if (parsed.type === 'image') {
+                  return (
+                    <div className="space-y-2">
+                      <div className="relative rounded-lg overflow-hidden bg-black/20 aspect-square max-w-[300px]">
+                        <Image
+                          src={parsed.content}
+                          alt={parsed.meta || 'Generated image'}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
+                      </div>
+                      {parsed.meta && (
+                        <p className="text-xs text-muted-foreground italic">&quot;{parsed.meta}&quot;</p>
+                      )}
+                      <a
+                        href={parsed.content}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-blue-400 hover:underline"
+                      >
+                        <Download className="h-3 w-3" />
+                        Open full image
+                      </a>
+                    </div>
+                  );
+                }
+
+                return (
+                  <pre className="text-xs bg-black/20 rounded p-2 overflow-x-auto whitespace-pre-wrap">
+                    {resultStr}
+                  </pre>
+                );
+              })()}
             </div>
           )}
 
