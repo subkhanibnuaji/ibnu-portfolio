@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import { HeroSection } from '@/components/sections/hero'
 import { InterestsSection } from '@/components/sections/interests'
 import { FeaturedProjectSection } from '@/components/sections/featured-project'
+import { AIPlaygroundSection } from '@/components/sections/ai-playground'
 import { SkillsSection } from '@/components/sections/skills'
 import { CredentialsSection } from '@/components/sections/credentials'
 import { ContactCTASection } from '@/components/sections/contact-cta'
@@ -35,6 +36,7 @@ export default function HomePage() {
         <StatsCounter />
         <InterestsSection />
         <FeaturedProjectSection />
+        <AIPlaygroundSection />
         <SkillsSection />
         <TestimonialsSection />
         <CredentialsSection />
