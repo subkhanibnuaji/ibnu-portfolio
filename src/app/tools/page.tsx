@@ -10,7 +10,7 @@ import {
   QrCode, Type, AlignLeft, BookOpen, Grid3X3,
   Binary, Regex, Brain, SquareStack, Cake, Banknote, Square, Smile,
   DollarSign, Receipt, LayoutGrid, Hash, Shuffle, Grid2X2, Wallet,
-  CircleDot, Bomb, ListChecks, Disc, ShoppingCart, User, Zap, Dices, Percent
+  CircleDot, Bomb, ListChecks, Disc, ShoppingCart, User, Zap, Dices, Percent, Monitor
 } from 'lucide-react'
 
 const TOOLS = [
@@ -490,6 +490,33 @@ const TOOLS = [
     bgColor: 'bg-green-500/10',
     textColor: 'text-green-500',
     category: 'Calculator'
+  },
+  {
+    slug: 'text-statistics',
+    name: 'Text Statistics',
+    description: 'Analyze text with word count, reading time, and more.',
+    icon: FileText,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Utility'
+  },
+  {
+    slug: 'tip-calculator',
+    name: 'Tip Calculator',
+    description: 'Calculate tips and split bills between people.',
+    icon: Receipt,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Calculator'
+  },
+  {
+    slug: 'aspect-ratio',
+    name: 'Aspect Ratio Calculator',
+    description: 'Calculate and convert aspect ratios for images and video.',
+    icon: Monitor,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Design'
   }
 ]
 
