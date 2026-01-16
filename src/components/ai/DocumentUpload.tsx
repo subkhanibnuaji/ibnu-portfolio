@@ -29,16 +29,18 @@ export interface UploadedDocument {
   id: string;
   name: string;
   size: number;
-  type: string;
-  status: 'uploading' | 'processing' | 'ready' | 'error';
+  type?: string;
+  status?: 'uploading' | 'processing' | 'ready' | 'error';
   error?: string;
   chunks?: number;
 }
 
 export interface DocumentUploadProps {
   documents: UploadedDocument[];
-  onUpload: (files: File[]) => Promise<void>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onUpload: (fileOrFiles: any) => Promise<any>;
   onRemove: (documentId: string) => void;
+  onDocumentsChange?: (documents: UploadedDocument[]) => void;
   disabled?: boolean;
   maxDocuments?: number;
   className?: string;

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
   Sparkles, Box, User, Palette, Smile, MessageSquare,
-  Brain, ArrowRight, Shield, Zap, Code, Tag, Hand, QrCode, Volume2
+  Brain, ArrowRight, Shield, Zap, Code, Tag, Hand, QrCode, Volume2, Send
 } from 'lucide-react'
 
 // LangChain-powered LLM Tools
@@ -38,6 +38,16 @@ const LLM_TOOLS = [
     bgColor: 'bg-orange-500/10',
     textColor: 'text-orange-500',
     model: 'Agent Tools'
+  },
+  {
+    slug: 'telegram-bot',
+    name: 'Telegram Bot',
+    description: 'AI chatbot on Telegram. Chat with IbnuGPT anywhere, anytime.',
+    icon: Send,
+    color: 'from-sky-500 to-blue-500',
+    bgColor: 'bg-sky-500/10',
+    textColor: 'text-sky-500',
+    model: 'Telegram API'
   }
 ]
 
@@ -327,6 +337,9 @@ export default function AIToolsPage() {
             </div>
             <div className="px-4 py-2 rounded-lg bg-background border border-border text-sm font-medium">
               Next.js Edge
+            </div>
+            <div className="px-4 py-2 rounded-lg bg-background border border-border text-sm font-medium">
+              Telegram Bot API
             </div>
           </div>
         </div>

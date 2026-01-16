@@ -17,7 +17,12 @@ import { cn } from '@/lib/utils';
 // ============================================
 
 export interface ChatInputProps {
-  onSend: (message: string) => void;
+  onSend?: (message: string) => void;
+  // Controlled mode props
+  value?: string;
+  onChange?: (value: string) => void;
+  onSubmit?: (e?: FormEvent) => void;
+  // Common props
   isLoading?: boolean;
   disabled?: boolean;
   placeholder?: string;
@@ -32,6 +37,9 @@ export interface ChatInputProps {
 
 export function ChatInput({
   onSend,
+  value: controlledValue,
+  onChange: controlledOnChange,
+  onSubmit: controlledOnSubmit,
   isLoading = false,
   disabled = false,
   placeholder = 'Type your message...',
@@ -39,8 +47,15 @@ export function ChatInput({
   onAttach,
   className,
 }: ChatInputProps) {
-  const [input, setInput] = useState('');
+  const [internalInput, setInternalInput] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Support both controlled and uncontrolled modes
+  const isControlled = controlledValue !== undefined;
+  const input = isControlled ? controlledValue : internalInput;
+  const setInput = isControlled
+    ? (val: string) => controlledOnChange?.(val)
+    : setInternalInput;
 
   // Auto-resize textarea
   useEffect(() => {
@@ -60,8 +75,13 @@ export function ChatInput({
     e?.preventDefault();
     if (!input.trim() || isLoading || disabled) return;
 
-    onSend(input.trim());
-    setInput('');
+    // Support controlled mode with onSubmit
+    if (controlledOnSubmit) {
+      controlledOnSubmit(e);
+    } else if (onSend) {
+      onSend(input.trim());
+      setInput('');
+    }
 
     // Reset textarea height
     if (textareaRef.current) {
@@ -159,14 +179,16 @@ export function ChatInput({
 // ============================================
 
 export interface StopButtonProps {
-  onStop: () => void;
+  onStop?: () => void;
+  onClick?: () => void; // Alias for onStop
   className?: string;
 }
 
-export function StopButton({ onStop, className }: StopButtonProps) {
+export function StopButton({ onStop, onClick, className }: StopButtonProps) {
+  const handleClick = onStop || onClick;
   return (
     <button
-      onClick={onStop}
+      onClick={handleClick}
       className={cn(
         'ai-stop-btn flex items-center gap-2 px-4 py-2 rounded-lg',
         'bg-red-500/20 hover:bg-red-500/30 text-red-400',
