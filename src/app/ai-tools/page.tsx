@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import {
   Sparkles, Box, User, Palette, Smile, MessageSquare,
-  Brain, ArrowRight, Shield, Zap, Code, Tag, Hand, QrCode, Volume2, Send
+  Brain, ArrowRight, Shield, Zap, Code, Tag, Hand, QrCode, Volume2, Mic, Languages, ScanText, CloudSun, Send
 } from 'lucide-react'
 
 // LangChain-powered LLM Tools
@@ -162,6 +162,46 @@ const BROWSER_TOOLS = [
     bgColor: 'bg-sky-500/10',
     textColor: 'text-sky-500',
     model: 'Web Speech API'
+  },
+  {
+    slug: 'speech-to-text',
+    name: 'Speech to Text',
+    description: 'Convert spoken words to text in real-time with multi-language support.',
+    icon: Mic,
+    color: 'from-red-500 to-orange-500',
+    bgColor: 'bg-red-500/10',
+    textColor: 'text-red-500',
+    model: 'Web Speech API'
+  },
+  {
+    slug: 'language-detector',
+    name: 'Language Detector',
+    description: 'Automatically detect the language of any text with confidence scores.',
+    icon: Languages,
+    color: 'from-amber-500 to-yellow-500',
+    bgColor: 'bg-amber-500/10',
+    textColor: 'text-amber-500',
+    model: 'NLP Analysis'
+  },
+  {
+    slug: 'word-cloud',
+    name: 'Word Cloud Generator',
+    description: 'Create beautiful word cloud visualizations from any text.',
+    icon: CloudSun,
+    color: 'from-teal-500 to-cyan-500',
+    bgColor: 'bg-teal-500/10',
+    textColor: 'text-teal-500',
+    model: 'Canvas API'
+  },
+  {
+    slug: 'text-summarizer',
+    name: 'Text Summarizer',
+    description: 'Automatically summarize long text into key points and sentences.',
+    icon: ScanText,
+    color: 'from-fuchsia-500 to-pink-500',
+    bgColor: 'bg-fuchsia-500/10',
+    textColor: 'text-fuchsia-500',
+    model: 'NLP Extraction'
   }
 ]
 
