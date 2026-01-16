@@ -17,6 +17,9 @@ import {
   ArrowUp,
   Search,
   Sparkles,
+  MessageSquare,
+  FileText,
+  Cpu,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
@@ -45,7 +48,10 @@ export function CommandPalette() {
     { id: 'creds', icon: Award, label: 'Go to Credentials', shortcut: 'G C', action: () => router.push('/certifications'), category: 'navigation' },
     { id: 'about', icon: User, label: 'Go to About', shortcut: 'G A', action: () => router.push('/about'), category: 'navigation' },
     { id: 'contact', icon: Mail, label: 'Go to Contact', shortcut: 'G K', action: () => router.push('/contact'), category: 'navigation' },
-    { id: 'simple-llm', icon: Sparkles, label: 'Go to Simple LLM', shortcut: 'G L', action: () => router.push('/simple-llm'), category: 'navigation' },
+    { id: 'ai-tools', icon: Sparkles, label: 'Go to AI Tools', shortcut: 'G T', action: () => router.push('/ai-tools'), category: 'navigation' },
+    { id: 'ai-llm', icon: MessageSquare, label: 'Go to LLM Chat', shortcut: 'G L', action: () => router.push('/ai-tools/llm'), category: 'navigation' },
+    { id: 'ai-rag', icon: FileText, label: 'Go to RAG System', shortcut: 'G R', action: () => router.push('/ai-tools/rag'), category: 'navigation' },
+    { id: 'ai-agent', icon: Cpu, label: 'Go to AI Agent', shortcut: 'G N', action: () => router.push('/ai-tools/agent'), category: 'navigation' },
     // Actions
     { id: 'terminal', icon: Terminal, label: 'Open Terminal', shortcut: 'T', action: () => {
       const event = new KeyboardEvent('keydown', { key: 't' })
