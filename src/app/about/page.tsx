@@ -16,8 +16,10 @@ import {
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import Image from 'next/image'
 import { GitHubStats } from '@/components/github/github-stats'
 import { ResumeDownload } from '@/components/resume/resume-download'
+import { personalPhotos } from '@/config/personal-photos'
 
 const education = [
   {
@@ -27,7 +29,9 @@ const education = [
     period: '2022 - 2024',
     gpa: '3.60/4.00',
     thesis: 'Evaluation of Product Differentiation Strategy Implementation at PT Sambel Korek DNO',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/9/9e/Logo_UGM.png'
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/9/9e/Logo_UGM.png',
+    photo: personalPhotos.education.ugm,
+    color: 'cyber-purple',
   },
   {
     degree: 'Bachelor of Science in Informatics (S.Kom)',
@@ -36,7 +40,9 @@ const education = [
     period: '2017 - 2021',
     gpa: '3.34/4.00',
     thesis: 'Animo: Web-Based Automation for F&B SMEs',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/0/04/Telkom_University_Logo.png'
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/0/04/Telkom_University_Logo.png',
+    photo: personalPhotos.education.telkom,
+    color: 'cyber-cyan',
   }
 ]
 
@@ -178,20 +184,45 @@ export default function AboutPage() {
             <h2 className="text-2xl md:text-3xl font-bold">Education</h2>
           </div>
 
-          <div className="grid gap-6">
+          <div className="grid gap-8">
             {education.map((edu, index) => (
               <motion.div
                 key={index}
                 variants={itemVariants}
-                className="glass rounded-2xl p-6 md:p-8"
+                className="glass rounded-2xl overflow-hidden"
               >
-                <div className="flex flex-col md:flex-row md:items-start gap-6">
-                  <div className="w-16 h-16 rounded-xl bg-white/10 flex items-center justify-center flex-shrink-0">
-                    <GraduationCap className="h-8 w-8 text-cyber-cyan" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-xl font-bold mb-1">{edu.degree}</h3>
-                    <p className="text-cyber-cyan font-medium mb-2">{edu.institution}</p>
+                <div className="flex flex-col lg:flex-row">
+                  {/* Photo Section */}
+                  {edu.photo && (
+                    <div className="relative lg:w-72 h-64 lg:h-auto flex-shrink-0">
+                      <Image
+                        src={edu.photo.src}
+                        alt={edu.photo.alt}
+                        fill
+                        className="object-cover object-top"
+                      />
+                      <div className={`absolute inset-0 bg-gradient-to-r from-transparent via-transparent to-card lg:bg-gradient-to-t lg:from-card lg:via-transparent lg:to-transparent`} />
+                      {/* Caption overlay */}
+                      <div className="absolute bottom-4 left-4 right-4 lg:hidden">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium bg-${edu.color}/20 text-${edu.color} backdrop-blur-sm`}>
+                          {edu.photo.caption}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Content Section */}
+                  <div className="flex-1 p-6 md:p-8">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className={`w-14 h-14 rounded-xl bg-${edu.color}/10 flex items-center justify-center flex-shrink-0`}>
+                        <GraduationCap className={`h-7 w-7 text-${edu.color}`} />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold mb-1">{edu.degree}</h3>
+                        <p className={`text-${edu.color} font-medium`}>{edu.institution}</p>
+                      </div>
+                    </div>
+
                     <div className="flex flex-wrap gap-4 text-sm text-muted-foreground mb-4">
                       <span className="flex items-center gap-1">
                         <MapPin className="h-4 w-4" />
@@ -203,9 +234,19 @@ export default function AboutPage() {
                       </span>
                       <span className="text-cyber-green font-medium">GPA: {edu.gpa}</span>
                     </div>
+
                     <p className="text-muted-foreground">
                       <strong className="text-foreground">Thesis:</strong> {edu.thesis}
                     </p>
+
+                    {/* Photo caption for desktop */}
+                    {edu.photo && (
+                      <div className="hidden lg:block mt-4">
+                        <span className={`px-3 py-1 rounded-full text-xs font-medium bg-${edu.color}/10 text-${edu.color}`}>
+                          {edu.photo.caption}
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </motion.div>

@@ -8,9 +8,13 @@ export function CustomCursor() {
   const ringRef = useRef<HTMLDivElement>(null)
   const [isHovering, setIsHovering] = useState(false)
   const [isVisible, setIsVisible] = useState(true)
-  const [isMobile, setIsMobile] = useState(false)
+  const [isMobile, setIsMobile] = useState(true) // Default to true to prevent flash
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
+    // Mark as mounted
+    setIsMounted(true)
+
     // Check if mobile
     const checkMobile = () => {
       setIsMobile(window.innerWidth <= 768 || 'ontouchstart' in window)
@@ -18,12 +22,19 @@ export function CustomCursor() {
     checkMobile()
     window.addEventListener('resize', checkMobile)
 
-    if (isMobile) return
+    return () => {
+      window.removeEventListener('resize', checkMobile)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!isMounted || isMobile) return
 
     let mouseX = 0
     let mouseY = 0
     let ringX = 0
     let ringY = 0
+    let animationId: number
 
     const handleMouseMove = (e: MouseEvent) => {
       mouseX = e.clientX
@@ -44,7 +55,7 @@ export function CustomCursor() {
         ringRef.current.style.top = `${ringY}px`
       }
 
-      requestAnimationFrame(animateRing)
+      animationId = requestAnimationFrame(animateRing)
     }
 
     const handleMouseEnter = () => setIsVisible(true)
@@ -74,12 +85,15 @@ export function CustomCursor() {
       document.removeEventListener('mousemove', handleMouseMove)
       document.removeEventListener('mouseenter', handleMouseEnter)
       document.removeEventListener('mouseleave', handleMouseLeave)
-      window.removeEventListener('resize', checkMobile)
+      if (animationId) {
+        cancelAnimationFrame(animationId)
+      }
       observer.disconnect()
     }
-  }, [isMobile])
+  }, [isMounted, isMobile])
 
-  if (isMobile) return null
+  // Don't render anything during SSR or on mobile
+  if (!isMounted || isMobile) return null
 
   return (
     <>

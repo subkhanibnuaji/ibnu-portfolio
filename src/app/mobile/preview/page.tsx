@@ -25,8 +25,8 @@ const viewModes: { mode: ViewMode; icon: typeof Smartphone; label: string; width
   { mode: 'desktop', icon: Monitor, label: 'Desktop', width: '100%' }
 ]
 
-// URL untuk Expo web app - bisa diganti ke URL production nanti
-const MOBILE_APP_URL = process.env.NEXT_PUBLIC_MOBILE_APP_URL || 'https://ibnu-portfolio-mobile.vercel.app'
+// URL untuk Expo web app - served from same domain as static HTML
+const MOBILE_APP_URL = '/mobile-app/index.html'
 
 export default function MobilePreviewPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('mobile')
@@ -137,7 +137,7 @@ export default function MobilePreviewPage() {
                 <div className="w-3 h-3 rounded-full bg-green-500/50" />
               </div>
               <div className="flex-1 bg-muted rounded-md px-3 py-1 text-xs text-muted-foreground truncate">
-                {MOBILE_APP_URL}
+                ibnu-portfolio-ashen.vercel.app/mobile-app
               </div>
             </div>
 

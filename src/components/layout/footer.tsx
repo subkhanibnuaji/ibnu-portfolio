@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { Github, Linkedin, Twitter, Mail } from 'lucide-react'
 import { FooterNewsletter } from '@/components/newsletter/newsletter-form'
@@ -27,9 +28,18 @@ const SOCIAL_LINKS = [
 ]
 
 export function Footer() {
+  const [year, setYear] = useState<number | null>(null)
+
+  useEffect(() => {
+    setYear(new Date().getFullYear())
+  }, [])
+
   return (
-    <footer className="relative border-t border-border bg-card/30">
-      <div className="container py-12 md:py-16">
+    <footer className="relative border-t border-border dark:border-primary/10 bg-card/30 dark:bg-card/20">
+      {/* Grid pattern overlay */}
+      <div className="absolute inset-0 grid-pattern opacity-20 dark:opacity-30" />
+
+      <div className="container relative z-10 py-12 md:py-16">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-10">
           {/* Brand */}
           <div className="md:col-span-1">
@@ -48,7 +58,7 @@ export function Footer() {
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/80 transition-colors"
+                  className="w-10 h-10 rounded-xl bg-muted dark:bg-muted/50 flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 transition-all duration-300 hover:scale-105"
                 >
                   <social.icon className="h-5 w-5" />
                   <span className="sr-only">{social.label}</span>
@@ -100,7 +110,7 @@ export function Footer() {
         {/* Bottom */}
         <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} Subkhan Ibnu Aji. All rights reserved.
+            &copy; {year ?? '2024'} Subkhan Ibnu Aji. All rights reserved.
           </p>
           <p className="text-sm text-muted-foreground">
             Built with passion for technology and the future.

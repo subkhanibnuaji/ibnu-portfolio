@@ -1,0 +1,25 @@
+'use client'
+
+import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
+import { StyleTransfer } from '@/components/ai-tools/style-transfer'
+
+export default function StyleTransferPage() {
+  return (
+    <main className="min-h-screen py-24">
+      <div className="container">
+        {/* Back Link */}
+        <Link
+          href="/ai-tools"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to AI Tools
+        </Link>
+
+        {/* Tool Component */}
+        <StyleTransfer />
+      </div>
+    </main>
+  )
+}
