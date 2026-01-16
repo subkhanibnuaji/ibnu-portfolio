@@ -1,19 +1,20 @@
-import { Metadata } from 'next'
+'use client'
 
-export const metadata: Metadata = {
-  title: 'AI Tools - Ibnu Portfolio',
-  description: 'Explore AI-powered tools - browser-based ML models and LangChain-powered LLM applications.',
-  openGraph: {
-    title: 'AI Tools - Ibnu Portfolio',
-    description: 'Explore AI-powered tools running in your browser and LangChain LLM applications.',
-    type: 'website'
-  }
-}
+import { Navbar } from '@/components/layout/navbar'
+import { Footer } from '@/components/layout/footer'
+import { BackToTop } from '@/components/ui/back-to-top'
 
 export default function AIToolsLayout({
   children
 }: {
   children: React.ReactNode
 }) {
-  return children
+  return (
+    <>
+      <Navbar />
+      {children}
+      <Footer />
+      <BackToTop />
+    </>
+  )
 }
