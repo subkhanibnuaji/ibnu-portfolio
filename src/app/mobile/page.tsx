@@ -13,7 +13,10 @@ import {
   Sparkles,
   Palette,
   Zap,
-  Wifi
+  Wifi,
+  Shield,
+  HardDrive,
+  MonitorSmartphone
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -58,6 +61,13 @@ const techStack = [
   'Reanimated'
 ]
 
+const downloadInfo = {
+  version: '1.0.0',
+  size: '~32 MB',
+  minAndroid: 'Android 6.0+',
+  lastUpdated: 'January 2026'
+}
+
 export default function MobilePage() {
   return (
     <PageLayout
@@ -67,64 +77,92 @@ export default function MobilePage() {
       badgeText="Cross-Platform"
     >
       <div className="container">
-        {/* Hero Section */}
+        {/* Download Section - Hero */}
         <motion.section
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-16"
         >
-          <div className="glass rounded-2xl p-8 md:p-12">
+          <div className="glass rounded-2xl p-8 md:p-12 border-2 border-cyber-green/30 bg-gradient-to-br from-cyber-green/5 to-transparent">
             <div className="grid lg:grid-cols-2 gap-12 items-center">
-              {/* Left - Info */}
+              {/* Left - Download Info */}
               <div>
                 <div className="flex items-center gap-2 mb-4">
-                  <span className="px-3 py-1 rounded-full bg-cyber-green/20 text-cyber-green text-sm font-medium">
-                    Active Development
+                  <span className="px-3 py-1 rounded-full bg-cyber-green/20 text-cyber-green text-sm font-medium flex items-center gap-1">
+                    <Sparkles className="h-3 w-3" />
+                    Available Now
                   </span>
                   <span className="px-3 py-1 rounded-full bg-cyber-purple/20 text-cyber-purple text-sm font-medium">
-                    v1.0.0
+                    v{downloadInfo.version}
                   </span>
                 </div>
 
                 <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                  Ibnu Portfolio
-                  <span className="gradient-text"> Mobile App</span>
+                  Download
+                  <span className="gradient-text"> Android App</span>
                 </h2>
 
                 <p className="text-muted-foreground text-lg mb-6">
-                  Aplikasi mobile portfolio yang dibuat dengan React Native dan Expo.
-                  Bisa di-deploy ke Android, iOS, dan Web dengan satu codebase.
+                  Unduh dan install aplikasi portfolio langsung di HP Android kamu.
+                  Gratis, tanpa iklan, dan bisa diakses offline.
                 </p>
 
-                <div className="flex flex-wrap gap-3 mb-8">
+                {/* App Info Cards */}
+                <div className="grid grid-cols-2 gap-3 mb-6">
+                  <div className="bg-muted/30 rounded-xl p-3 flex items-center gap-3">
+                    <HardDrive className="h-5 w-5 text-cyber-cyan" />
+                    <div>
+                      <div className="text-xs text-muted-foreground">Size</div>
+                      <div className="font-semibold">{downloadInfo.size}</div>
+                    </div>
+                  </div>
+                  <div className="bg-muted/30 rounded-xl p-3 flex items-center gap-3">
+                    <Shield className="h-5 w-5 text-cyber-green" />
+                    <div>
+                      <div className="text-xs text-muted-foreground">Requires</div>
+                      <div className="font-semibold">{downloadInfo.minAndroid}</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Download Button */}
+                <div className="flex flex-wrap gap-3 mb-6">
                   <a
-                    href="https://github.com/subkhanibnuaji/ibnu-portfolio/tree/main/mobile-app"
+                    href="https://github.com/subkhanibnuaji/ibnu-portfolio/releases/latest/download/ibnu-portfolio.apk"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    <Button variant="gradient" className="gap-2">
-                      <Github className="h-4 w-4" />
-                      View Source
+                    <Button variant="gradient" size="lg" className="gap-2 text-lg px-8">
+                      <Download className="h-5 w-5" />
+                      Download APK
                     </Button>
                   </a>
-                  <Link href="/mobile/preview">
-                    <Button variant="outline" className="gap-2">
-                      <ExternalLink className="h-4 w-4" />
-                      Live Preview
+                  <a
+                    href="https://github.com/subkhanibnuaji/ibnu-portfolio/releases"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button variant="outline" size="lg" className="gap-2">
+                      <Github className="h-5 w-5" />
+                      All Releases
                     </Button>
-                  </Link>
+                  </a>
                 </div>
 
-                {/* Tech Stack */}
-                <div className="flex flex-wrap gap-2">
-                  {techStack.map((tech) => (
-                    <span
-                      key={tech}
-                      className="px-3 py-1 rounded-full bg-muted text-sm"
-                    >
-                      {tech}
-                    </span>
-                  ))}
+                {/* Install Instructions */}
+                <div className="text-sm text-muted-foreground">
+                  <p className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-cyber-green" />
+                    Download file APK
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-cyber-green" />
+                    Buka file di HP Android
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <Check className="h-4 w-4 text-cyber-green" />
+                    Izinkan install dari sumber tidak dikenal jika diminta
+                  </p>
                 </div>
               </div>
 
@@ -197,6 +235,11 @@ export default function MobilePage() {
                   {/* Decorative Elements */}
                   <div className="absolute -top-4 -right-4 w-24 h-24 bg-cyber-cyan/20 rounded-full blur-3xl" />
                   <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-cyber-purple/20 rounded-full blur-3xl" />
+
+                  {/* Download Badge */}
+                  <div className="absolute -top-2 -right-2 bg-cyber-green text-black px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                    FREE
+                  </div>
                 </div>
               </div>
             </div>
@@ -264,13 +307,33 @@ export default function MobilePage() {
           </div>
         </motion.section>
 
-        {/* How to Run */}
+        {/* Tech Stack */}
+        <motion.section
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.35 }}
+          className="mb-16"
+        >
+          <h3 className="text-2xl font-bold mb-8 text-center">Tech Stack</h3>
+          <div className="flex flex-wrap justify-center gap-3">
+            {techStack.map((tech) => (
+              <span
+                key={tech}
+                className="px-4 py-2 rounded-full bg-muted text-sm font-medium"
+              >
+                {tech}
+              </span>
+            ))}
+          </div>
+        </motion.section>
+
+        {/* Developer Section */}
         <motion.section
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          <h3 className="text-2xl font-bold mb-8 text-center">How to Run</h3>
+          <h3 className="text-2xl font-bold mb-8 text-center">For Developers</h3>
           <div className="glass rounded-2xl p-6 md:p-8">
             <div className="font-mono text-sm bg-zinc-950 rounded-xl p-6 overflow-x-auto">
               <div className="text-zinc-500"># Clone repository</div>
@@ -295,9 +358,15 @@ export default function MobilePage() {
               >
                 <Button variant="outline" className="gap-2">
                   <Github className="h-4 w-4" />
-                  GitHub Repository
+                  View Source Code
                 </Button>
               </a>
+              <Link href="/mobile/preview">
+                <Button variant="outline" className="gap-2">
+                  <MonitorSmartphone className="h-4 w-4" />
+                  Web Preview
+                </Button>
+              </Link>
             </div>
           </div>
         </motion.section>
