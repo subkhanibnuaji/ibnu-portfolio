@@ -11,6 +11,11 @@ import { AchievementSystem } from '@/components/gamification/achievement-system'
 import { EasterEggs } from '@/components/effects/easter-eggs'
 import { QuickActionsFAB } from '@/components/ui/quick-actions-fab'
 import { SiteStatsWidget } from '@/components/widgets/site-stats-widget'
+import { SkillsGlobe } from '@/components/visualizations/skills-globe'
+import { VoiceCommands } from '@/components/voice/voice-commands'
+import { VisitorActivity } from '@/components/widgets/visitor-activity'
+import { PWAInstallPrompt } from '@/components/pwa/install-prompt'
+import { FocusMode } from '@/components/modes/focus-mode'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import '@/styles/globals.css'
@@ -120,6 +125,11 @@ export default function RootLayout({
               <EasterEggs />
               <QuickActionsFAB />
               <SiteStatsWidget />
+              <SkillsGlobe />
+              <VoiceCommands />
+              <VisitorActivity />
+              <PWAInstallPrompt />
+              <FocusMode />
             </ThemeProvider>
           </SessionProvider>
         </CanvasFixProvider>
