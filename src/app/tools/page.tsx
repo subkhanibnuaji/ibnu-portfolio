@@ -11,7 +11,8 @@ import {
   Binary, Regex, Brain, SquareStack, Cake, Banknote, Square, Smile,
   DollarSign, Receipt, LayoutGrid, Hash, Shuffle, Grid2X2, Wallet,
   CircleDot, Bomb, ListChecks, Disc, ShoppingCart, User, Zap, Dices, Percent, Monitor,
-  Radio, Coins, PiggyBank, Moon, Link2, LetterText, Fingerprint, BadgePercent, Languages, Flame, Atom
+  Radio, Coins, PiggyBank, Moon, Link2, LetterText, Fingerprint, BadgePercent, Languages, Flame, Atom,
+  Thermometer, GraduationCap, Lightbulb, Pipette, Car
 } from 'lucide-react'
 
 const TOOLS = [
@@ -634,6 +635,51 @@ const TOOLS = [
     icon: Atom,
     bgColor: 'bg-cyan-500/10',
     textColor: 'text-cyan-500',
+    category: 'Calculator'
+  },
+  {
+    slug: 'temperature-converter',
+    name: 'Temperature Converter',
+    description: 'Convert between Celsius, Fahrenheit, and Kelvin.',
+    icon: Thermometer,
+    bgColor: 'bg-red-500/10',
+    textColor: 'text-red-500',
+    category: 'Utility'
+  },
+  {
+    slug: 'gpa-calculator',
+    name: 'GPA Calculator',
+    description: 'Calculate your Grade Point Average.',
+    icon: GraduationCap,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Calculator'
+  },
+  {
+    slug: 'electricity-calculator',
+    name: 'Electricity Calculator',
+    description: 'Calculate electricity usage and cost.',
+    icon: Lightbulb,
+    bgColor: 'bg-yellow-500/10',
+    textColor: 'text-yellow-500',
+    category: 'Calculator'
+  },
+  {
+    slug: 'color-converter',
+    name: 'Color Converter',
+    description: 'Convert colors between HEX, RGB, HSL, and CMYK.',
+    icon: Pipette,
+    bgColor: 'bg-pink-500/10',
+    textColor: 'text-pink-500',
+    category: 'Design'
+  },
+  {
+    slug: 'fuel-calculator',
+    name: 'Fuel Calculator',
+    description: 'Calculate fuel costs, consumption, and range.',
+    icon: Car,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
     category: 'Calculator'
   }
 ]
