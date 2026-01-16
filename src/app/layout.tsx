@@ -5,6 +5,7 @@ import { CanvasFixProvider } from '@/components/providers/canvas-fix-provider'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { SessionProvider } from '@/components/providers/session-provider'
 import { Toaster } from '@/components/ui/sonner'
+import { ScrollCapabilitiesPopup } from '@/components/effects/scroll-capabilities-popup'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import '@/styles/globals.css'
@@ -108,6 +109,7 @@ export default function RootLayout({
             >
               {children}
               <Toaster richColors position="bottom-right" />
+              <ScrollCapabilitiesPopup />
             </ThemeProvider>
           </SessionProvider>
         </CanvasFixProvider>
