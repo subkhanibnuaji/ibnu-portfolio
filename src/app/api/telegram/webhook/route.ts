@@ -17,53 +17,52 @@ import {
 // CONFIGURATION
 // ============================================
 
-export const runtime = 'edge';
-export const maxDuration = 30;
+// Use nodejs runtime for better async support
+export const runtime = 'nodejs';
+export const maxDuration = 60; // Increase timeout for AI responses
+export const dynamic = 'force-dynamic';
 
 // ============================================
 // POST - Handle incoming webhook updates
 // ============================================
 
 export async function POST(req: NextRequest) {
+  console.log('[Telegram Webhook] Received request');
+
   try {
     // Verify bot token is configured
     const token = getBotToken();
     if (!token) {
-      console.error('TELEGRAM_BOT_TOKEN is not configured');
+      console.error('[Telegram Webhook] TELEGRAM_BOT_TOKEN is not configured');
       return NextResponse.json(
         { error: 'Bot not configured' },
         { status: 500 }
       );
     }
 
-    // Optional: Verify webhook secret (recommended for production)
-    const webhookSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
-    if (webhookSecret) {
-      const providedSecret = req.headers.get('X-Telegram-Bot-Api-Secret-Token');
-      if (providedSecret !== webhookSecret) {
-        console.warn('Invalid webhook secret provided');
-        return NextResponse.json(
-          { error: 'Unauthorized' },
-          { status: 401 }
-        );
-      }
+    // Parse update from Telegram
+    let update: TelegramUpdate;
+    try {
+      update = await req.json();
+      console.log('[Telegram Webhook] Update received:', JSON.stringify(update, null, 2));
+    } catch (parseError) {
+      console.error('[Telegram Webhook] Failed to parse request body:', parseError);
+      return NextResponse.json({ ok: false, error: 'Invalid JSON' }, { status: 400 });
     }
 
-    // Parse update from Telegram
-    const update: TelegramUpdate = await req.json();
-
-    // Process update asynchronously
-    // We respond immediately to Telegram and process in background
-    // This prevents timeout issues
-    handleUpdate(update).catch((error) => {
-      console.error('Error processing Telegram update:', error);
-    });
+    // Process update and WAIT for completion
+    try {
+      await handleUpdate(update);
+      console.log('[Telegram Webhook] Update processed successfully');
+    } catch (handleError) {
+      console.error('[Telegram Webhook] Error processing update:', handleError);
+      // Still return 200 to prevent Telegram from retrying
+    }
 
     // Always return 200 OK to Telegram
-    // If we return error, Telegram will retry sending the update
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error('Webhook Error:', error);
+    console.error('[Telegram Webhook] Unexpected error:', error);
     // Still return 200 to prevent Telegram from retrying
     return NextResponse.json({ ok: true });
   }

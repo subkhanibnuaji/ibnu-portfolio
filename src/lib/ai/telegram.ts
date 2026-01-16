@@ -633,8 +633,11 @@ export async function handleCallbackQuery(
  * Process incoming Telegram update
  */
 export async function handleUpdate(update: TelegramUpdate): Promise<void> {
+  console.log('[Telegram] Processing update:', update.update_id);
+
   // Handle callback queries (button clicks)
   if (update.callback_query) {
+    console.log('[Telegram] Handling callback query');
     const { id, from, message, data } = update.callback_query;
     const chatId = message?.chat.id || from.id;
 
@@ -647,46 +650,60 @@ export async function handleUpdate(update: TelegramUpdate): Promise<void> {
   // Handle regular messages
   if (update.message) {
     const { chat, from, text } = update.message;
+    console.log('[Telegram] Message from chat:', chat.id, 'Text:', text);
 
     if (!text) {
-      // Ignore non-text messages
+      console.log('[Telegram] Ignoring non-text message');
       return;
     }
 
     // Handle commands
     if (text.startsWith('/')) {
-      const command = text.split(' ')[0].toLowerCase().replace('@', '');
+      // Extract command, remove bot mention (e.g., /start@BotName -> /start)
+      const commandPart = text.split(' ')[0].toLowerCase();
+      const command = commandPart.split('@')[0];
+      console.log('[Telegram] Command detected:', command);
 
       switch (command) {
         case '/start':
+          console.log('[Telegram] Handling /start');
           await handleStart(chat.id, from);
           break;
         case '/help':
+          console.log('[Telegram] Handling /help');
           await handleHelp(chat.id);
           break;
         case '/about':
+          console.log('[Telegram] Handling /about');
           await handleAbout(chat.id);
           break;
         case '/clear':
+          console.log('[Telegram] Handling /clear');
           await handleClear(chat.id);
           break;
         case '/model':
+          console.log('[Telegram] Handling /model');
           await handleModelSelection(chat.id);
           break;
         default:
+          console.log('[Telegram] Unknown command:', command);
           await sendMessage(chat.id, '❓ Unknown command. Use /help to see available commands.');
       }
       return;
     }
 
     // Handle regular chat message
+    console.log('[Telegram] Handling chat message, sending typing action');
     await sendChatAction(chat.id, 'typing');
 
     try {
+      console.log('[Telegram] Generating AI response...');
       const response = await generateResponse(chat.id, text);
+      console.log('[Telegram] AI response generated, sending message');
       await sendMessage(chat.id, response, { parseMode: 'HTML' });
+      console.log('[Telegram] Message sent successfully');
     } catch (error) {
-      console.error('Error handling message:', error);
+      console.error('[Telegram] Error handling message:', error);
       await sendMessage(chat.id, '😅 Sorry, something went wrong. Please try again.');
     }
   }
