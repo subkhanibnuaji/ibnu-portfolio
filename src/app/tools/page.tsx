@@ -10,7 +10,8 @@ import {
   QrCode, Type, AlignLeft, BookOpen, Grid3X3,
   Binary, Regex, Brain, SquareStack, Cake, Banknote, Square, Smile,
   DollarSign, Receipt, LayoutGrid, Hash, Shuffle, Grid2X2, Wallet,
-  CircleDot, Bomb, ListChecks, Disc, ShoppingCart, User, Zap, Dices, Percent, Monitor
+  CircleDot, Bomb, ListChecks, Disc, ShoppingCart, User, Zap, Dices, Percent, Monitor,
+  Radio, Coins, PiggyBank
 } from 'lucide-react'
 
 const TOOLS = [
@@ -517,6 +518,51 @@ const TOOLS = [
     bgColor: 'bg-purple-500/10',
     textColor: 'text-purple-500',
     category: 'Design'
+  },
+  {
+    slug: 'morse-code',
+    name: 'Morse Code Translator',
+    description: 'Convert text to Morse code and back with audio playback.',
+    icon: Radio,
+    bgColor: 'bg-amber-500/10',
+    textColor: 'text-amber-500',
+    category: 'Utility'
+  },
+  {
+    slug: 'binary-converter',
+    name: 'Number Base Converter',
+    description: 'Convert between decimal, binary, octal, and hexadecimal.',
+    icon: Binary,
+    bgColor: 'bg-cyan-500/10',
+    textColor: 'text-cyan-500',
+    category: 'Developer'
+  },
+  {
+    slug: 'coin-flip',
+    name: 'Coin Flip',
+    description: 'Flip a virtual coin with stats tracking.',
+    icon: Coins,
+    bgColor: 'bg-yellow-500/10',
+    textColor: 'text-yellow-500',
+    category: 'Utility'
+  },
+  {
+    slug: 'savings-calculator',
+    name: 'Savings Goal Calculator',
+    description: 'Plan savings with interest and monthly contributions.',
+    icon: PiggyBank,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Finance'
+  },
+  {
+    slug: 'random-number',
+    name: 'Random Number Generator',
+    description: 'Generate random numbers in any range.',
+    icon: Shuffle,
+    bgColor: 'bg-violet-500/10',
+    textColor: 'text-violet-500',
+    category: 'Utility'
   }
 ]
 
