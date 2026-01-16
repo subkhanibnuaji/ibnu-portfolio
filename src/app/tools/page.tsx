@@ -7,7 +7,10 @@ import {
   Ruler, Clock, Timer, ArrowRightLeft, Code, Quote, Paintbrush,
   Cloud, Blocks, FileText, Palette, Timer as StopwatchIcon, Key, Target,
   Braces, StickyNote, Scale, Globe, Sparkles, Hourglass,
-  QrCode, Type, AlignLeft, BookOpen, Grid3X3
+  QrCode, Type, AlignLeft, BookOpen, Grid3X3,
+  Binary, Regex, Brain, SquareStack, Cake, Banknote, Square, Smile,
+  DollarSign, Receipt, LayoutGrid, Hash, Shuffle, Grid2X2, Wallet,
+  CircleDot, Bomb, ListChecks, Disc, ShoppingCart, User, Zap, Dices, Percent, Monitor
 } from 'lucide-react'
 
 const TOOLS = [
@@ -253,6 +256,267 @@ const TOOLS = [
     bgColor: 'bg-blue-500/10',
     textColor: 'text-blue-500',
     category: 'Game'
+  },
+  {
+    slug: 'base64-tool',
+    name: 'Base64 Encoder',
+    description: 'Encode and decode text or files to/from Base64 format.',
+    icon: Binary,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Developer'
+  },
+  {
+    slug: 'regex-tester',
+    name: 'Regex Tester',
+    description: 'Test and debug regular expressions with live highlighting.',
+    icon: Regex,
+    bgColor: 'bg-orange-500/10',
+    textColor: 'text-orange-500',
+    category: 'Developer'
+  },
+  {
+    slug: 'memory-game',
+    name: 'Memory Game',
+    description: 'Test your memory by matching pairs of cards.',
+    icon: Brain,
+    bgColor: 'bg-pink-500/10',
+    textColor: 'text-pink-500',
+    category: 'Game'
+  },
+  {
+    slug: 'game-2048',
+    name: '2048',
+    description: 'Slide tiles and combine numbers to reach 2048!',
+    icon: SquareStack,
+    bgColor: 'bg-amber-500/10',
+    textColor: 'text-amber-500',
+    category: 'Game'
+  },
+  {
+    slug: 'age-calculator',
+    name: 'Age Calculator',
+    description: 'Calculate your exact age with zodiac signs and fun facts.',
+    icon: Cake,
+    bgColor: 'bg-pink-500/10',
+    textColor: 'text-pink-500',
+    category: 'Calculator'
+  },
+  {
+    slug: 'loan-calculator',
+    name: 'Loan Calculator',
+    description: 'Calculate monthly payments and total interest for loans.',
+    icon: Banknote,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Finance'
+  },
+  {
+    slug: 'box-shadow-generator',
+    name: 'Box Shadow Generator',
+    description: 'Create CSS box shadows with live preview and presets.',
+    icon: Square,
+    bgColor: 'bg-violet-500/10',
+    textColor: 'text-violet-500',
+    category: 'Design'
+  },
+  {
+    slug: 'emoji-picker',
+    name: 'Emoji Picker',
+    description: 'Browse and copy emojis organized by category.',
+    icon: Smile,
+    bgColor: 'bg-yellow-500/10',
+    textColor: 'text-yellow-500',
+    category: 'Utility'
+  },
+  {
+    slug: 'currency-converter',
+    name: 'Currency Converter',
+    description: 'Convert between 24 world currencies instantly.',
+    icon: DollarSign,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Finance'
+  },
+  {
+    slug: 'invoice-generator',
+    name: 'Invoice Generator',
+    description: 'Create professional invoices with itemized billing.',
+    icon: Receipt,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Business'
+  },
+  {
+    slug: 'brick-breaker',
+    name: 'Brick Breaker',
+    description: 'Classic arcade game - break all the bricks with the ball!',
+    icon: LayoutGrid,
+    bgColor: 'bg-red-500/10',
+    textColor: 'text-red-500',
+    category: 'Game'
+  },
+  {
+    slug: 'sudoku',
+    name: 'Sudoku',
+    description: 'Classic number puzzle with multiple difficulty levels.',
+    icon: Hash,
+    bgColor: 'bg-indigo-500/10',
+    textColor: 'text-indigo-500',
+    category: 'Game'
+  },
+  {
+    slug: 'word-scramble',
+    name: 'Word Scramble',
+    description: 'Unscramble letters to find hidden words in 6 categories.',
+    icon: Shuffle,
+    bgColor: 'bg-emerald-500/10',
+    textColor: 'text-emerald-500',
+    category: 'Game'
+  },
+  {
+    slug: 'pixel-art-editor',
+    name: 'Pixel Art Editor',
+    description: 'Create beautiful pixel art with multiple tools and colors.',
+    icon: Grid2X2,
+    bgColor: 'bg-pink-500/10',
+    textColor: 'text-pink-500',
+    category: 'Creative'
+  },
+  {
+    slug: 'expense-tracker',
+    name: 'Expense Tracker',
+    description: 'Track income and expenses with charts and categories.',
+    icon: Wallet,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Finance'
+  },
+  {
+    slug: 'connect-four',
+    name: 'Connect Four',
+    description: 'Drop discs to connect 4 in a row! Play vs friend or AI.',
+    icon: CircleDot,
+    bgColor: 'bg-red-500/10',
+    textColor: 'text-red-500',
+    category: 'Game'
+  },
+  {
+    slug: 'minesweeper',
+    name: 'Minesweeper',
+    description: 'Classic puzzle game - clear the board without hitting mines!',
+    icon: Bomb,
+    bgColor: 'bg-gray-500/10',
+    textColor: 'text-gray-500',
+    category: 'Game'
+  },
+  {
+    slug: 'checklist',
+    name: 'Checklist',
+    description: 'Create multiple lists with priorities and due dates.',
+    icon: ListChecks,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Productivity'
+  },
+  {
+    slug: 'simon-says',
+    name: 'Simon Says',
+    description: 'Memory game - repeat the color pattern as it grows!',
+    icon: Disc,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Game'
+  },
+  {
+    slug: 'unit-price-calculator',
+    name: 'Unit Price Calculator',
+    description: 'Compare product prices to find the best deal.',
+    icon: ShoppingCart,
+    bgColor: 'bg-orange-500/10',
+    textColor: 'text-orange-500',
+    category: 'Calculator'
+  },
+  {
+    slug: 'hangman',
+    name: 'Hangman',
+    description: 'Classic word guessing game with 6 categories.',
+    icon: User,
+    bgColor: 'bg-indigo-500/10',
+    textColor: 'text-indigo-500',
+    category: 'Game'
+  },
+  {
+    slug: 'reaction-test',
+    name: 'Reaction Time Test',
+    description: 'Test how fast you can react! Track your best times.',
+    icon: Zap,
+    bgColor: 'bg-yellow-500/10',
+    textColor: 'text-yellow-500',
+    category: 'Game'
+  },
+  {
+    slug: 'dice-roller',
+    name: 'Dice Roller',
+    description: 'Roll any combination of RPG dice (d4, d6, d8, d10, d12, d20, d100).',
+    icon: Dices,
+    bgColor: 'bg-red-500/10',
+    textColor: 'text-red-500',
+    category: 'Utility'
+  },
+  {
+    slug: 'timer',
+    name: 'Timer',
+    description: 'Set custom timers with presets and alarm sounds.',
+    icon: Clock,
+    bgColor: 'bg-cyan-500/10',
+    textColor: 'text-cyan-500',
+    category: 'Utility'
+  },
+  {
+    slug: 'color-palette',
+    name: 'Color Palette Generator',
+    description: 'Generate harmonious color palettes with various modes.',
+    icon: Palette,
+    bgColor: 'bg-pink-500/10',
+    textColor: 'text-pink-500',
+    category: 'Design'
+  },
+  {
+    slug: 'percentage-calculator',
+    name: 'Percentage Calculator',
+    description: 'Calculate percentages, changes, and more.',
+    icon: Percent,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Calculator'
+  },
+  {
+    slug: 'text-statistics',
+    name: 'Text Statistics',
+    description: 'Analyze text with word count, reading time, and more.',
+    icon: FileText,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Utility'
+  },
+  {
+    slug: 'tip-calculator',
+    name: 'Tip Calculator',
+    description: 'Calculate tips and split bills between people.',
+    icon: Receipt,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Calculator'
+  },
+  {
+    slug: 'aspect-ratio',
+    name: 'Aspect Ratio Calculator',
+    description: 'Calculate and convert aspect ratios for images and video.',
+    icon: Monitor,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Design'
   }
 ]
 
