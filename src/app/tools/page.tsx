@@ -12,7 +12,7 @@ import {
   DollarSign, Receipt, LayoutGrid, Hash, Shuffle, Grid2X2, Wallet,
   CircleDot, Bomb, ListChecks, Disc, ShoppingCart, User, Zap, Dices, Percent, Monitor,
   Radio, Coins, PiggyBank, Moon, Link2, LetterText, Fingerprint, BadgePercent, Languages, Flame, Atom,
-  Thermometer, GraduationCap, Lightbulb, Pipette, Car
+  Thermometer, GraduationCap, Lightbulb, Pipette, Car, CalendarDays, MapPin, Footprints, Scaling, Dice6, Database
 } from 'lucide-react'
 
 const TOOLS = [
@@ -681,6 +681,60 @@ const TOOLS = [
     bgColor: 'bg-green-500/10',
     textColor: 'text-green-500',
     category: 'Calculator'
+  },
+  {
+    slug: 'date-difference',
+    name: 'Date Difference',
+    description: 'Calculate the difference between two dates.',
+    icon: CalendarDays,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Calculator'
+  },
+  {
+    slug: 'timezone-converter',
+    name: 'Timezone Converter',
+    description: 'Convert time between different time zones.',
+    icon: MapPin,
+    bgColor: 'bg-indigo-500/10',
+    textColor: 'text-indigo-500',
+    category: 'Utility'
+  },
+  {
+    slug: 'pace-calculator',
+    name: 'Pace Calculator',
+    description: 'Calculate running pace, time, or distance.',
+    icon: Footprints,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Health'
+  },
+  {
+    slug: 'px-to-rem',
+    name: 'PX to REM Converter',
+    description: 'Convert between pixels and rem units.',
+    icon: Scaling,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Developer'
+  },
+  {
+    slug: 'probability-calculator',
+    name: 'Probability Calculator',
+    description: 'Calculate probabilities for various scenarios.',
+    icon: Dice6,
+    bgColor: 'bg-pink-500/10',
+    textColor: 'text-pink-500',
+    category: 'Calculator'
+  },
+  {
+    slug: 'data-size-converter',
+    name: 'Data Size Converter',
+    description: 'Convert between bytes, KB, MB, GB, TB.',
+    icon: Database,
+    bgColor: 'bg-cyan-500/10',
+    textColor: 'text-cyan-500',
+    category: 'Developer'
   }
 ]
 
