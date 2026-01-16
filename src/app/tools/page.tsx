@@ -11,7 +11,7 @@ import {
   Binary, Regex, Brain, SquareStack, Cake, Banknote, Square, Smile,
   DollarSign, Receipt, LayoutGrid, Hash, Shuffle, Grid2X2, Wallet,
   CircleDot, Bomb, ListChecks, Disc, ShoppingCart, User, Zap, Dices, Percent, Monitor,
-  Radio, Coins, PiggyBank, Moon, Link2, LetterText
+  Radio, Coins, PiggyBank, Moon, Link2, LetterText, Fingerprint, BadgePercent, Languages, Flame, Atom
 } from 'lucide-react'
 
 const TOOLS = [
@@ -590,6 +590,51 @@ const TOOLS = [
     bgColor: 'bg-indigo-500/10',
     textColor: 'text-indigo-500',
     category: 'Health'
+  },
+  {
+    slug: 'hash-generator',
+    name: 'Hash Generator',
+    description: 'Generate MD5, SHA-1, SHA-256, SHA-384, SHA-512 hashes.',
+    icon: Fingerprint,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Developer'
+  },
+  {
+    slug: 'discount-calculator',
+    name: 'Discount Calculator',
+    description: 'Calculate discounts, savings, and final prices.',
+    icon: BadgePercent,
+    bgColor: 'bg-red-500/10',
+    textColor: 'text-red-500',
+    category: 'Calculator'
+  },
+  {
+    slug: 'roman-numeral',
+    name: 'Roman Numeral Converter',
+    description: 'Convert between Arabic and Roman numerals.',
+    icon: Languages,
+    bgColor: 'bg-amber-500/10',
+    textColor: 'text-amber-500',
+    category: 'Utility'
+  },
+  {
+    slug: 'bmr-calculator',
+    name: 'BMR Calculator',
+    description: 'Calculate your Basal Metabolic Rate and daily calories.',
+    icon: Flame,
+    bgColor: 'bg-orange-500/10',
+    textColor: 'text-orange-500',
+    category: 'Health'
+  },
+  {
+    slug: 'prime-checker',
+    name: 'Prime Number Checker',
+    description: 'Check if a number is prime and find prime factors.',
+    icon: Atom,
+    bgColor: 'bg-cyan-500/10',
+    textColor: 'text-cyan-500',
+    category: 'Calculator'
   }
 ]
 
