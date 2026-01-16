@@ -5,6 +5,7 @@ import { CanvasFixProvider } from '@/components/providers/canvas-fix-provider'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { SessionProvider } from '@/components/providers/session-provider'
 import { Toaster } from '@/components/ui/sonner'
+import { SiteNavigator } from '@/components/site-navigator'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import '@/styles/globals.css'
@@ -107,6 +108,7 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               {children}
+              <SiteNavigator />
               <Toaster richColors position="bottom-right" />
             </ThemeProvider>
           </SessionProvider>
