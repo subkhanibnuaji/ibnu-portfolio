@@ -159,6 +159,8 @@ export const AI_FEATURES = {
     supportedFormats: ['.txt', '.md', '.pdf', '.json'],
     maxChunkSize: 1000,
     chunkOverlap: 200,
+    maxDocumentsPerUser: 10,
+    maxDocumentSizeMB: 10,
   },
   agent: {
     enabled: true,

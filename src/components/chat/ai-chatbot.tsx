@@ -69,7 +69,7 @@ function parseSpecialResult(result: string): ParsedResult {
 async function handleFileGeneration(result: string): Promise<boolean> {
   const parsed = parseSpecialResult(result)
   if (parsed.type === 'pdf' && parsed.data) {
-    generatePDF(parsed.data as PDFData)
+    await generatePDF(parsed.data as PDFData)
     return true
   }
   if (parsed.type === 'ppt' && parsed.data) {

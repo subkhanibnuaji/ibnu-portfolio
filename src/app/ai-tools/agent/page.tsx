@@ -38,7 +38,6 @@ interface AgentMessage {
 
 export default function AgentPage() {
   const [messages, setMessages] = useState<AgentMessage[]>([]);
-  const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [model, setModel] = useState<GroqModelId>(AI_DEFAULTS.model);
   const [error, setError] = useState<string | null>(null);
@@ -62,15 +61,13 @@ export default function AgentPage() {
     }
   }, []);
 
-  const handleSubmit = useCallback(
-    async (e?: React.FormEvent) => {
-      e?.preventDefault();
-      if (!input.trim() || isLoading) return;
+  const handleSend = useCallback(
+    async (message: string) => {
+      if (!message.trim() || isLoading) return;
 
-      const userMessage: AgentMessage = { role: 'user', content: input.trim() };
+      const userMessage: AgentMessage = { role: 'user', content: message.trim() };
       const newMessages = [...messages, userMessage];
       setMessages(newMessages);
-      setInput('');
       setError(null);
       setIsLoading(true);
       setCurrentToolExecutions([]);
@@ -174,7 +171,7 @@ export default function AgentPage() {
         abortControllerRef.current = null;
       }
     },
-    [input, isLoading, messages, model]
+    [isLoading, messages, model]
   );
 
   const handleClear = useCallback(() => {
@@ -254,7 +251,7 @@ export default function AgentPage() {
                 ].map((suggestion) => (
                   <button
                     key={suggestion}
-                    onClick={() => setInput(suggestion)}
+                    onClick={() => handleSend(suggestion)}
                     className="rounded-full bg-gray-700/50 px-4 py-2 text-sm text-gray-300 transition-colors hover:bg-gray-700"
                   >
                     {suggestion}
@@ -287,9 +284,10 @@ export default function AgentPage() {
                       </div>
                     )}
                     <ChatMessage
+                      id={`msg-${index}`}
                       role={message.role}
                       content={message.content}
-                      isLoading={false}
+                      isStreaming={false}
                     />
                   </motion.div>
                 ))}
@@ -346,13 +344,11 @@ export default function AgentPage() {
         <div className="mt-4">
           {isLoading ? (
             <div className="flex items-center justify-center">
-              <StopButton onClick={handleStop} />
+              <StopButton onStop={handleStop} />
             </div>
           ) : (
             <ChatInput
-              value={input}
-              onChange={setInput}
-              onSubmit={handleSubmit}
+              onSend={handleSend}
               placeholder="Ask the agent to do something..."
               disabled={isLoading}
             />

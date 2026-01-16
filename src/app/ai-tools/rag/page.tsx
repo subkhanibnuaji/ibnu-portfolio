@@ -18,11 +18,16 @@ import {
   DocumentUpload,
   type UploadedDocument,
 } from '@/components/ai';
-import { GROQ_MODELS, AI_DEFAULTS, type GroqModelId, type AIMessage } from '@/lib/ai/config';
+import { GROQ_MODELS, AI_DEFAULTS, type GroqModelId } from '@/lib/ai/config';
+
+// Simple message interface for this page
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+}
 
 export default function RAGPage() {
-  const [messages, setMessages] = useState<AIMessage[]>([]);
-  const [input, setInput] = useState('');
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [model, setModel] = useState<GroqModelId>(AI_DEFAULTS.model);
   const [error, setError] = useState<string | null>(null);
@@ -104,15 +109,13 @@ export default function RAGPage() {
     [sessionId]
   );
 
-  const handleSubmit = useCallback(
-    async (e?: React.FormEvent) => {
-      e?.preventDefault();
-      if (!input.trim() || isLoading) return;
+  const handleSend = useCallback(
+    async (message: string) => {
+      if (!message.trim() || isLoading) return;
 
-      const userMessage: AIMessage = { role: 'user', content: input.trim() };
+      const userMessage: Message = { role: 'user', content: message.trim() };
       const newMessages = [...messages, userMessage];
       setMessages(newMessages);
-      setInput('');
       setError(null);
       setIsLoading(true);
 
@@ -187,7 +190,7 @@ export default function RAGPage() {
         abortControllerRef.current = null;
       }
     },
-    [input, isLoading, messages, model, sessionId]
+    [isLoading, messages, model, sessionId]
   );
 
   const handleClear = useCallback(async () => {
@@ -212,7 +215,6 @@ export default function RAGPage() {
           onUpload={handleDocumentUpload}
           onRemove={handleDocumentRemove}
           documents={documents}
-          onDocumentsChange={setDocuments}
         />
         {documents.length > 0 && (
           <div className="mt-4 rounded-lg bg-gray-700/30 p-3">
@@ -293,7 +295,7 @@ export default function RAGPage() {
                   ].map((suggestion) => (
                     <button
                       key={suggestion}
-                      onClick={() => setInput(suggestion)}
+                      onClick={() => handleSend(suggestion)}
                       className="rounded-full bg-gray-700/50 px-4 py-2 text-sm text-gray-300 transition-colors hover:bg-gray-700"
                     >
                       {suggestion}
@@ -313,9 +315,10 @@ export default function RAGPage() {
                   transition={{ duration: 0.2 }}
                 >
                   <ChatMessage
+                    id={`msg-${index}`}
                     role={message.role}
                     content={message.content}
-                    isLoading={
+                    isStreaming={
                       isLoading &&
                       index === messages.length - 1 &&
                       message.role === 'assistant'
@@ -343,13 +346,11 @@ export default function RAGPage() {
         <div className="mt-4">
           {isLoading ? (
             <div className="flex items-center justify-center">
-              <StopButton onClick={handleStop} />
+              <StopButton onStop={handleStop} />
             </div>
           ) : (
             <ChatInput
-              value={input}
-              onChange={setInput}
-              onSubmit={handleSubmit}
+              onSend={handleSend}
               placeholder={
                 documents.length > 0
                   ? 'Ask about your documents...'

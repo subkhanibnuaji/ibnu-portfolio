@@ -6,8 +6,6 @@
  * PPT generation is handled server-side via API route.
  */
 
-import { jsPDF } from 'jspdf';
-
 // ============================================
 // PDF GENERATOR
 // ============================================
@@ -18,7 +16,10 @@ export interface PDFData {
   author?: string;
 }
 
-export function generatePDF(data: PDFData): void {
+export async function generatePDF(data: PDFData): Promise<void> {
+  // Dynamic import to avoid SSR issues
+  const { jsPDF } = await import('jspdf');
+
   const doc = new jsPDF();
   const pageWidth = doc.internal.pageSize.getWidth();
   const margin = 20;
