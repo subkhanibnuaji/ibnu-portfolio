@@ -8,6 +8,7 @@
  */
 
 import { useState } from 'react';
+import Image from 'next/image';
 import {
   Wrench,
   Calculator,
@@ -19,6 +20,11 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
+  ImageIcon,
+  Languages,
+  Laugh,
+  Code,
+  Download,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { AIToolCall } from '@/lib/ai/config';
@@ -45,7 +51,20 @@ const TOOL_ICONS: Record<string, React.ElementType> = {
   current_time: Clock,
   weather: Cloud,
   text_analysis: FileText,
+  generate_image: ImageIcon,
+  translate: Languages,
+  tell_joke: Laugh,
+  generate_code: Code,
 };
+
+// Parse special results (like images)
+function parseSpecialResult(result: string): { type: 'text' | 'image'; content: string; meta?: string } {
+  if (result.startsWith('IMAGE_GENERATED:')) {
+    const parts = result.replace('IMAGE_GENERATED:', '').split('|');
+    return { type: 'image', content: parts[0], meta: parts[1] };
+  }
+  return { type: 'text', content: result };
+}
 
 // ============================================
 // COMPONENT
@@ -141,11 +160,44 @@ export function ToolOutput({ tool, input, result, isLoading, toolCall, status, c
           {toolResult && (
             <div>
               <p className="text-xs text-muted-foreground mb-1">Output:</p>
-              <pre className="text-xs bg-black/20 rounded p-2 overflow-x-auto whitespace-pre-wrap">
-                {typeof toolResult === 'string'
-                  ? toolResult
-                  : JSON.stringify(toolResult, null, 2)}
-              </pre>
+              {(() => {
+                const resultStr = typeof toolResult === 'string' ? toolResult : JSON.stringify(toolResult, null, 2);
+                const parsed = parseSpecialResult(resultStr);
+
+                if (parsed.type === 'image') {
+                  return (
+                    <div className="space-y-2">
+                      <div className="relative rounded-lg overflow-hidden bg-black/20 aspect-square max-w-[300px]">
+                        <Image
+                          src={parsed.content}
+                          alt={parsed.meta || 'Generated image'}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
+                      </div>
+                      {parsed.meta && (
+                        <p className="text-xs text-muted-foreground italic">&quot;{parsed.meta}&quot;</p>
+                      )}
+                      <a
+                        href={parsed.content}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-blue-400 hover:underline"
+                      >
+                        <Download className="h-3 w-3" />
+                        Open full image
+                      </a>
+                    </div>
+                  );
+                }
+
+                return (
+                  <pre className="text-xs bg-black/20 rounded p-2 overflow-x-auto whitespace-pre-wrap">
+                    {resultStr}
+                  </pre>
+                );
+              })()}
             </div>
           )}
 

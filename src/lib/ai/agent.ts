@@ -146,6 +146,123 @@ Note: This is mock data for demonstration.`;
 };
 
 // ============================================
+// IMAGE GENERATION TOOL (Pollinations.ai - FREE)
+// ============================================
+
+const imageGenerationTool: Tool = {
+  name: 'generate_image',
+  description: 'Generate an image from a text description using AI. Creates images based on prompts.',
+  parameters: {
+    type: 'object',
+    properties: {
+      prompt: {
+        type: 'string',
+        description: 'Detailed description of the image to generate (e.g., "a sunset over mountains with purple sky")',
+      },
+      style: {
+        type: 'string',
+        description: 'Art style (optional): realistic, anime, cartoon, oil-painting, watercolor, 3d-render, pixel-art',
+      },
+    },
+    required: ['prompt'],
+  },
+  execute: async (args) => {
+    const prompt = args.prompt as string;
+    const style = args.style as string || '';
+
+    // Enhance prompt with style if provided
+    const fullPrompt = style ? `${prompt}, ${style} style, high quality` : `${prompt}, high quality, detailed`;
+
+    // Pollinations.ai - 100% FREE, no API key needed
+    const encodedPrompt = encodeURIComponent(fullPrompt);
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=512&height=512&nologo=true`;
+
+    return `IMAGE_GENERATED:${imageUrl}|${prompt}`;
+  },
+};
+
+// ============================================
+// TRANSLATE TOOL (FREE)
+// ============================================
+
+const translateTool: Tool = {
+  name: 'translate',
+  description: 'Translate text between languages',
+  parameters: {
+    type: 'object',
+    properties: {
+      text: {
+        type: 'string',
+        description: 'Text to translate',
+      },
+      to: {
+        type: 'string',
+        description: 'Target language (e.g., "indonesian", "english", "japanese", "spanish")',
+      },
+    },
+    required: ['text', 'to'],
+  },
+  execute: async (args) => {
+    const text = args.text as string;
+    const to = args.to as string;
+
+    // This will be handled by the LLM itself as a translation task
+    return `TRANSLATE_REQUEST:${text}|${to}`;
+  },
+};
+
+// ============================================
+// JOKE GENERATOR TOOL
+// ============================================
+
+const jokeTool: Tool = {
+  name: 'tell_joke',
+  description: 'Tell a random joke or joke about a specific topic',
+  parameters: {
+    type: 'object',
+    properties: {
+      topic: {
+        type: 'string',
+        description: 'Topic for the joke (optional, e.g., "programming", "cats")',
+      },
+    },
+    required: [],
+  },
+  execute: async (args) => {
+    const topic = args.topic as string || 'random';
+    return `JOKE_REQUEST:${topic}`;
+  },
+};
+
+// ============================================
+// CODE GENERATOR TOOL
+// ============================================
+
+const codeGeneratorTool: Tool = {
+  name: 'generate_code',
+  description: 'Generate code snippets in various programming languages',
+  parameters: {
+    type: 'object',
+    properties: {
+      task: {
+        type: 'string',
+        description: 'Description of what the code should do',
+      },
+      language: {
+        type: 'string',
+        description: 'Programming language (e.g., "python", "javascript", "typescript", "java")',
+      },
+    },
+    required: ['task', 'language'],
+  },
+  execute: async (args) => {
+    const task = args.task as string;
+    const language = args.language as string;
+    return `CODE_REQUEST:${task}|${language}`;
+  },
+};
+
+// ============================================
 // TEXT ANALYSIS TOOL
 // ============================================
 
@@ -187,6 +304,10 @@ export const AVAILABLE_TOOLS: Record<string, Tool> = {
   calculator: calculatorTool,
   current_time: currentTimeTool,
   weather: weatherTool,
+  generate_image: imageGenerationTool,
+  translate: translateTool,
+  tell_joke: jokeTool,
+  generate_code: codeGeneratorTool,
   text_analysis: textAnalysisTool,
 };
 
