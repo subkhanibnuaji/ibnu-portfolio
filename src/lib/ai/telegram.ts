@@ -94,7 +94,9 @@ const TELEGRAM_API_BASE = 'https://api.telegram.org/bot';
  * Get bot token from environment
  */
 export function getBotToken(): string | undefined {
-  return process.env.TELEGRAM_BOT_TOKEN;
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  // Trim any whitespace that might have been added
+  return token?.trim();
 }
 
 /**
@@ -109,20 +111,31 @@ async function callTelegramAPI(
     throw new Error('TELEGRAM_BOT_TOKEN is not configured');
   }
 
-  const response = await fetch(`${TELEGRAM_API_BASE}${token}/${method}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(params),
-  });
+  const url = `${TELEGRAM_API_BASE}${token}/${method}`;
 
-  const data = await response.json();
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
 
-  if (!data.ok) {
-    console.error('Telegram API Error:', data);
-    throw new Error(data.description || 'Telegram API error');
+    const data = await response.json();
+
+    if (!data.ok) {
+      console.error('Telegram API Error:', {
+        method,
+        error: data.description,
+        errorCode: data.error_code,
+      });
+      throw new Error(data.description || 'Telegram API error');
+    }
+
+    return data.result;
+  } catch (error) {
+    console.error('Telegram API Call Failed:', { method, error });
+    throw error;
   }
-
-  return data.result;
 }
 
 /**
