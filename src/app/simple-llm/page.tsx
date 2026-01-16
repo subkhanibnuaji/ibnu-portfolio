@@ -9,7 +9,6 @@ import {
   Bot,
   User,
   Sparkles,
-  Settings,
   Trash2,
   Copy,
   Check,
@@ -17,9 +16,11 @@ import {
   ChevronDown,
   Zap,
   Brain,
-  MessageSquare
+  MessageSquare,
+  ExternalLink
 } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
+import Link from 'next/link'
 
 interface Message {
   id: string
@@ -29,9 +30,10 @@ interface Message {
 }
 
 const models = [
-  { id: 'claude-sonnet-4-20250514', name: 'Claude Sonnet 4', description: 'Best for most tasks', icon: Sparkles },
-  { id: 'claude-3-5-haiku-20241022', name: 'Claude 3.5 Haiku', description: 'Fast and efficient', icon: Zap },
-  { id: 'claude-3-opus-20240229', name: 'Claude 3 Opus', description: 'Most capable', icon: Brain },
+  { id: 'llama-3.3-70b-versatile', name: 'Llama 3.3 70B', description: 'Most capable, versatile', icon: Brain },
+  { id: 'llama-3.1-8b-instant', name: 'Llama 3.1 8B', description: 'Fast and efficient', icon: Zap },
+  { id: 'mixtral-8x7b-32768', name: 'Mixtral 8x7B', description: 'Great for complex tasks', icon: Sparkles },
+  { id: 'gemma2-9b-it', name: 'Gemma 2 9B', description: "Google's efficient model", icon: Bot },
 ]
 
 const examplePrompts = [
@@ -108,7 +110,10 @@ export default function SimpleLLMPage() {
         })
       })
 
-      if (!response.ok) throw new Error('Failed to get response')
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to get response')
+      }
 
       const reader = response.body?.getReader()
       const decoder = new TextDecoder()
@@ -139,6 +144,9 @@ export default function SimpleLLMPage() {
                   return updated
                 })
               }
+              if (parsed.error) {
+                throw new Error(parsed.error)
+              }
             } catch {
               // Skip invalid JSON
             }
@@ -151,7 +159,9 @@ export default function SimpleLLMPage() {
         const updated = [...prev]
         const lastMessage = updated[updated.length - 1]
         if (lastMessage.role === 'assistant') {
-          lastMessage.content = 'Maaf, terjadi kesalahan. Silakan coba lagi.'
+          lastMessage.content = error instanceof Error
+            ? `Error: ${error.message}\n\nTip: Set GROQ_API_KEY in environment variables. Get your free API key at console.groq.com`
+            : 'Maaf, terjadi kesalahan. Silakan coba lagi.'
         }
         return updated
       })
@@ -185,9 +195,9 @@ export default function SimpleLLMPage() {
   return (
     <PageLayout
       title="Simple LLM"
-      subtitle="Chat dengan AI menggunakan LangChain - Powered by Claude"
+      subtitle="Chat dengan AI menggunakan LangChain - Powered by Groq (FREE)"
       showBadge
-      badgeText="LangChain + Claude API"
+      badgeText="LangChain + Groq API (Gratis)"
     >
       <div className="container max-w-4xl">
         <motion.div
@@ -198,13 +208,13 @@ export default function SimpleLLMPage() {
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-white/10">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-cyber-cyan/10">
-                <MessageSquare className="h-5 w-5 text-cyber-cyan" />
+              <div className="p-2 rounded-lg bg-cyber-purple/10">
+                <Brain className="h-5 w-5 text-cyber-purple" />
               </div>
               <div>
-                <h3 className="font-semibold">LangChain Chat</h3>
+                <h3 className="font-semibold">IbnuGPT Chat</h3>
                 <p className="text-xs text-muted-foreground">
-                  {messages.length} messages
+                  {messages.length} messages • Powered by Groq
                 </p>
               </div>
             </div>
@@ -239,18 +249,18 @@ export default function SimpleLLMPage() {
                             setShowModelSelect(false)
                           }}
                           className={`w-full flex items-center gap-3 p-3 hover:bg-white/5 transition-colors ${
-                            selectedModel.id === model.id ? 'bg-cyber-cyan/10' : ''
+                            selectedModel.id === model.id ? 'bg-cyber-purple/10' : ''
                           }`}
                         >
                           <model.icon className={`h-5 w-5 ${
-                            selectedModel.id === model.id ? 'text-cyber-cyan' : 'text-muted-foreground'
+                            selectedModel.id === model.id ? 'text-cyber-purple' : 'text-muted-foreground'
                           }`} />
                           <div className="text-left">
                             <p className="font-medium text-sm">{model.name}</p>
                             <p className="text-xs text-muted-foreground">{model.description}</p>
                           </div>
                           {selectedModel.id === model.id && (
-                            <Check className="h-4 w-4 text-cyber-cyan ml-auto" />
+                            <Check className="h-4 w-4 text-cyber-purple ml-auto" />
                           )}
                         </button>
                       ))}
@@ -280,12 +290,12 @@ export default function SimpleLLMPage() {
                 animate={{ opacity: 1 }}
                 className="h-full flex flex-col items-center justify-center text-center"
               >
-                <div className="p-4 rounded-full bg-cyber-cyan/10 mb-4">
-                  <Bot className="h-8 w-8 text-cyber-cyan" />
+                <div className="p-4 rounded-full bg-cyber-purple/10 mb-4">
+                  <Brain className="h-8 w-8 text-cyber-purple" />
                 </div>
-                <h3 className="text-xl font-bold mb-2">Mulai Percakapan</h3>
+                <h3 className="text-xl font-bold mb-2">IbnuGPT</h3>
                 <p className="text-muted-foreground mb-6 max-w-md">
-                  Tanyakan apa saja kepada AI. Didukung oleh LangChain dan Claude.
+                  Tanyakan apa saja kepada AI. Didukung oleh LangChain dan Groq (100% Gratis).
                 </p>
 
                 {/* Example Prompts */}
@@ -314,8 +324,8 @@ export default function SimpleLLMPage() {
                     }`}
                   >
                     {message.role === 'assistant' && (
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-cyber-cyan/20 flex items-center justify-center">
-                        <Bot className="h-4 w-4 text-cyber-cyan" />
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-cyber-purple/20 flex items-center justify-center">
+                        <Brain className="h-4 w-4 text-cyber-purple" />
                       </div>
                     )}
 
@@ -356,8 +366,8 @@ export default function SimpleLLMPage() {
                     </div>
 
                     {message.role === 'user' && (
-                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-cyber-purple/20 flex items-center justify-center">
-                        <User className="h-4 w-4 text-cyber-purple" />
+                      <div className="flex-shrink-0 w-8 h-8 rounded-full bg-cyber-cyan/20 flex items-center justify-center">
+                        <User className="h-4 w-4 text-cyber-cyan" />
                       </div>
                     )}
                   </motion.div>
@@ -390,7 +400,7 @@ export default function SimpleLLMPage() {
                   onKeyDown={handleKeyDown}
                   placeholder="Ketik pesan Anda..."
                   rows={1}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-cyber-cyan/50 placeholder:text-muted-foreground"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-cyber-purple/50 placeholder:text-muted-foreground"
                   style={{ minHeight: '48px', maxHeight: '120px' }}
                 />
               </div>
@@ -409,7 +419,7 @@ export default function SimpleLLMPage() {
               </Button>
             </form>
             <p className="text-xs text-muted-foreground mt-2 text-center">
-              Press Enter to send, Shift+Enter for new line
+              Press Enter to send • Powered by Groq (Free) • {selectedModel.name}
             </p>
           </div>
         </motion.div>
@@ -440,9 +450,9 @@ export default function SimpleLLMPage() {
             <div className="p-2 rounded-lg bg-cyber-purple/10 w-fit mb-4">
               <Brain className="h-5 w-5 text-cyber-purple" />
             </div>
-            <h3 className="font-bold mb-2">Claude AI</h3>
+            <h3 className="font-bold mb-2">100% Gratis</h3>
             <p className="text-sm text-muted-foreground">
-              Didukung oleh model Claude terbaru dari Anthropic untuk respons berkualitas tinggi.
+              Menggunakan Groq API yang gratis. Llama 3.3 70B dengan kecepatan super cepat.
             </p>
           </motion.div>
 
@@ -461,6 +471,37 @@ export default function SimpleLLMPage() {
             </p>
           </motion.div>
         </div>
+
+        {/* Get API Key Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mt-8 glass rounded-xl p-6"
+        >
+          <div className="flex items-start gap-4">
+            <div className="p-2 rounded-lg bg-cyber-orange/10 flex-shrink-0">
+              <MessageSquare className="h-5 w-5 text-cyber-orange" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold mb-2">Cara Setup</h3>
+              <p className="text-sm text-muted-foreground mb-4">
+                Untuk menggunakan fitur AI Chat, Anda perlu mendapatkan API key gratis dari Groq:
+              </p>
+              <ol className="text-sm text-muted-foreground space-y-2 mb-4">
+                <li>1. Daftar akun di <code className="bg-white/10 px-1 rounded">console.groq.com</code></li>
+                <li>2. Buat API Key di dashboard</li>
+                <li>3. Set environment variable: <code className="bg-white/10 px-1 rounded">GROQ_API_KEY=your_key</code></li>
+              </ol>
+              <Button variant="outline" size="sm" asChild>
+                <Link href="https://console.groq.com" target="_blank" rel="noopener noreferrer">
+                  Get Free API Key
+                  <ExternalLink className="ml-2 h-3 w-3" />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </PageLayout>
   )

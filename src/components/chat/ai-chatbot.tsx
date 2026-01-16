@@ -2,9 +2,11 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Bot, X, Send, User, Trash2, Sparkles } from 'lucide-react'
+import { Bot, X, Send, User, Trash2, Sparkles, Brain, Zap, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+
+type ChatMode = 'quick' | 'ai'
 
 interface Message {
   id: string
@@ -504,6 +506,7 @@ Currently focused on improving English for international opportunities and Manda
 - **/certifications** - 50+ credentials
 - **/contact** - Send me a message
 - **/blog** - Articles and insights
+- **/simple-llm** - Chat with AI (LangChain)
 
 **Keyboard Shortcuts:**
 - Press **Cmd+K** (or Ctrl+K) to open command palette
@@ -693,6 +696,7 @@ const INITIAL_QUICK_REPLIES: QuickReply[] = [
 
 export function AIChatbot() {
   const [isOpen, setIsOpen] = useState(false)
+  const [mode, setMode] = useState<ChatMode>('quick')
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -703,6 +707,7 @@ export function AIChatbot() {
     }
   ])
   const [input, setInput] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -720,9 +725,8 @@ export function AIChatbot() {
     }
   }, [isOpen])
 
-  const sendMessage = (content: string) => {
-    if (!content.trim()) return
-
+  // Send message with AI mode (using Groq API)
+  const sendAIMessage = async (content: string) => {
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
@@ -730,7 +734,99 @@ export function AIChatbot() {
       timestamp: new Date()
     }
 
-    // Find response from knowledge base
+    const assistantMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      role: 'assistant',
+      content: '',
+      timestamp: new Date()
+    }
+
+    setMessages((prev) => [...prev, userMessage, assistantMessage])
+    setInput('')
+    setIsLoading(true)
+
+    try {
+      const response = await fetch('/api/simple-llm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [...messages, userMessage].map(m => ({
+            role: m.role,
+            content: m.content
+          })),
+          model: 'llama-3.3-70b-versatile'
+        })
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to get response')
+      }
+
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+
+      if (!reader) throw new Error('No reader available')
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        const chunk = decoder.decode(value)
+        const lines = chunk.split('\n')
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6)
+            if (data === '[DONE]') continue
+
+            try {
+              const parsed = JSON.parse(data)
+              if (parsed.content) {
+                setMessages(prev => {
+                  const updated = [...prev]
+                  const lastMessage = updated[updated.length - 1]
+                  if (lastMessage.role === 'assistant') {
+                    lastMessage.content += parsed.content
+                  }
+                  return updated
+                })
+              }
+              if (parsed.error) {
+                throw new Error(parsed.error)
+              }
+            } catch {
+              // Skip invalid JSON
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('AI Chat Error:', error)
+      setMessages(prev => {
+        const updated = [...prev]
+        const lastMessage = updated[updated.length - 1]
+        if (lastMessage.role === 'assistant') {
+          lastMessage.content = error instanceof Error
+            ? `Error: ${error.message}\n\nTip: Make sure GROQ_API_KEY is set. Get free key at console.groq.com`
+            : 'Sorry, an error occurred. Please try again.'
+        }
+        return updated
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // Send message with Quick mode (pattern matching)
+  const sendQuickMessage = (content: string) => {
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: content.trim(),
+      timestamp: new Date()
+    }
+
     const { response, quickReplies } = findResponse(content)
 
     const assistantMessage: Message = {
@@ -745,6 +841,16 @@ export function AIChatbot() {
     setInput('')
   }
 
+  const sendMessage = (content: string) => {
+    if (!content.trim() || isLoading) return
+
+    if (mode === 'ai') {
+      sendAIMessage(content)
+    } else {
+      sendQuickMessage(content)
+    }
+  }
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
@@ -757,16 +863,33 @@ export function AIChatbot() {
       {
         id: '1',
         role: 'assistant',
-        content: "Hi! I'm Ibnu's portfolio assistant. What would you like to know?",
+        content: mode === 'ai'
+          ? "Hi! I'm IbnuGPT powered by AI. Ask me anything and I'll do my best to help!"
+          : "Hi! I'm Ibnu's portfolio assistant. What would you like to know?",
         timestamp: new Date(),
-        quickReplies: INITIAL_QUICK_REPLIES
+        quickReplies: mode === 'quick' ? INITIAL_QUICK_REPLIES : undefined
+      }
+    ])
+  }
+
+  const switchMode = (newMode: ChatMode) => {
+    setMode(newMode)
+    setMessages([
+      {
+        id: '1',
+        role: 'assistant',
+        content: newMode === 'ai'
+          ? "Hi! I'm IbnuGPT powered by Llama 3.3 (via Groq). I can answer any questions with AI intelligence. What would you like to know?"
+          : "Hi! I'm Ibnu's portfolio assistant. I can help you learn about his background, projects, skills, and interests. What would you like to know?",
+        timestamp: new Date(),
+        quickReplies: newMode === 'quick' ? INITIAL_QUICK_REPLIES : undefined
       }
     ])
   }
 
   // Get the last message's quick replies
   const lastMessage = messages[messages.length - 1]
-  const showQuickReplies = lastMessage?.role === 'assistant' && lastMessage?.quickReplies
+  const showQuickReplies = mode === 'quick' && lastMessage?.role === 'assistant' && lastMessage?.quickReplies
 
   return (
     <>
@@ -807,16 +930,34 @@ export function AIChatbot() {
             <div className="flex items-center justify-between p-4 border-b border-border bg-card/50">
               <div className="flex items-center gap-3">
                 <div className="relative">
-                  <div className="w-10 h-10 rounded-full bg-cyber-gradient flex items-center justify-center">
-                    <Bot className="h-5 w-5 text-white" />
+                  <div className={cn(
+                    "w-10 h-10 rounded-full flex items-center justify-center",
+                    mode === 'ai' ? "bg-cyber-purple" : "bg-cyber-gradient"
+                  )}>
+                    {mode === 'ai' ? (
+                      <Brain className="h-5 w-5 text-white" />
+                    ) : (
+                      <Bot className="h-5 w-5 text-white" />
+                    )}
                   </div>
                   <span className="absolute bottom-0 right-0 w-3 h-3 bg-cyber-green rounded-full border-2 border-background" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-sm">Portfolio Assistant</h3>
+                  <h3 className="font-semibold text-sm">
+                    {mode === 'ai' ? 'IbnuGPT' : 'Portfolio Assistant'}
+                  </h3>
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Sparkles className="h-3 w-3" />
-                    Quick Answers
+                    {mode === 'ai' ? (
+                      <>
+                        <Brain className="h-3 w-3" />
+                        AI Powered (Llama 3.3)
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-3 w-3" />
+                        Quick Answers
+                      </>
+                    )}
                   </p>
                 </div>
               </div>
@@ -828,6 +969,34 @@ export function AIChatbot() {
                   <X className="h-4 w-4" />
                 </Button>
               </div>
+            </div>
+
+            {/* Mode Selector */}
+            <div className="flex p-2 gap-2 border-b border-border bg-muted/30">
+              <button
+                onClick={() => switchMode('quick')}
+                className={cn(
+                  "flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all",
+                  mode === 'quick'
+                    ? "bg-cyber-cyan/20 text-cyber-cyan border border-cyber-cyan/30"
+                    : "text-muted-foreground hover:bg-muted"
+                )}
+              >
+                <Zap className="h-3.5 w-3.5" />
+                Quick Answers
+              </button>
+              <button
+                onClick={() => switchMode('ai')}
+                className={cn(
+                  "flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all",
+                  mode === 'ai'
+                    ? "bg-cyber-purple/20 text-cyber-purple border border-cyber-purple/30"
+                    : "text-muted-foreground hover:bg-muted"
+                )}
+              >
+                <Brain className="h-3.5 w-3.5" />
+                AI Chat
+              </button>
             </div>
 
             {/* Messages */}
@@ -843,11 +1012,15 @@ export function AIChatbot() {
                   <div
                     className={cn(
                       'w-8 h-8 rounded-full flex items-center justify-center shrink-0',
-                      message.role === 'user' ? 'bg-primary' : 'bg-cyber-gradient'
+                      message.role === 'user'
+                        ? 'bg-primary'
+                        : mode === 'ai' ? 'bg-cyber-purple' : 'bg-cyber-gradient'
                     )}
                   >
                     {message.role === 'user' ? (
                       <User className="h-4 w-4 text-white" />
+                    ) : mode === 'ai' ? (
+                      <Brain className="h-4 w-4 text-white" />
                     ) : (
                       <Bot className="h-4 w-4 text-white" />
                     )}
@@ -860,7 +1033,7 @@ export function AIChatbot() {
                   >
                     {message.role === 'assistant' ? (
                       <div className="text-sm whitespace-pre-line">
-                        {message.content.split('\n').map((line, i) => {
+                        {message.content ? message.content.split('\n').map((line, i) => {
                           // Handle bold text
                           const parts = line.split(/(\*\*[^*]+\*\*)/g)
                           return (
@@ -873,7 +1046,12 @@ export function AIChatbot() {
                               })}
                             </p>
                           )
-                        })}
+                        }) : (
+                          <span className="flex items-center gap-2">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            Thinking...
+                          </span>
+                        )}
                       </div>
                     ) : (
                       <p className="text-sm">{message.content}</p>
@@ -910,18 +1088,34 @@ export function AIChatbot() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Ask me anything..."
+                  placeholder={mode === 'ai' ? "Ask anything..." : "Ask me anything..."}
+                  disabled={isLoading}
                   className={cn(
                     'flex-1 px-4 py-2.5 rounded-xl',
                     'bg-muted border-0 outline-none',
                     'text-sm placeholder:text-muted-foreground',
-                    'focus:ring-2 focus:ring-primary/20'
+                    'focus:ring-2 focus:ring-primary/20',
+                    'disabled:opacity-50'
                   )}
                 />
-                <Button size="icon" onClick={() => sendMessage(input)} disabled={!input.trim()} className="shrink-0">
-                  <Send className="h-4 w-4" />
+                <Button
+                  size="icon"
+                  onClick={() => sendMessage(input)}
+                  disabled={!input.trim() || isLoading}
+                  className="shrink-0"
+                >
+                  {isLoading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="h-4 w-4" />
+                  )}
                 </Button>
               </div>
+              {mode === 'ai' && (
+                <p className="text-[10px] text-muted-foreground mt-2 text-center">
+                  Powered by Groq (Free) • Llama 3.3 70B
+                </p>
+              )}
             </div>
           </motion.div>
         )}
