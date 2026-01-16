@@ -11,7 +11,7 @@ import {
   Binary, Regex, Brain, SquareStack, Cake, Banknote, Square, Smile,
   DollarSign, Receipt, LayoutGrid, Hash, Shuffle, Grid2X2, Wallet,
   CircleDot, Bomb, ListChecks, Disc, ShoppingCart, User, Zap, Dices, Percent, Monitor,
-  Radio, Coins, PiggyBank
+  Radio, Coins, PiggyBank, Moon, Link2, LetterText
 } from 'lucide-react'
 
 const TOOLS = [
@@ -563,6 +563,33 @@ const TOOLS = [
     bgColor: 'bg-violet-500/10',
     textColor: 'text-violet-500',
     category: 'Utility'
+  },
+  {
+    slug: 'character-counter',
+    name: 'Character Counter',
+    description: 'Count characters and words with platform limits.',
+    icon: LetterText,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Utility'
+  },
+  {
+    slug: 'url-encoder',
+    name: 'URL Encoder/Decoder',
+    description: 'Encode and decode URLs for web development.',
+    icon: Link2,
+    bgColor: 'bg-cyan-500/10',
+    textColor: 'text-cyan-500',
+    category: 'Developer'
+  },
+  {
+    slug: 'sleep-calculator',
+    name: 'Sleep Calculator',
+    description: 'Calculate optimal sleep and wake times based on sleep cycles.',
+    icon: Moon,
+    bgColor: 'bg-indigo-500/10',
+    textColor: 'text-indigo-500',
+    category: 'Health'
   }
 ]
 
