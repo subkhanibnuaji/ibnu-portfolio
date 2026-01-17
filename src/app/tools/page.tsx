@@ -735,6 +735,211 @@ const TOOLS = [
     bgColor: 'bg-cyan-500/10',
     textColor: 'text-cyan-500',
     category: 'Developer'
+  },
+  // New Developer Tools
+  {
+    slug: 'api-playground',
+    name: 'API Playground',
+    description: 'Test REST APIs with custom headers, body, and methods.',
+    icon: Globe,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Developer'
+  },
+  {
+    slug: 'jwt-decoder',
+    name: 'JWT Decoder',
+    description: 'Decode and inspect JSON Web Tokens with expiration check.',
+    icon: Key,
+    bgColor: 'bg-yellow-500/10',
+    textColor: 'text-yellow-500',
+    category: 'Developer'
+  },
+  {
+    slug: 'sql-formatter',
+    name: 'SQL Formatter',
+    description: 'Format and beautify SQL queries with syntax highlighting.',
+    icon: Database,
+    bgColor: 'bg-orange-500/10',
+    textColor: 'text-orange-500',
+    category: 'Developer'
+  },
+  {
+    slug: 'cron-builder',
+    name: 'Cron Expression Builder',
+    description: 'Build and parse cron expressions with next run preview.',
+    icon: Clock,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Developer'
+  },
+  {
+    slug: 'xml-formatter',
+    name: 'XML Formatter',
+    description: 'Format and validate XML documents with pretty print.',
+    icon: FileText,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Developer'
+  },
+  // Network Tools
+  {
+    slug: 'ip-lookup',
+    name: 'IP Lookup',
+    description: 'Get geolocation and ISP info for any IP address.',
+    icon: Globe,
+    bgColor: 'bg-cyan-500/10',
+    textColor: 'text-cyan-500',
+    category: 'Network'
+  },
+  {
+    slug: 'dns-lookup',
+    name: 'DNS Lookup',
+    description: 'Query DNS records for any domain - A, AAAA, MX, TXT.',
+    icon: Globe,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Network'
+  },
+  {
+    slug: 'ssl-checker',
+    name: 'SSL Certificate Checker',
+    description: 'Check SSL certificate validity and expiration date.',
+    icon: Key,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Network'
+  },
+  {
+    slug: 'whois-lookup',
+    name: 'WHOIS Lookup',
+    description: 'Look up domain registration and ownership information.',
+    icon: Globe,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Network'
+  },
+  // Life & Wellness Tools
+  {
+    slug: 'meditation-timer',
+    name: 'Meditation Timer',
+    description: 'Guided meditation with breathing exercises and ambient sounds.',
+    icon: Sparkles,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Wellness'
+  },
+  {
+    slug: 'water-tracker',
+    name: 'Water Tracker',
+    description: 'Track daily water intake with goals and streaks.',
+    icon: Sparkles,
+    bgColor: 'bg-cyan-500/10',
+    textColor: 'text-cyan-500',
+    category: 'Wellness'
+  },
+  {
+    slug: 'calorie-counter',
+    name: 'Calorie Counter',
+    description: 'Track calories and macros with food database.',
+    icon: Flame,
+    bgColor: 'bg-orange-500/10',
+    textColor: 'text-orange-500',
+    category: 'Wellness'
+  },
+  {
+    slug: 'breathing-exercise',
+    name: 'Breathing Exercise',
+    description: 'Guided breathing patterns for relaxation and focus.',
+    icon: Sparkles,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Wellness'
+  },
+  // Social Media Tools
+  {
+    slug: 'bio-link-generator',
+    name: 'Bio Link Generator',
+    description: 'Create a beautiful link-in-bio page with custom themes.',
+    icon: Link2,
+    bgColor: 'bg-pink-500/10',
+    textColor: 'text-pink-500',
+    category: 'Social'
+  },
+  {
+    slug: 'hashtag-generator',
+    name: 'Hashtag Generator',
+    description: 'Generate relevant hashtags for your social media posts.',
+    icon: Hash,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Social'
+  },
+  {
+    slug: 'username-generator',
+    name: 'Username Generator',
+    description: 'Generate unique usernames with various styles.',
+    icon: User,
+    bgColor: 'bg-cyan-500/10',
+    textColor: 'text-cyan-500',
+    category: 'Social'
+  },
+  // Math & Science
+  {
+    slug: 'graph-plotter',
+    name: 'Graph Plotter',
+    description: 'Plot mathematical functions with interactive controls.',
+    icon: Target,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Math'
+  },
+  {
+    slug: 'scientific-calculator',
+    name: 'Scientific Calculator',
+    description: 'Full-featured scientific calculator with history.',
+    icon: Calculator,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Math'
+  },
+  // Productivity
+  {
+    slug: 'kanban-board',
+    name: 'Kanban Board',
+    description: 'Visual task management with drag and drop.',
+    icon: LayoutGrid,
+    bgColor: 'bg-indigo-500/10',
+    textColor: 'text-indigo-500',
+    category: 'Productivity'
+  },
+  {
+    slug: 'focus-timer',
+    name: 'Focus Timer',
+    description: 'Deep work timer with Pomodoro and custom modes.',
+    icon: Target,
+    bgColor: 'bg-red-500/10',
+    textColor: 'text-red-500',
+    category: 'Productivity'
+  },
+  // Creative
+  {
+    slug: 'meme-generator',
+    name: 'Meme Generator',
+    description: 'Create memes with templates and custom text.',
+    icon: Smile,
+    bgColor: 'bg-yellow-500/10',
+    textColor: 'text-yellow-500',
+    category: 'Creative'
+  },
+  {
+    slug: 'image-compressor',
+    name: 'Image Compressor',
+    description: 'Compress images while maintaining quality.',
+    icon: Sparkles,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Utility'
   }
 ]
 
