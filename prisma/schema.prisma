@@ -328,6 +328,7 @@ model Comment {
   user        User?    @relation(fields: [userId], references: [id])
   name        String?  // For anonymous comments
   email       String?
+  ip          String?  // IP address for spam detection
   likes       Int      @default(0)
   approved    Boolean  @default(false)
   createdAt   DateTime @default(now())

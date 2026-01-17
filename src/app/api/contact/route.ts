@@ -58,8 +58,8 @@ export async function POST(req: NextRequest) {
           message,
           ip,
           userAgent,
-          status: 'PENDING',
-          priority: determinePriority(subject, message),
+          status: 'NEW',
+          priority: determinePriority(subject || 'General Inquiry', message),
         },
       })
       submissionId = submission.id
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
       const emailResult = await sendContactNotification({
         name,
         email,
-        subject,
+        subject: subject || 'General Inquiry',
         message,
       })
       emailSent = emailResult.success
@@ -167,7 +167,7 @@ export async function GET(req: NextRequest) {
 // HELPERS
 // =============================================================================
 
-function determinePriority(subject: string, message: string): string {
+function determinePriority(subject: string, message: string): 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' {
   const urgentKeywords = ['urgent', 'asap', 'emergency', 'immediately', 'critical']
   const highKeywords = ['job', 'opportunity', 'collaboration', 'partnership', 'business']
 
@@ -181,5 +181,5 @@ function determinePriority(subject: string, message: string): string {
     return 'HIGH'
   }
 
-  return 'NORMAL'
+  return 'MEDIUM'
 }
