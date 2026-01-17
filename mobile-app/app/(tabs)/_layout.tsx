@@ -2,12 +2,36 @@ import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
-import { Platform } from 'react-native';
+import { Platform, TouchableOpacity, View } from 'react-native';
+import { router } from 'expo-router';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
+  const { isAuthenticated } = useAuth();
   const theme = colorScheme ?? 'dark';
   const colors = Colors[theme];
+
+  const HeaderRight = () => (
+    <View style={{ flexDirection: 'row', marginRight: 16, gap: 8 }}>
+      <TouchableOpacity
+        onPress={() => router.push('/search')}
+        style={{ padding: 8 }}
+      >
+        <Ionicons name="search" size={22} color={colors.text} />
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => router.push(isAuthenticated ? '/profile' : '/(auth)/login')}
+        style={{ padding: 8 }}
+      >
+        <Ionicons
+          name={isAuthenticated ? 'person-circle' : 'person-circle-outline'}
+          size={24}
+          color={colors.primary}
+        />
+      </TouchableOpacity>
+    </View>
+  );
 
   return (
     <Tabs
@@ -28,6 +52,7 @@ export default function TabLayout() {
         headerTitleStyle: {
           fontWeight: '600',
         },
+        headerRight: () => <HeaderRight />,
       }}
     >
       <Tabs.Screen
@@ -53,7 +78,7 @@ export default function TabLayout() {
         options={{
           title: 'About',
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="person-outline" size={size} color={color} />
+            <Ionicons name="information-circle-outline" size={size} color={color} />
           ),
         }}
       />
