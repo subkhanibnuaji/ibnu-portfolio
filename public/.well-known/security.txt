@@ -1,0 +1,33 @@
+# Security Policy for Ibnu Portfolio
+# This file follows the security.txt standard (RFC 9116)
+# https://securitytxt.org/
+
+# Contact for security issues
+Contact: mailto:security@heyibnu.com
+Contact: https://github.com/subkhanibnuaji/ibnu-portfolio/security/advisories/new
+
+# Encryption key for secure communication (optional)
+# Encryption: https://heyibnu.com/.well-known/pgp-key.txt
+
+# Security policy page
+Policy: https://heyibnu.com/security-policy
+
+# Acknowledgments page for security researchers
+Acknowledgments: https://heyibnu.com/security-thanks
+
+# Preferred languages
+Preferred-Languages: en, id
+
+# Canonical URL for this file
+Canonical: https://heyibnu.com/.well-known/security.txt
+
+# Expiration date (1 year from now, update annually)
+Expires: 2027-01-17T00:00:00.000Z
+
+# Hiring security researchers?
+# Hiring: https://heyibnu.com/careers
+
+# Bug bounty program (if any)
+# Note: Currently we don't have a paid bug bounty program,
+# but we greatly appreciate responsible disclosure and will
+# acknowledge security researchers on our thanks page.

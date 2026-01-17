@@ -21,6 +21,7 @@ import { SkipLink } from '@/components/accessibility/skip-link'
 import { HomePageSchema, AutoBreadcrumbSchema } from '@/components/seo/schema-markup'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { WebVitalsReporter } from '@/components/monitoring/web-vitals-reporter'
 import '@/styles/globals.css'
 
 export const metadata: Metadata = {
@@ -146,6 +147,7 @@ export default function RootLayout({
         </CanvasFixProvider>
         <Analytics />
         <SpeedInsights />
+        <WebVitalsReporter />
       </body>
     </html>
   )
