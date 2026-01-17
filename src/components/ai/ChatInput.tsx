@@ -29,6 +29,8 @@ export interface ChatInputProps {
   showAttachment?: boolean;
   onAttach?: () => void;
   className?: string;
+  initialValue?: string;
+  onValueChange?: (value: string) => void;
 }
 
 // ============================================
@@ -46,8 +48,10 @@ export function ChatInput({
   showAttachment = false,
   onAttach,
   className,
+  initialValue = '',
+  onValueChange,
 }: ChatInputProps) {
-  const [internalInput, setInternalInput] = useState('');
+  const [internalInput, setInternalInput] = useState(initialValue || '');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Support both controlled and uncontrolled modes
@@ -56,6 +60,14 @@ export function ChatInput({
   const setInput = isControlled
     ? (val: string) => controlledOnChange?.(val)
     : setInternalInput;
+
+  // Sync with external initialValue changes
+  useEffect(() => {
+    if (initialValue && initialValue !== internalInput && !isControlled) {
+      setInternalInput(initialValue);
+      onValueChange?.('');
+    }
+  }, [initialValue, isControlled, internalInput, onValueChange]);
 
   // Auto-resize textarea
   useEffect(() => {

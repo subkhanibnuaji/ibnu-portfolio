@@ -30,6 +30,18 @@ import {
   FileDown,
   Presentation,
   Type,
+  BookOpen,
+  Library,
+  Bitcoin,
+  Lightbulb,
+  Key,
+  Ruler,
+  Palette,
+  Hash,
+  Quote,
+  Link2,
+  Calendar,
+  SmilePlus,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { AIToolCall } from '@/lib/ai/config';
@@ -52,19 +64,42 @@ export interface ToolOutputProps {
 
 // Tool icons
 const TOOL_ICONS: Record<string, React.ElementType> = {
+  // Utility
   calculator: Calculator,
   current_time: Clock,
   weather: Cloud,
-  text_analysis: FileText,
+  convert_unit: Ruler,
+  date_calculator: Calendar,
+  shorten_url: Link2,
+
+  // Generation
   generate_image: ImageIcon,
-  translate: Languages,
-  tell_joke: Laugh,
-  generate_code: Code,
   generate_qr: QrCode,
   generate_meme: Smile,
   generate_pdf: FileDown,
   generate_ppt: Presentation,
   generate_lorem: Type,
+  generate_password: Key,
+  generate_colors: Palette,
+  generate_hashtags: Hash,
+  generate_code: Code,
+  emoji_picker: SmilePlus,
+
+  // Knowledge
+  wikipedia_search: Library,
+  define_word: BookOpen,
+  random_fact: Lightbulb,
+  quote_of_day: Quote,
+
+  // Finance
+  crypto_price: Bitcoin,
+
+  // Text
+  translate: Languages,
+  text_analysis: FileText,
+
+  // Fun
+  tell_joke: Laugh,
 };
 
 // Parse special results (images, QR codes, PDFs, PPTs)

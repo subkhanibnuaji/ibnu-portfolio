@@ -1359,7 +1359,17 @@ export function AIChatbot() {
     }
   }, [sendMessage, input])
 
-  // Memoized clear chat handler
+  const getWelcomeMessage = (chatMode: ChatMode) => {
+    switch (chatMode) {
+      case 'agent':
+        return "Hi! I'm IbnuGPT Agent with 25 superpowers! 🚀\n\n📸 **Generate:** Images, QR codes, Memes, PDFs, Presentations, Color Palettes, Passwords, Hashtags, Emojis\n📚 **Knowledge:** Wikipedia, Dictionary, Random facts, Crypto prices, Daily quotes\n🔧 **Utility:** Calculator, Unit converter, Date calculator, URL shortener, Code generator, Text analysis, Translate\n\nTry: \"Give me a motivational quote\" or \"Shorten this URL\" or \"How many days until Christmas?\""
+      case 'ai':
+        return "Hi! I'm IbnuGPT powered by Llama 3.3 (via Groq). I can answer any questions with AI intelligence. What would you like to know?"
+      default:
+        return "Hi! I'm Ibnu's portfolio assistant. I can help you learn about his background, projects, skills, and interests. What would you like to know?"
+    }
+  }
+
   const clearChat = useCallback(() => {
     setMessages([
       {
