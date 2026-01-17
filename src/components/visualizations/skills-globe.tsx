@@ -72,7 +72,7 @@ export function SkillsGlobe() {
   const [autoRotate, setAutoRotate] = useState(true)
   const [zoom, setZoom] = useState(1)
   const pointsRef = useRef<Point3D[]>([])
-  const animationRef = useRef<number>()
+  const animationRef = useRef<number>(0)
   const isDraggingRef = useRef(false)
   const lastMouseRef = useRef({ x: 0, y: 0 })
 

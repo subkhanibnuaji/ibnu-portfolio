@@ -54,7 +54,7 @@ export const AI_MODELS = {
 
 export type GroqModelId = keyof typeof AI_MODELS.groq;
 
-// Alias for backward compatibility
+// Alias for backwards compatibility
 export const GROQ_MODELS = AI_MODELS.groq;
 
 // ============================================
@@ -159,8 +159,6 @@ export const AI_FEATURES = {
     supportedFormats: ['.txt', '.md', '.pdf', '.json'],
     maxChunkSize: 1000,
     chunkOverlap: 200,
-    maxDocumentsPerUser: 10,
-    maxDocumentSizeMB: 10,
   },
   agent: {
     enabled: true,
@@ -188,10 +186,10 @@ export const AI_ERRORS = {
 // ============================================
 
 export interface AIMessage {
-  id?: string;
+  id: string;
   role: 'user' | 'assistant' | 'system';
   content: string;
-  timestamp?: Date;
+  timestamp: Date;
   model?: string;
   tokens?: number;
 }
