@@ -137,6 +137,13 @@ export function PersonalizationPanel() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
+  // Listen for open event from Quick Actions FAB
+  useEffect(() => {
+    const handleOpen = () => setIsOpen(true)
+    window.addEventListener('openPersonalization', handleOpen)
+    return () => window.removeEventListener('openPersonalization', handleOpen)
+  }, [])
+
   return (
     <>
       {/* Global styles for personalization */}
@@ -163,16 +170,7 @@ export function PersonalizationPanel() {
         }
       `}</style>
 
-      {/* Trigger Button */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed top-44 left-4 z-40 p-3 rounded-full bg-card/80 backdrop-blur-sm border border-border/50 hover:border-primary/50 shadow-lg hover:shadow-xl transition-all group"
-        title="Personalization (⌘,)"
-      >
-        <Settings2 className="h-5 w-5 text-muted-foreground group-hover:text-primary group-hover:rotate-90 transition-all duration-300" />
-      </button>
-
-      {/* Panel */}
+      {/* Panel - triggered via Quick Actions FAB */}
       <AnimatePresence>
         {isOpen && (
           <>

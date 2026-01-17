@@ -11,17 +11,12 @@ import {
   Brain,
   Gamepad2,
   Mail,
-  FileText,
-  Github,
-  Linkedin,
-  MessageSquare,
-  Palette,
-  Calculator,
-  Music,
-  Search,
   Moon,
   Sun,
-  Sparkles,
+  Settings2,
+  Accessibility,
+  Bookmark,
+  BarChart3,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
@@ -60,6 +55,26 @@ export function QuickActionsFAB() {
     setIsOpen(false)
   }, [theme, setTheme])
 
+  const openPersonalization = useCallback(() => {
+    window.dispatchEvent(new CustomEvent('openPersonalization'))
+    setIsOpen(false)
+  }, [])
+
+  const openAccessibility = useCallback(() => {
+    window.dispatchEvent(new CustomEvent('openAccessibility'))
+    setIsOpen(false)
+  }, [])
+
+  const openBookmarks = useCallback(() => {
+    window.dispatchEvent(new CustomEvent('openBookmarks'))
+    setIsOpen(false)
+  }, [])
+
+  const openSiteStats = useCallback(() => {
+    window.dispatchEvent(new CustomEvent('openSiteStats'))
+    setIsOpen(false)
+  }, [])
+
   const actions: QuickAction[] = [
     {
       icon: Terminal,
@@ -97,6 +112,36 @@ export function QuickActionsFAB() {
       description: 'Toggle theme',
       action: toggleTheme,
       color: 'from-amber-500 to-orange-500',
+    },
+    {
+      icon: Settings2,
+      label: 'Personalize',
+      description: 'Customize appearance',
+      action: openPersonalization,
+      color: 'from-violet-500 to-purple-500',
+      shortcut: '⌘,',
+    },
+    {
+      icon: Accessibility,
+      label: 'Accessibility',
+      description: 'Accessibility options',
+      action: openAccessibility,
+      color: 'from-blue-500 to-cyan-500',
+    },
+    {
+      icon: Bookmark,
+      label: 'Bookmarks',
+      description: 'View saved pages',
+      action: openBookmarks,
+      color: 'from-amber-500 to-yellow-500',
+      shortcut: '⌘⇧B',
+    },
+    {
+      icon: BarChart3,
+      label: 'Stats',
+      description: 'Site statistics',
+      action: openSiteStats,
+      color: 'from-emerald-500 to-green-500',
     },
     {
       icon: Mail,
