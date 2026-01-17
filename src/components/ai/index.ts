@@ -11,3 +11,12 @@ export { ChatInput, StopButton, type ChatInputProps, type StopButtonProps } from
 export { ModelSelector, type ModelSelectorProps } from './ModelSelector';
 export { DocumentUpload, type DocumentUploadProps, type UploadedDocument } from './DocumentUpload';
 export { ToolOutput, ToolsList, type ToolOutputProps, type ToolsListProps } from './ToolOutput';
+
+// AI Tools for pillar page
+export {
+  AIToolsGrid,
+  TokenCounter,
+  PromptTemplateBuilder,
+  TextReadabilityAnalyzer,
+  JSONSchemaGenerator
+} from './ai-tools';

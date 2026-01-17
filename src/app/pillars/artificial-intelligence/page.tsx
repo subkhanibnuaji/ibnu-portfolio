@@ -5,9 +5,11 @@ import Link from 'next/link'
 import {
   Brain, Sparkles, Bot, MessageSquare, Code, Cpu, Zap, ArrowRight,
   Eye, Mic, FileText, Palette, Hand, Languages, CloudSun, Tag,
-  User, Box, Smile, QrCode, Volume2, ScanText, Shield
+  User, Box, Smile, QrCode, Volume2, ScanText, Shield, Hash,
+  Wand2, BookOpen, Wrench
 } from 'lucide-react'
 import { NewsFeed } from '@/components/pillars/news-feed'
+import { AIToolsGrid } from '@/components/ai'
 
 // LangChain-powered LLM Tools (from AI Tools page)
 const LLM_TOOLS = [
@@ -110,6 +112,27 @@ export default function ArtificialIntelligencePage() {
             Explore the cutting edge of AI development. News, research breakthroughs,
             and interactive AI tools you can try right in your browser.
           </p>
+
+          {/* Tool Badges */}
+          <div className="flex flex-wrap justify-center gap-3 mt-8">
+            {[
+              { icon: Hash, label: 'Token Counter' },
+              { icon: Wand2, label: 'Prompt Builder' },
+              { icon: BookOpen, label: 'Readability' },
+              { icon: Code, label: 'JSON Schema' },
+            ].map((badge, index) => (
+              <motion.div
+                key={badge.label}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3 + index * 0.1 }}
+                className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm"
+              >
+                <badge.icon className="w-4 h-4 text-ai-primary" />
+                <span className="font-medium">{badge.label}</span>
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
       </section>
 
@@ -249,6 +272,28 @@ export default function ArtificialIntelligencePage() {
             </motion.div>
           ))}
         </div>
+      </section>
+
+      {/* AI Developer Tools Section */}
+      <section className="container mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-8"
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-lg bg-ai-primary/10 flex items-center justify-center">
+              <Wrench className="w-5 h-5 text-ai-primary" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold">AI Developer Tools</h2>
+              <p className="text-sm text-muted-foreground">Utilities for prompt engineering & LLM development</p>
+            </div>
+          </div>
+        </motion.div>
+
+        <AIToolsGrid />
       </section>
 
       {/* AI Trends */}
