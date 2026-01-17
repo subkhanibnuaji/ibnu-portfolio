@@ -246,17 +246,17 @@ export function Navbar() {
     <>
       <header
         className={cn(
-          'fixed top-0 left-0 right-0 z-[52] transition-all duration-300',
+          'fixed top-0 left-0 right-0 z-[52] transition-all duration-300 pointer-events-auto',
           isScrolled
             ? 'bg-background/80 dark:bg-background/70 backdrop-blur-xl border-b border-border/50 dark:border-primary/10 py-3 shadow-sm dark:shadow-primary/5'
             : 'bg-transparent py-5'
         )}
       >
-        <nav className="container flex items-center justify-between">
+        <nav className="container flex items-center justify-between pointer-events-auto">
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center gap-2 text-xl font-bold tracking-tight relative z-10"
+            className="flex items-center gap-2 text-xl font-bold tracking-tight relative z-10 cursor-pointer"
           >
             <span className="gradient-text">IBNU</span>
             <span className="w-2 h-2 rounded-full bg-cyber-cyan animate-pulse" />
@@ -268,7 +268,7 @@ export function Navbar() {
             <Link
               href="/"
               className={cn(
-                'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+                'px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer',
                 pathname === '/'
                   ? 'text-foreground bg-muted'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
@@ -303,7 +303,7 @@ export function Navbar() {
             <Link
               href="/about"
               className={cn(
-                'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+                'px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer',
                 pathname === '/about'
                   ? 'text-foreground bg-muted'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
@@ -316,7 +316,7 @@ export function Navbar() {
             <Link
               href="/certifications"
               className={cn(
-                'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+                'px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer',
                 pathname === '/certifications'
                   ? 'text-foreground bg-muted'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
