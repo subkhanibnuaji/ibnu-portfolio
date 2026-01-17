@@ -12,7 +12,8 @@ import {
   DollarSign, Receipt, LayoutGrid, Hash, Shuffle, Grid2X2, Wallet,
   CircleDot, Bomb, ListChecks, Disc, ShoppingCart, User, Zap, Dices, Percent, Monitor,
   Radio, Coins, PiggyBank, Moon, Link2, LetterText, Fingerprint, BadgePercent, Languages, Flame, Atom,
-  Thermometer, GraduationCap, Lightbulb, Pipette, Car, CalendarDays, MapPin, Footprints, Scaling, Dice6, Database
+  Thermometer, GraduationCap, Lightbulb, Pipette, Car, CalendarDays, MapPin, Footprints, Scaling, Dice6, Database,
+  TrendingUp
 } from 'lucide-react'
 
 const TOOLS = [
@@ -1102,6 +1103,92 @@ const TOOLS = [
     bgColor: 'bg-purple-500/10',
     textColor: 'text-purple-500',
     category: 'Developer'
+  },
+  // Animation & Effects
+  {
+    slug: 'particle-system',
+    name: 'Particle System',
+    description: 'Create beautiful particle effects with customizable physics.',
+    icon: Sparkles,
+    bgColor: 'bg-orange-500/10',
+    textColor: 'text-orange-500',
+    category: 'Creative'
+  },
+  {
+    slug: 'css-animation-generator',
+    name: 'CSS Animation Generator',
+    description: 'Generate CSS keyframe animations with live preview.',
+    icon: Sparkles,
+    bgColor: 'bg-pink-500/10',
+    textColor: 'text-pink-500',
+    category: 'Design'
+  },
+  // More Games
+  {
+    slug: 'wordle-game',
+    name: 'Wordle',
+    description: 'Guess the 5-letter word in 6 tries. Track your stats!',
+    icon: Grid3X3,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Game'
+  },
+  {
+    slug: 'pong-game',
+    name: 'Pong',
+    description: 'Classic Pong game - play against AI or a friend.',
+    icon: Gamepad2,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Game'
+  },
+  {
+    slug: 'space-invaders',
+    name: 'Space Invaders',
+    description: 'Classic arcade shooter - defend Earth from aliens!',
+    icon: Zap,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Game'
+  },
+  // Finance & Crypto
+  {
+    slug: 'crypto-tracker',
+    name: 'Crypto Tracker',
+    description: 'Track cryptocurrency prices and market data in real-time.',
+    icon: Coins,
+    bgColor: 'bg-yellow-500/10',
+    textColor: 'text-yellow-500',
+    category: 'Finance'
+  },
+  {
+    slug: 'investment-calculator',
+    name: 'Investment Calculator',
+    description: 'Calculate compound interest and plan your investments.',
+    icon: TrendingUp,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Finance'
+  },
+  // Security
+  {
+    slug: 'encryption-tool',
+    name: 'Encryption Tool',
+    description: 'Encrypt and decrypt text with various ciphers.',
+    icon: Key,
+    bgColor: 'bg-red-500/10',
+    textColor: 'text-red-500',
+    category: 'Security'
+  },
+  // Collaboration
+  {
+    slug: 'whiteboard',
+    name: 'Whiteboard',
+    description: 'Digital whiteboard for drawing and sketching ideas.',
+    icon: Paintbrush,
+    bgColor: 'bg-cyan-500/10',
+    textColor: 'text-cyan-500',
+    category: 'Creative'
   }
 ]
 
