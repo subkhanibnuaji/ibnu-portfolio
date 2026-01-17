@@ -16,7 +16,12 @@ import {
   Brain,
   MessageSquare,
   FileSearch,
-  Sparkles
+  Sparkles,
+  Shield,
+  Wallet,
+  Cpu,
+  Layers,
+  Zap
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
@@ -27,6 +32,34 @@ const NAV_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/about', label: 'About' },
   { href: '/certifications', label: 'Credentials' },
+]
+
+// Dropdown menu items for "3 Pillars"
+const PILLARS_ITEMS = [
+  {
+    href: '/interests',
+    label: 'All Interests',
+    icon: Layers,
+    description: 'Explore all three pillars'
+  },
+  {
+    href: '/interests#ai',
+    label: 'Artificial Intelligence',
+    icon: Brain,
+    description: 'AI, LLMs, and autonomous agents'
+  },
+  {
+    href: '/interests#crypto',
+    label: 'Blockchain & Crypto',
+    icon: Wallet,
+    description: 'DeFi, Web3, and trading'
+  },
+  {
+    href: '/interests#cyber',
+    label: 'Cybersecurity',
+    icon: Shield,
+    description: 'OSINT, threat intel, forensics'
+  },
 ]
 
 // Dropdown menu items for "Explore"
@@ -83,12 +116,13 @@ interface DropdownProps {
   label: string
   items: typeof EXPLORE_ITEMS
   isActive: boolean
+  icon?: React.ElementType
 }
 
-function NavDropdown({ label, items, isActive }: DropdownProps) {
+function NavDropdown({ label, items, isActive, icon: Icon }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handleMouseEnter = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
@@ -99,10 +133,26 @@ function NavDropdown({ label, items, isActive }: DropdownProps) {
     timeoutRef.current = setTimeout(() => setIsOpen(false), 150)
   }
 
+  const handleClick = () => {
+    setIsOpen(!isOpen)
+  }
+
   useEffect(() => {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current)
     }
+  }, [])
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
   return (
@@ -113,14 +163,19 @@ function NavDropdown({ label, items, isActive }: DropdownProps) {
       onMouseLeave={handleMouseLeave}
     >
       <button
+        type="button"
         className={cn(
-          'px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1',
+          'px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5',
+          'cursor-pointer select-none',
           isActive
             ? 'text-foreground bg-muted'
             : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
         )}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleClick}
+        aria-expanded={isOpen}
+        aria-haspopup="true"
       >
+        {Icon && <Icon className="h-4 w-4" />}
         {label}
         <ChevronDown className={cn(
           'h-3 w-3 transition-transform duration-200',
@@ -135,10 +190,10 @@ function NavDropdown({ label, items, isActive }: DropdownProps) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.96 }}
             transition={{ duration: 0.15 }}
-            className="absolute top-full left-0 mt-2 w-64 p-2 rounded-xl bg-background/95 backdrop-blur-xl border border-border shadow-xl z-50"
+            className="absolute top-full left-0 mt-2 w-64 p-2 rounded-xl bg-background/95 backdrop-blur-xl border border-border shadow-xl z-[60]"
           >
             {items.map((item) => {
-              const Icon = item.icon
+              const ItemIcon = item.icon
               return (
                 <Link
                   key={item.href}
@@ -147,7 +202,7 @@ function NavDropdown({ label, items, isActive }: DropdownProps) {
                   onClick={() => setIsOpen(false)}
                 >
                   <div className="p-2 rounded-lg bg-muted group-hover:bg-cyber-cyan/20 transition-colors">
-                    <Icon className="h-4 w-4 text-muted-foreground group-hover:text-cyber-cyan transition-colors" />
+                    <ItemIcon className="h-4 w-4 text-muted-foreground group-hover:text-cyber-cyan transition-colors" />
                   </div>
                   <div>
                     <div className="font-medium text-sm">{item.label}</div>
@@ -183,14 +238,15 @@ export function Navbar() {
     setMobileSubmenu(null)
   }, [pathname])
 
-  const isExploreActive = EXPLORE_ITEMS.some(item => pathname.startsWith(item.href))
-  const isAIActive = AI_ITEMS.some(item => pathname.startsWith(item.href))
+  const isPillarsActive = pathname.startsWith('/interests')
+  const isExploreActive = EXPLORE_ITEMS.some(item => pathname.startsWith(item.href.split('#')[0]))
+  const isAIActive = AI_ITEMS.some(item => pathname.startsWith(item.href.split('#')[0]))
 
   return (
     <>
       <header
         className={cn(
-          'fixed top-0 left-0 right-0 z-40 transition-all duration-300',
+          'fixed top-0 left-0 right-0 z-50 transition-all duration-300',
           isScrolled
             ? 'bg-background/80 dark:bg-background/70 backdrop-blur-xl border-b border-border/50 dark:border-primary/10 py-3 shadow-sm dark:shadow-primary/5'
             : 'bg-transparent py-5'
@@ -200,7 +256,7 @@ export function Navbar() {
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center gap-2 text-xl font-bold tracking-tight"
+            className="flex items-center gap-2 text-xl font-bold tracking-tight relative z-10"
           >
             <span className="gradient-text">IBNU</span>
             <span className="w-2 h-2 rounded-full bg-cyber-cyan animate-pulse" />
@@ -208,20 +264,26 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.slice(0, 1).map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
-                  pathname === link.href
-                    ? 'text-foreground bg-muted'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {/* Home Link */}
+            <Link
+              href="/"
+              className={cn(
+                'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+                pathname === '/'
+                  ? 'text-foreground bg-muted'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+              )}
+            >
+              Home
+            </Link>
+
+            {/* 3 Pillars Dropdown */}
+            <NavDropdown
+              label="3 Pillars"
+              items={PILLARS_ITEMS}
+              isActive={isPillarsActive}
+              icon={Sparkles}
+            />
 
             {/* Explore Dropdown */}
             <NavDropdown
@@ -237,24 +299,35 @@ export function Navbar() {
               isActive={isAIActive}
             />
 
-            {NAV_LINKS.slice(1).map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
-                  pathname === link.href
-                    ? 'text-foreground bg-muted'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
+            {/* About Link */}
+            <Link
+              href="/about"
+              className={cn(
+                'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+                pathname === '/about'
+                  ? 'text-foreground bg-muted'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+              )}
+            >
+              About
+            </Link>
+
+            {/* Credentials Link */}
+            <Link
+              href="/certifications"
+              className={cn(
+                'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+                pathname === '/certifications'
+                  ? 'text-foreground bg-muted'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+              )}
+            >
+              Credentials
+            </Link>
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 relative z-10">
             {/* Theme Toggle */}
             <ThemeToggle />
 
@@ -310,7 +383,7 @@ export function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-16 z-30 p-4 md:hidden"
+            className="fixed inset-x-0 top-16 z-[55] p-4 md:hidden"
           >
             <div className="rounded-2xl bg-background/95 backdrop-blur-xl border border-border p-4 shadow-xl max-h-[80vh] overflow-y-auto">
               <nav className="flex flex-col gap-1">
@@ -327,9 +400,64 @@ export function Navbar() {
                   Home
                 </Link>
 
-                {/* Explore Section */}
+                {/* 3 Pillars Section */}
                 <div className="mt-2">
                   <button
+                    type="button"
+                    onClick={() => setMobileSubmenu(mobileSubmenu === 'pillars' ? null : 'pillars')}
+                    className={cn(
+                      'w-full px-4 py-3 rounded-xl text-sm font-medium transition-colors flex items-center justify-between',
+                      isPillarsActive
+                        ? 'text-foreground bg-muted'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    )}
+                  >
+                    <span className="flex items-center gap-2">
+                      <Sparkles className="h-4 w-4" />
+                      3 Pillars
+                    </span>
+                    <ChevronDown className={cn(
+                      'h-4 w-4 transition-transform',
+                      mobileSubmenu === 'pillars' && 'rotate-180'
+                    )} />
+                  </button>
+                  <AnimatePresence>
+                    {mobileSubmenu === 'pillars' && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="pl-4 mt-1 space-y-1">
+                          {PILLARS_ITEMS.map((item) => {
+                            const ItemIcon = item.icon
+                            return (
+                              <Link
+                                key={item.href}
+                                href={item.href}
+                                className={cn(
+                                  'flex items-center gap-3 px-4 py-2 rounded-lg text-sm transition-colors',
+                                  pathname === item.href.split('#')[0]
+                                    ? 'text-foreground bg-muted/50'
+                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
+                                )}
+                              >
+                                <ItemIcon className="h-4 w-4" />
+                                {item.label}
+                              </Link>
+                            )
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Explore Section */}
+                <div>
+                  <button
+                    type="button"
                     onClick={() => setMobileSubmenu(mobileSubmenu === 'explore' ? null : 'explore')}
                     className={cn(
                       'w-full px-4 py-3 rounded-xl text-sm font-medium transition-colors flex items-center justify-between',
@@ -339,7 +467,7 @@ export function Navbar() {
                     )}
                   >
                     <span className="flex items-center gap-2">
-                      <Sparkles className="h-4 w-4" />
+                      <FolderKanban className="h-4 w-4" />
                       Explore
                     </span>
                     <ChevronDown className={cn(
@@ -357,7 +485,7 @@ export function Navbar() {
                       >
                         <div className="pl-4 mt-1 space-y-1">
                           {EXPLORE_ITEMS.map((item) => {
-                            const Icon = item.icon
+                            const ItemIcon = item.icon
                             return (
                               <Link
                                 key={item.href}
@@ -369,7 +497,7 @@ export function Navbar() {
                                     : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
                                 )}
                               >
-                                <Icon className="h-4 w-4" />
+                                <ItemIcon className="h-4 w-4" />
                                 {item.label}
                               </Link>
                             )
@@ -383,6 +511,7 @@ export function Navbar() {
                 {/* AI Section */}
                 <div>
                   <button
+                    type="button"
                     onClick={() => setMobileSubmenu(mobileSubmenu === 'ai' ? null : 'ai')}
                     className={cn(
                       'w-full px-4 py-3 rounded-xl text-sm font-medium transition-colors flex items-center justify-between',
@@ -410,7 +539,7 @@ export function Navbar() {
                       >
                         <div className="pl-4 mt-1 space-y-1">
                           {AI_ITEMS.map((item) => {
-                            const Icon = item.icon
+                            const ItemIcon = item.icon
                             return (
                               <Link
                                 key={item.href}
@@ -422,7 +551,7 @@ export function Navbar() {
                                     : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
                                 )}
                               >
-                                <Icon className="h-4 w-4" />
+                                <ItemIcon className="h-4 w-4" />
                                 {item.label}
                               </Link>
                             )
@@ -433,21 +562,31 @@ export function Navbar() {
                   </AnimatePresence>
                 </div>
 
-                {/* Other Links */}
-                {NAV_LINKS.slice(1).map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={cn(
-                      'px-4 py-3 rounded-xl text-sm font-medium transition-colors',
-                      pathname === link.href
-                        ? 'text-foreground bg-muted'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                    )}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+                {/* About */}
+                <Link
+                  href="/about"
+                  className={cn(
+                    'px-4 py-3 rounded-xl text-sm font-medium transition-colors',
+                    pathname === '/about'
+                      ? 'text-foreground bg-muted'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  )}
+                >
+                  About
+                </Link>
+
+                {/* Credentials */}
+                <Link
+                  href="/certifications"
+                  className={cn(
+                    'px-4 py-3 rounded-xl text-sm font-medium transition-colors',
+                    pathname === '/certifications'
+                      ? 'text-foreground bg-muted'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  )}
+                >
+                  Credentials
+                </Link>
 
                 <Button variant="gradient" className="mt-4" asChild>
                   <Link href="/contact">Let&apos;s Connect</Link>
