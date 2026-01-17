@@ -20,11 +20,12 @@ import { cn } from '@/lib/utils';
 export type FeedbackType = 'up' | 'down' | null;
 
 export interface ChatMessageProps {
-  id: string;
+  id?: string;
   role: 'user' | 'assistant' | 'system';
   content: string;
   timestamp?: Date;
   isStreaming?: boolean;
+  isLoading?: boolean; // Alias for isStreaming
   model?: string;
   feedback?: FeedbackType;
   onFeedback?: (id: string, feedback: FeedbackType) => void;
@@ -39,9 +40,12 @@ function ChatMessageComponent({
   role,
   content,
   isStreaming = false,
+  isLoading = false,
   feedback,
   onFeedback,
 }: ChatMessageProps) {
+  // Support both isStreaming and isLoading
+  const streaming = isStreaming || isLoading;
   const [copied, setCopied] = useState(false);
   const [localFeedback, setLocalFeedback] = useState<FeedbackType>(feedback || null);
 
@@ -54,7 +58,9 @@ function ChatMessageComponent({
   const handleFeedback = (type: 'up' | 'down') => {
     const newFeedback = localFeedback === type ? null : type;
     setLocalFeedback(newFeedback);
-    onFeedback?.(id, newFeedback);
+    if (id) {
+      onFeedback?.(id, newFeedback);
+    }
   };
 
   const isUser = role === 'user';
@@ -154,7 +160,7 @@ function ChatMessageComponent({
                   <span className="typing-dot h-2.5 w-2.5 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500" />
                 </div>
                 <span className="text-sm font-medium">
-                  {isStreaming ? 'Generating response...' : 'Thinking...'}
+                  {streaming ? 'Generating response...' : 'Thinking...'}
                 </span>
               </div>
             )}
@@ -164,7 +170,7 @@ function ChatMessageComponent({
         )}
 
         {/* Action Buttons */}
-        {content && !isStreaming && (
+        {content && !streaming && (
           <div
             className={cn(
               'ai-action-btns absolute -bottom-7 flex items-center gap-3',
