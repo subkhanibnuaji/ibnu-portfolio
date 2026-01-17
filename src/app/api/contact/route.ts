@@ -44,7 +44,6 @@ export async function POST(req: NextRequest) {
     const { name = '', email = '', subject = '', message = '' } = validation.data || {}
 
     // Get request metadata
-    const ip = getClientIp(req)
     const userAgent = req.headers.get('user-agent') || undefined
 
     // Save to database
