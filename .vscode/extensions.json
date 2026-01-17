@@ -1,0 +1,15 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "bradlc.vscode-tailwindcss",
+    "prisma.prisma",
+    "formulahendry.auto-rename-tag",
+    "christian-kohler.path-intellisense",
+    "mikestead.dotenv",
+    "naumovs.color-highlight",
+    "yoavbls.pretty-ts-errors",
+    "gruntfuggly.todo-tree"
+  ],
+  "unwantedRecommendations": []
+}
