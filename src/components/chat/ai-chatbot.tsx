@@ -1,9 +1,19 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback, useMemo, useTransition, memo } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
-import { Bot, X, Send, User, Trash2, Sparkles, Brain, Zap, Loader2, Wand2 } from 'lucide-react'
+import {
+  Bot, X, Send, User, Trash2, Sparkles, Brain, Zap, Loader2, Wand2,
+  Home, FolderKanban, Award, BookOpen, Mail, Star, User as UserIcon,
+  MessageSquare, FileText, Cpu, ImageIcon as ImageOff, Palette, Hand, Camera, Globe2, Mic, Volume2, Type, CloudSun,
+  Gamepad2, Calculator, Clock, Timer, QrCode, CheckSquare, StickyNote, Wallet,
+  FileCode2, PenTool, Music, Terminal, Command, Keyboard, Search, Bot as BotIcon,
+  ChevronRight, ArrowLeft, Grid3X3, Rocket, Settings, Phone,
+  Download, Copy, Check, ThumbsUp, ThumbsDown, RotateCcw, History, MicOff,
+  Minimize2, Maximize2, Share2, ChevronDown
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { generatePDF, generatePPT, type PDFData, type PPTData } from '@/lib/ai/file-generators'
@@ -87,6 +97,16 @@ interface Message {
   quickReplies?: QuickReply[]
   toolExecutions?: ToolExecution[]
   images?: string[]
+  feedback?: 'up' | 'down' | null
+}
+
+interface ChatSession {
+  id: string
+  title: string
+  messages: Message[]
+  mode: ChatMode
+  createdAt: Date
+  updatedAt: Date
 }
 
 // Parse special results (images, QR codes, files)
@@ -151,7 +171,186 @@ interface QuickReply {
   value: string
 }
 
-// Knowledge base for pattern matching - Comprehensive version
+// Quick Tool Categories - Comprehensive
+interface QuickTool {
+  icon: React.ElementType
+  label: string
+  description: string
+  href?: string
+  action?: string
+  color: string
+  isNew?: boolean
+  isHot?: boolean
+}
+
+interface QuickCategory {
+  id: string
+  title: string
+  icon: React.ElementType
+  color: string
+  gradient: string
+  tools: QuickTool[]
+}
+
+const QUICK_CATEGORIES: QuickCategory[] = [
+  {
+    id: 'pages',
+    title: 'Main Pages',
+    icon: Home,
+    color: 'text-cyan-400',
+    gradient: 'from-cyan-500 to-blue-500',
+    tools: [
+      { icon: Home, label: 'Home', description: 'Main homepage', href: '/', color: 'text-cyan-400' },
+      { icon: UserIcon, label: 'About', description: 'About me & timeline', href: '/about', color: 'text-blue-400' },
+      { icon: FolderKanban, label: 'Projects', description: 'Portfolio gallery', href: '/projects', color: 'text-purple-400' },
+      { icon: BookOpen, label: 'Blog', description: 'Articles & insights', href: '/blog', color: 'text-pink-400' },
+      { icon: Award, label: 'Credentials', description: '50+ certifications', href: '/certifications', color: 'text-amber-400' },
+      { icon: Star, label: 'Interests', description: 'AI, Blockchain, Security', href: '/interests', color: 'text-yellow-400' },
+      { icon: Mail, label: 'Contact', description: 'Get in touch', href: '/contact', color: 'text-green-400' },
+      { icon: Phone, label: 'Mobile App', description: 'Download Android app', href: '/mobile', color: 'text-emerald-400' },
+    ],
+  },
+  {
+    id: 'ai-tools',
+    title: 'AI Tools',
+    icon: Brain,
+    color: 'text-purple-400',
+    gradient: 'from-purple-500 to-pink-500',
+    tools: [
+      { icon: MessageSquare, label: 'LLM Chat', description: 'Chat with AI', href: '/ai-tools/llm', color: 'text-purple-400', isHot: true },
+      { icon: FileText, label: 'RAG System', description: 'Upload & ask docs', href: '/ai-tools/rag', color: 'text-pink-400', isNew: true },
+      { icon: Cpu, label: 'AI Agent', description: 'Agent with tools', href: '/ai-tools/agent', color: 'text-cyan-400', isHot: true },
+      { icon: ImageOff, label: 'BG Removal', description: 'Remove backgrounds', href: '/ai-tools/background-removal', color: 'text-green-400' },
+      { icon: Palette, label: 'Color Extract', description: 'Extract image colors', href: '/ai-tools/color-extractor', color: 'text-amber-400' },
+      { icon: Wand2, label: 'Style Transfer', description: 'Neural style transfer', href: '/ai-tools/style-transfer', color: 'text-purple-400' },
+      { icon: Hand, label: 'Hand Gesture', description: 'Hand tracking', href: '/ai-tools/hand-gesture', color: 'text-blue-400' },
+      { icon: Camera, label: 'Face Landmark', description: 'Face detection', href: '/ai-tools/face-landmark', color: 'text-pink-400' },
+      { icon: Camera, label: 'Object Detection', description: 'COCO-SSD detection', href: '/ai-tools/object-detection', color: 'text-cyan-400' },
+      { icon: Camera, label: 'Pose Estimation', description: 'Body pose tracking', href: '/ai-tools/pose-estimation', color: 'text-green-400' },
+      { icon: Globe2, label: 'Language Detect', description: 'Detect language', href: '/ai-tools/language-detector', color: 'text-amber-400' },
+      { icon: Type, label: 'Sentiment', description: 'Analyze sentiment', href: '/ai-tools/sentiment-analysis', color: 'text-rose-400' },
+      { icon: FileText, label: 'Summarizer', description: 'AI summarization', href: '/ai-tools/text-summarizer', color: 'text-blue-400' },
+      { icon: CloudSun, label: 'Word Cloud', description: 'Generate word clouds', href: '/ai-tools/word-cloud', color: 'text-purple-400' },
+      { icon: Mic, label: 'Speech to Text', description: 'Audio transcription', href: '/ai-tools/speech-to-text', color: 'text-cyan-400' },
+      { icon: Volume2, label: 'Text to Speech', description: 'TTS synthesis', href: '/ai-tools/text-to-speech', color: 'text-green-400' },
+      { icon: QrCode, label: 'QR Scanner', description: 'Scan QR codes', href: '/ai-tools/qr-scanner', color: 'text-amber-400' },
+    ],
+  },
+  {
+    id: 'games',
+    title: 'Games',
+    icon: Gamepad2,
+    color: 'text-green-400',
+    gradient: 'from-green-500 to-emerald-500',
+    tools: [
+      { icon: Gamepad2, label: 'Snake', description: 'Classic snake', href: '/tools/snake-game', color: 'text-green-400' },
+      { icon: Gamepad2, label: 'Tetris', description: 'Block puzzle', href: '/tools/tetris-game', color: 'text-cyan-400' },
+      { icon: Gamepad2, label: '2048', description: 'Number puzzle', href: '/tools/2048-game', color: 'text-amber-400' },
+      { icon: Gamepad2, label: 'Sudoku', description: 'Number logic', href: '/tools/sudoku', color: 'text-blue-400' },
+      { icon: Gamepad2, label: 'Minesweeper', description: 'Mine finder', href: '/tools/minesweeper', color: 'text-red-400' },
+      { icon: Gamepad2, label: 'Memory Game', description: 'Card matching', href: '/tools/memory-game', color: 'text-purple-400' },
+      { icon: Gamepad2, label: 'Tic Tac Toe', description: 'X and O', href: '/tools/tic-tac-toe', color: 'text-pink-400' },
+      { icon: Gamepad2, label: 'Connect Four', description: '4-in-a-row', href: '/tools/connect-four', color: 'text-yellow-400' },
+      { icon: Gamepad2, label: 'Hangman', description: 'Word guess', href: '/tools/hangman', color: 'text-orange-400' },
+      { icon: Gamepad2, label: 'Simon Says', description: 'Memory sequence', href: '/tools/simon-says', color: 'text-emerald-400' },
+    ],
+  },
+  {
+    id: 'utilities',
+    title: 'Utilities',
+    icon: Calculator,
+    color: 'text-amber-400',
+    gradient: 'from-amber-500 to-orange-500',
+    tools: [
+      { icon: Calculator, label: 'Calculator', description: 'Scientific calc', href: '/tools/calculator', color: 'text-amber-400' },
+      { icon: Calculator, label: 'Unit Converter', description: 'Convert units', href: '/tools/unit-converter', color: 'text-blue-400' },
+      { icon: Wallet, label: 'Currency', description: 'Currency converter', href: '/tools/currency-converter', color: 'text-green-400' },
+      { icon: Clock, label: 'World Clock', description: 'Time zones', href: '/tools/world-clock', color: 'text-cyan-400' },
+      { icon: Timer, label: 'Pomodoro', description: 'Focus timer', href: '/tools/pomodoro', color: 'text-red-400' },
+      { icon: Timer, label: 'Countdown', description: 'Countdown timer', href: '/tools/countdown-timer', color: 'text-purple-400' },
+      { icon: QrCode, label: 'QR Generator', description: 'Create QR codes', href: '/tools/qr-generator', color: 'text-pink-400' },
+      { icon: CheckSquare, label: 'Checklist', description: 'Task checklist', href: '/tools/checklist', color: 'text-emerald-400' },
+      { icon: StickyNote, label: 'Notes', description: 'Quick notes', href: '/tools/notes-app', color: 'text-yellow-400' },
+      { icon: Wallet, label: 'Expense', description: 'Track expenses', href: '/tools/expense-tracker', color: 'text-orange-400' },
+    ],
+  },
+  {
+    id: 'dev-tools',
+    title: 'Developer',
+    icon: FileCode2,
+    color: 'text-blue-400',
+    gradient: 'from-blue-500 to-indigo-500',
+    tools: [
+      { icon: FileCode2, label: 'Code Editor', description: 'HTML/CSS/JS', href: '/tools/code-playground', color: 'text-blue-400' },
+      { icon: FileCode2, label: 'JSON Format', description: 'Format JSON', href: '/tools/json-formatter', color: 'text-green-400' },
+      { icon: FileCode2, label: 'Regex Tester', description: 'Test regex', href: '/tools/regex-tester', color: 'text-purple-400' },
+      { icon: FileCode2, label: 'Base64', description: 'Encode/decode', href: '/tools/base64-tool', color: 'text-cyan-400' },
+      { icon: FileCode2, label: 'Hash Gen', description: 'Generate hash', href: '/tools/hash-generator', color: 'text-amber-400' },
+      { icon: Type, label: 'Markdown', description: 'Markdown editor', href: '/tools/markdown-editor', color: 'text-pink-400' },
+      { icon: Type, label: 'Text Convert', description: 'Transform text', href: '/tools/text-converter', color: 'text-yellow-400' },
+      { icon: Type, label: 'Lorem Gen', description: 'Placeholder text', href: '/tools/lorem-generator', color: 'text-orange-400' },
+    ],
+  },
+  {
+    id: 'design',
+    title: 'Design',
+    icon: PenTool,
+    color: 'text-pink-400',
+    gradient: 'from-pink-500 to-rose-500',
+    tools: [
+      { icon: Palette, label: 'Color Picker', description: 'Pick colors', href: '/tools/color-picker', color: 'text-pink-400' },
+      { icon: Palette, label: 'Color Convert', description: 'Convert colors', href: '/tools/color-converter', color: 'text-purple-400' },
+      { icon: Palette, label: 'Gradient', description: 'CSS gradients', href: '/tools/gradient-generator', color: 'text-cyan-400' },
+      { icon: Palette, label: 'Palette Gen', description: 'Color palettes', href: '/tools/palette-generator', color: 'text-green-400' },
+      { icon: PenTool, label: 'Box Shadow', description: 'CSS shadows', href: '/tools/box-shadow-generator', color: 'text-amber-400' },
+      { icon: PenTool, label: 'Drawing', description: 'Drawing board', href: '/tools/drawing-canvas', color: 'text-blue-400' },
+      { icon: Type, label: 'Emoji Picker', description: 'Browse emojis', href: '/tools/emoji-picker', color: 'text-yellow-400' },
+    ],
+  },
+  {
+    id: 'special',
+    title: 'Special Features',
+    icon: Zap,
+    color: 'text-cyan-400',
+    gradient: 'from-cyan-400 to-purple-500',
+    tools: [
+      { icon: Terminal, label: 'Terminal', description: 'Built-in terminal', action: 'terminal', color: 'text-green-400', isHot: true },
+      { icon: Command, label: 'Command Palette', description: 'Quick nav (⌘K)', action: 'command', color: 'text-cyan-400' },
+      { icon: Keyboard, label: 'Shortcuts', description: 'Keyboard help (?)', action: 'shortcuts', color: 'text-purple-400' },
+      { icon: Search, label: 'Search', description: 'Search site', action: 'search', color: 'text-pink-400' },
+      { icon: BotIcon, label: 'AI Chat', description: 'Chat with AI', action: 'ai-mode', color: 'text-amber-400', isHot: true },
+      { icon: Music, label: 'Music Visualizer', description: 'Audio visuals', href: '/tools/music-visualizer', color: 'text-blue-400' },
+      { icon: CloudSun, label: 'Weather', description: 'Check weather', href: '/tools/weather-widget', color: 'text-cyan-400' },
+      { icon: Keyboard, label: 'Typing Test', description: 'Test speed', href: '/tools/typing-test', color: 'text-green-400' },
+      { icon: Rocket, label: 'All 70+ Tools', description: 'Browse all tools', href: '/tools', color: 'text-orange-400' },
+      { icon: Settings, label: 'All AI Tools', description: 'Browse AI tools', href: '/ai-tools', color: 'text-purple-400' },
+    ],
+  },
+]
+
+// Suggested prompts for different modes
+const SUGGESTED_PROMPTS = {
+  quick: [
+    "Tell me about Ibnu's background",
+    "What projects has he worked on?",
+    "What are his technical skills?",
+    "How can I contact him?",
+  ],
+  ai: [
+    "Explain machine learning in simple terms",
+    "What's the difference between AI and ML?",
+    "Help me write a professional email",
+    "Summarize the key trends in tech",
+  ],
+  agent: [
+    "Generate an image of a futuristic city",
+    "Create a QR code for my website",
+    "What's the current price of Bitcoin?",
+    "Calculate 15% tip on $85",
+  ],
+}
+
+// Knowledge base for pattern matching
 const knowledgeBase = {
   greetings: {
     patterns: ['hi', 'hello', 'hey', 'halo', 'hai', 'good morning', 'good afternoon', 'good evening', 'howdy', 'sup', 'apa kabar', 'selamat'],
@@ -171,150 +370,11 @@ I'm a cross-functional professional currently working as a Civil Servant (ASN) a
 **Background:**
 - Senior Executive MBA from Universitas Gadjah Mada (UGM)
 - Bachelor in Informatics from Telkom University
-- 5+ years of experience in tech and consulting
-
-**Current Role:**
-Managing enterprise IT projects including HUB PKP, SIBARU, and SIMONI at the ministry.`,
+- 5+ years of experience in tech and consulting`,
     quickReplies: [
       { label: 'Education', value: 'Tell me about your education' },
       { label: 'Experience', value: 'What is your work experience?' },
       { label: 'Interests', value: 'What are your interests?' }
-    ]
-  },
-  education: {
-    patterns: ['education', 'study', 'university', 'degree', 'mba', 'bachelor', 'ugm', 'telkom', 'kuliah', 'sekolah', 'pendidikan'],
-    response: `**Education:**
-
-1. **Senior Executive MBA** - Universitas Gadjah Mada (UGM)
-   - Period: 2022 - 2024
-   - GPA: 3.60/4.00
-   - Thesis: Product Differentiation Strategy at PT Sambel Korek DNO
-
-2. **Bachelor of Informatics (S.Kom)** - Telkom University
-   - Period: 2017 - 2021
-   - GPA: 3.34/4.00
-   - Thesis: Animo - Web-Based Automation for F&B SMEs
-
-**Languages:** Indonesian (Native), English (TOEFL ITP 593), Arabic & Mandarin (Beginner, HSK 1)`,
-    quickReplies: [
-      { label: 'Work Experience', value: 'What is your work experience?' },
-      { label: 'Certifications', value: 'What certifications do you have?' }
-    ]
-  },
-  experience: {
-    patterns: ['experience', 'work', 'job', 'career', 'ministry', 'consulting', 'startup', 'kerja', 'pengalaman'],
-    response: `**Work Experience:**
-
-1. **Civil Servant (ASN)** - Ministry of Housing & Settlement Areas
-   - Aug 2024 - Present
-   - Managing IT projects: HUB PKP, SIBARU, SIMONI
-   - Evaluate procurement proposals >IDR 10B
-
-2. **Founder & CEO** - Virtus Futura Consulting
-   - Jul 2021 - Jul 2024
-   - Managed portfolio >IDR 1T (~USD 71M)
-   - Hospital feasibility, healthcare turnaround, F&B scale-up
-
-3. **Founder & CEO** - Automate All (CV Solusi Automasi Indonesia)
-   - Aug 2020 - Aug 2022
-   - Built 100+ RPA bots, 50+ clients
-   - Achieved IDR 1B valuation
-
-4. **Independent Crypto Investor**
-   - Jul 2021 - Present
-   - $68K-100K cumulative futures volume`,
-    quickReplies: [
-      { label: 'Virtus Consulting', value: 'Tell me about Virtus Futura' },
-      { label: 'Automate All', value: 'Tell me about Automate All startup' }
-    ]
-  },
-  virtusfutura: {
-    patterns: ['virtus', 'futura', 'consulting', 'consultant', 'konsultan'],
-    response: `**Virtus Futura Consulting** (Jul 2021 - Jul 2024)
-
-Project-based consulting firm in strategy, operations, and digital transformation.
-
-**Key Achievements:**
-- Managed portfolio >IDR 1T (~USD 71M)
-- Hospital feasibility studies (IDR 331B project)
-- Healthcare turnaround management
-- Multi-clinic governance models
-- F&B scale-up: IDR 100M to IDR 1B/month revenue
-
-**Sectors:** Healthcare, F&B, Retail, Real Estate
-
-The company was wound down when Ibnu joined the government as a Civil Servant.`,
-    quickReplies: [
-      { label: 'Automate All', value: 'Tell me about Automate All startup' },
-      { label: 'Current Work', value: 'What are you doing now?' }
-    ]
-  },
-  automateall: {
-    patterns: ['automate all', 'automate', 'rpa', 'automation', 'robot', 'solusi automasi'],
-    response: `**Automate All - CV Solusi Automasi Indonesia** (Aug 2020 - Aug 2022)
-
-RPA (Robotic Process Automation) startup founded during college.
-
-**Achievements:**
-- Built 100+ automation bots for 10+ clients
-- Served 50+ total clients
-- Achieved IDR 1B valuation through pre-seed efforts
-- Top 100 Startup - Startup4Industry 2021 (Ministry of Industry)
-- Top 100 Startup - ASMI 2021 (Kemendikbud/Dikti)
-- Top 45 - Bandung Startup Pitching Day (SBM ITB)
-- Top 20 - BLOCK71 Community Open Incubation (NUS Enterprise)
-
-**Services:** Document automation, data extraction, workflow automation, custom bots`,
-    quickReplies: [
-      { label: 'Awards', value: 'What awards has he won?' },
-      { label: 'Current Role', value: 'What are you doing now?' }
-    ]
-  },
-  projects: {
-    patterns: ['project', 'portfolio', 'work on', 'built', 'develop', 'proyek'],
-    response: `**Key Projects:**
-
-1. **HUB PKP (Klinik Rumah)** - In Development
-   - Digital platform for Indonesia's self-built housing program
-   - AI-powered design, permits, marketplace
-
-2. **SIBARU** - Active
-   - Enterprise information system for ministry
-
-3. **SIMONI** - Active
-   - Housing program monitoring system
-
-4. **RPA Solutions** - 100+ bots for 10+ clients
-
-5. **ICP Token dApp** - Web3 app on Internet Computer
-
-6. **This Portfolio** - Next.js 15, AI chatbot, Terminal emulator`,
-    quickReplies: [
-      { label: 'HUB PKP Details', value: 'Tell me more about HUB PKP project' },
-      { label: 'Tech Stack', value: 'What technologies do you use?' }
-    ]
-  },
-  hubpkp: {
-    patterns: ['hub pkp', 'klinik rumah', 'housing platform', 'rumah', 'housing', 'perumahan'],
-    response: `**HUB PKP - Klinik Rumah**
-
-The flagship digital platform for Indonesia's self-built housing ecosystem.
-
-**Features:**
-- AI-powered house design consultation
-- Integrated permit processing (PBG/SIMBG)
-- Material marketplace with price comparison
-- Certified worker/contractor facilitation
-- Housing finance integration with banks
-- Construction monitoring system
-
-**Impact:**
-Streamlines housing construction for 84% of Indonesian homes built through self-construction (swadaya).
-
-**Technologies:** React, TypeScript, Node.js, PostgreSQL, AWS, SIMBG API integration`,
-    quickReplies: [
-      { label: 'Other Projects', value: 'What other projects have you worked on?' },
-      { label: 'Tech Stack', value: 'What technologies do you use?' }
     ]
   },
   skills: {
@@ -327,228 +387,60 @@ Streamlines housing construction for 84% of Indonesian homes built through self-
 
 **AI/ML:** LLM Workflows (85%), Prompt Engineering (90%), Agentic AI (80%), RAG Systems (75%)
 
-**Blockchain:** DeFi Protocols (80%), Smart Contracts (70%), On-chain Analysis (75%)
-
-**Cloud & DevOps:** AWS (80%), Docker (70%), Linux (80%), Git (90%)
-
-**Soft Skills:** Project Management, Strategic Planning, Team Leadership, Public Speaking`,
+**Blockchain:** DeFi Protocols (80%), Smart Contracts (70%), On-chain Analysis (75%)`,
     quickReplies: [
       { label: 'Certifications', value: 'What certifications do you have?' },
       { label: 'AI Skills', value: 'Tell me about your AI experience' }
     ]
   },
+  projects: {
+    patterns: ['project', 'portfolio', 'work on', 'built', 'develop', 'proyek'],
+    response: `**Key Projects:**
+
+1. **HUB PKP (Klinik Rumah)** - Digital platform for Indonesia's self-built housing program
+2. **SIBARU** - Enterprise information system for ministry
+3. **SIMONI** - Housing program monitoring system
+4. **RPA Solutions** - 100+ bots for 10+ clients
+5. **This Portfolio** - Next.js 15, AI chatbot, Terminal emulator`,
+    quickReplies: [
+      { label: 'Tech Stack', value: 'What technologies do you use?' },
+      { label: 'AI Projects', value: 'Tell me about AI projects' }
+    ]
+  },
   interests: {
-    patterns: ['interest', 'passion', 'focus', 'specialization', 'minat', 'passion'],
+    patterns: ['interest', 'passion', 'focus', 'specialization', 'minat'],
     response: `**Three Core Interests:**
 
-1. **Artificial Intelligence**
-   - Agentic AI & Multi-Agent Systems
-   - LLM Workflows & Prompt Engineering
-   - AI for Government Documentation
-   - RAG Systems & Knowledge Bases
-
-2. **Crypto & Blockchain**
-   - Portfolio Management & DeFi
-   - On-chain Analysis & Research
-   - Smart Contract Development
-   - Token Economics
-
-3. **Cybersecurity**
-   - Defensive Security & OPSEC
-   - OSINT & Threat Intelligence
-   - Web Application Security
-   - Privacy & Anonymity`,
+1. **Artificial Intelligence** - Agentic AI, LLM Workflows, RAG Systems
+2. **Crypto & Blockchain** - DeFi, On-chain Analysis, Smart Contracts
+3. **Cybersecurity** - Defensive Security, OSINT, Web App Security`,
     quickReplies: [
       { label: 'AI Details', value: 'Tell me more about your AI work' },
-      { label: 'Crypto Trading', value: 'Tell me about your crypto experience' },
-      { label: 'Cybersecurity', value: 'Tell me about cybersecurity' }
-    ]
-  },
-  ai: {
-    patterns: ['artificial intelligence', 'machine learning', 'llm', 'langchain', 'gpt', 'claude', 'agentic', 'rag', 'kecerdasan buatan'],
-    response: `**AI & Machine Learning:**
-
-I explore agentic AI systems, LLM workflows, and their applications in government and enterprise.
-
-**Focus Areas:**
-- Agentic AI & Multi-Agent Systems
-- RAG (Retrieval Augmented Generation)
-- Prompt Engineering & Chain-of-Thought
-- AI for Government Documentation
-- Autonomous Task Completion
-
-**Technologies:** LangChain, LangGraph, AutoGen, CrewAI, OpenAI, Claude, Ollama, HuggingFace
-
-**Vision:** AI will revolutionize government service delivery through autonomous document processing and intelligent citizen assistance.`,
-    quickReplies: [
-      { label: 'Projects', value: 'What AI projects have you built?' },
-      { label: 'Blockchain', value: 'Tell me about your blockchain work' }
-    ]
-  },
-  crypto: {
-    patterns: ['crypto', 'bitcoin', 'trading', 'defi', 'web3', 'futures', 'altcoin', 'memecoin'],
-    response: `**Crypto & Trading Experience:**
-
-**Portfolio Allocation:**
-- 70% Bitcoin (BTC) - Core holding
-- 15% Strong Altcoins - ETH, SOL, etc.
-- 10% Memecoin - High risk, high reward
-- 5% DEX Coins - Liquidity provision
-
-**Trading Stats:**
-- $68K-100K cumulative futures volume
-- Thesis-driven, risk-controlled approach
-- Spot and CEX/DEX derivatives
-- Active on Binance, Bybit, Jupiter, GMX
-
-**Skills:** DeFi protocols, On-chain analysis, Smart contracts, Portfolio management, MEV research`,
-    quickReplies: [
-      { label: 'Web3 Projects', value: 'Have you built any Web3 projects?' },
-      { label: 'DeFi Details', value: 'Tell me about DeFi' }
-    ]
-  },
-  defi: {
-    patterns: ['defi', 'decentralized finance', 'yield', 'liquidity', 'swap', 'lending'],
-    response: `**DeFi Experience:**
-
-**Protocols Used:**
-- DEXs: Uniswap, Jupiter, Raydium, GMX
-- Lending: Aave, Compound, Kamino
-- Derivatives: GMX, dYdX, Hyperliquid
-- Yield: Convex, Yearn, Marinade
-
-**Skills:**
-- Liquidity provision & yield farming
-- Perpetual futures trading
-- On-chain analysis (Dune, Arkham, DefiLlama)
-- MEV protection strategies
-- Bridge & cross-chain operations
-
-**Philosophy:** DeFi enables financial sovereignty and removes intermediaries from finance.`,
-    quickReplies: [
-      { label: 'Crypto Portfolio', value: 'Tell me about your crypto portfolio' },
-      { label: 'Web3 Projects', value: 'Have you built Web3 projects?' }
-    ]
-  },
-  cybersecurity: {
-    patterns: ['cybersecurity', 'security', 'hacking', 'pentest', 'osint', 'opsec', 'keamanan', 'cyber'],
-    response: `**Cybersecurity Focus:**
-
-**Areas of Interest:**
-- Defensive Security & Hardening
-- OPSEC (Operational Security)
-- OSINT (Open Source Intelligence)
-- Threat Intelligence & Analysis
-- Web Application Security
-- Privacy & Anonymity
-
-**Tools & Frameworks:**
-- Burp Suite, OWASP ZAP
-- Nmap, Wireshark
-- Maltego, theHarvester
-- Linux security hardening
-
-**Certifications:** Google Cybersecurity Professional, IBM Cybersecurity Analyst
-
-**Philosophy:** Security is a mindset, not just tools. Defense-in-depth and zero trust.`,
-    quickReplies: [
-      { label: 'Certifications', value: 'What security certifications?' },
-      { label: 'AI Security', value: 'AI and security?' }
+      { label: 'Crypto', value: 'Tell me about crypto experience' }
     ]
   },
   certifications: {
     patterns: ['certification', 'certificate', 'credential', 'course', 'harvard', 'stanford', 'google', 'ibm', 'mckinsey', 'sertifikat'],
     response: `**50+ Certifications from:**
 
-**Elite Universities:**
-- Leadership (Harvard)
-- Machine Learning (Stanford)
-- Finance (Cambridge Judge)
-- Web3 & Blockchain (INSEAD)
-- Business Strategy (Wharton)
-
-**Tech Giants:**
-- Cybersecurity Professional (Google)
-- Business Intelligence (Google)
-- Project Management (Google)
-- AI & Data Engineering (IBM)
-- AWS Cloud Fundamentals (Amazon)
-
-**Consulting Firms:**
-- Forward Program (McKinsey)
-- Strategy Consulting (BCG, Deloitte)
-- Audit & Finance (PwC, EY, KPMG)
+**Elite Universities:** Harvard, Stanford, Cambridge, INSEAD, Wharton
+**Tech Giants:** Google, IBM, AWS, Meta
+**Consulting Firms:** McKinsey, BCG, Deloitte, PwC, EY, KPMG
 
 Visit **/certifications** to see all credentials!`,
     quickReplies: [
-      { label: 'View All Certs', value: 'How can I see all certifications?' },
+      { label: 'View All Certs', value: 'Navigate to certifications' },
       { label: 'Skills', value: 'What skills do you have?' }
     ]
   },
-  awards: {
-    patterns: ['award', 'achievement', 'penghargaan', 'prestasi', 'trophy', 'winner'],
-    response: `**Awards & Achievements:**
-
-**Academic:**
-- 2nd Best Outstanding Graduate (Innovation & Entrepreneurship) - Telkom University 2022
-
-**Startup Competitions:**
-- Top 100 Startup - Startup4Industry 2021 (Ministry of Industry)
-- Top 100 Startup - ASMI 2021 (Kemendikbud/Dikti)
-- Top 45 - Bandung Startup Pitching Day (SBM ITB / LPIK ITB)
-- Top 20 - BLOCK71 Community Open Incubation (NUS Enterprise Singapore)
-
-**Business:**
-- Achieved IDR 1B startup valuation (Automate All)
-- Managed IDR 1T+ consulting portfolio (Virtus Futura)`,
-    quickReplies: [
-      { label: 'Automate All', value: 'Tell me about Automate All' },
-      { label: 'Virtus Consulting', value: 'Tell me about Virtus Futura' }
-    ]
-  },
-  organizations: {
-    patterns: ['organization', 'membership', 'member', 'cfa', 'hipmi', 'kadin', 'komunitas', 'organisasi'],
-    response: `**Professional Memberships:**
-
-1. **CFA Institute** - Member
-   - ID: 200530563
-   - Since 2024
-
-2. **KADIN Indonesia** - Member
-   - ID: 20203-2132274685
-   - Chamber of Commerce
-
-3. **BPD HIPMI JAYA** - Member
-   - DKI Jakarta Young Entrepreneurs
-   - Since 2021
-
-4. **Akademi Crypto** - Lifetime Member
-   - Indonesian crypto community
-   - Since 2023
-
-These networks help me stay connected with business and tech communities.`,
-    quickReplies: [
-      { label: 'Contact', value: 'How can I contact you?' },
-      { label: 'LinkedIn', value: 'What is your LinkedIn?' }
-    ]
-  },
   contact: {
-    patterns: ['contact', 'email', 'reach', 'hire', 'connect', 'work together', 'collaborate', 'hubungi', 'kontak'],
+    patterns: ['contact', 'email', 'reach', 'hire', 'connect', 'work together', 'hubungi', 'kontak'],
     response: `**Let's Connect!**
 
-**Contact Info:**
 - Email: hi@heyibnu.com
 - GitHub: github.com/subkhanibnuaji
 - LinkedIn: linkedin.com/in/subkhanibnuaji
 - Twitter: @subkhanibnuaji
-- Location: Jakarta, Indonesia
-
-**Open For:**
-- Project Collaboration
-- Consulting Opportunities
-- Speaking Engagements
-- Advisory Roles
-- Technical Discussions
 
 Visit the **Contact** page to send a message directly!`,
     quickReplies: [
@@ -787,12 +679,11 @@ Located in Jakarta, Indonesia.`,
     ]
   },
   default: {
-    response: "I'm not sure about that specific topic. I can help you with information about:\n\n- **Background** - Education, experience, skills\n- **Projects** - HUB PKP, RPA solutions, Web3\n- **Interests** - AI, Blockchain, Cybersecurity\n- **Certifications** - 50+ credentials\n- **Contact** - How to reach Ibnu\n\nWhat would you like to know?",
+    response: "I'm not sure about that. I can help you with:\n\n- **Background** - Education, experience, skills\n- **Projects** - Portfolio and work\n- **Interests** - AI, Blockchain, Cybersecurity\n- **Contact** - How to reach Ibnu\n\nOr use the **Quick Menu** for direct access to all features!",
     quickReplies: [
       { label: 'About Ibnu', value: 'Tell me about Ibnu' },
       { label: 'Projects', value: 'What projects has he worked on?' },
-      { label: 'Interests', value: 'What are your interests?' },
-      { label: 'Contact', value: 'How can I contact you?' }
+      { label: 'Quick Menu', value: 'Show quick menu' }
     ]
   }
 }
@@ -803,7 +694,6 @@ function findResponse(input: string): { response: string; quickReplies?: QuickRe
 
   for (const [key, data] of Object.entries(knowledgeBase)) {
     if (key === 'default') continue
-
     const hasPatterns = 'patterns' in data
     if (hasPatterns && data.patterns.some(pattern => lowerInput.includes(pattern))) {
       return { response: data.response, quickReplies: data.quickReplies }
@@ -821,8 +711,291 @@ const INITIAL_QUICK_REPLIES: QuickReply[] = [
   { label: 'About Ibnu', value: 'Tell me about Ibnu' },
   { label: 'Projects', value: 'What projects has he worked on?' },
   { label: 'Skills & Tech', value: 'What are his skills?' },
-  { label: 'Interests', value: 'What are your interests?' }
+  { label: 'Quick Menu', value: 'Show quick menu' }
 ]
+
+// LocalStorage keys
+const STORAGE_KEYS = {
+  CHAT_HISTORY: 'ibnu-chat-history',
+  CURRENT_SESSION: 'ibnu-chat-current-session',
+}
+
+// Typing Indicator Component
+function TypingIndicator() {
+  return (
+    <div className="flex gap-1 items-center px-4 py-3">
+      <div className="flex gap-1">
+        {[0, 1, 2].map((i) => (
+          <motion.div
+            key={i}
+            className="w-2 h-2 rounded-full bg-muted-foreground/50"
+            animate={{ y: [0, -5, 0] }}
+            transition={{
+              duration: 0.6,
+              repeat: Infinity,
+              delay: i * 0.15,
+            }}
+          />
+        ))}
+      </div>
+      <span className="text-xs text-muted-foreground ml-2">IbnuGPT is typing...</span>
+    </div>
+  )
+}
+
+// Quick Tool Picker Component
+function QuickToolPicker({
+  onNavigate,
+  onAction,
+  onClose
+}: {
+  onNavigate: (href: string) => void
+  onAction: (action: string) => void
+  onClose: () => void
+}) {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [searchQuery, setSearchQuery] = useState('')
+
+  const selectedCategoryData = QUICK_CATEGORIES.find(c => c.id === selectedCategory)
+
+  // Filter tools based on search
+  const filteredCategories = searchQuery
+    ? QUICK_CATEGORIES.map(cat => ({
+        ...cat,
+        tools: cat.tools.filter(tool =>
+          tool.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          tool.description.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+      })).filter(cat => cat.tools.length > 0)
+    : QUICK_CATEGORIES
+
+  return (
+    <div className="p-3">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3">
+        {selectedCategory ? (
+          <button
+            onClick={() => setSelectedCategory(null)}
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>Back</span>
+          </button>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Grid3X3 className="h-4 w-4 text-primary" />
+            <span className="text-sm font-semibold">Quick Actions</span>
+          </div>
+        )}
+        <button
+          onClick={onClose}
+          className="p-1 rounded hover:bg-muted transition-colors"
+        >
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+
+      {/* Search */}
+      {!selectedCategory && (
+        <div className="mb-3">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search tools..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-muted/50 border-0 outline-none focus:ring-2 focus:ring-primary/20"
+            />
+          </div>
+        </div>
+      )}
+
+      {!selectedCategory ? (
+        // Category Grid or Search Results
+        searchQuery ? (
+          <div className="space-y-2 max-h-[300px] overflow-y-auto">
+            {filteredCategories.map((category) => (
+              <div key={category.id}>
+                <div className="text-xs font-medium text-muted-foreground mb-1">{category.title}</div>
+                {category.tools.map((tool, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      if (tool.href) onNavigate(tool.href)
+                      else if (tool.action) onAction(tool.action)
+                      onClose()
+                    }}
+                    className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors text-left"
+                  >
+                    <tool.icon className={cn("h-4 w-4", tool.color)} />
+                    <span className="text-sm">{tool.label}</span>
+                  </button>
+                ))}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-2">
+            {filteredCategories.map((category) => (
+              <motion.button
+                key={category.id}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setSelectedCategory(category.id)}
+                className={cn(
+                  "flex items-center gap-3 p-3 rounded-xl",
+                  "bg-gradient-to-br opacity-90 hover:opacity-100",
+                  category.gradient,
+                  "text-white text-left transition-all"
+                )}
+              >
+                <category.icon className="h-5 w-5" />
+                <div>
+                  <div className="text-sm font-medium">{category.title}</div>
+                  <div className="text-[10px] opacity-80">{category.tools.length} items</div>
+                </div>
+              </motion.button>
+            ))}
+          </div>
+        )
+      ) : (
+        // Tools List
+        <div className="space-y-1 max-h-[300px] overflow-y-auto">
+          <div className="flex items-center gap-2 mb-3">
+            <div className={cn("p-1.5 rounded-lg bg-gradient-to-br", selectedCategoryData?.gradient)}>
+              {selectedCategoryData && <selectedCategoryData.icon className="h-4 w-4 text-white" />}
+            </div>
+            <span className="font-semibold text-sm">{selectedCategoryData?.title}</span>
+          </div>
+
+          {selectedCategoryData?.tools.map((tool, index) => (
+            <motion.button
+              key={index}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: index * 0.03 }}
+              onClick={() => {
+                if (tool.href) onNavigate(tool.href)
+                else if (tool.action) onAction(tool.action)
+                onClose()
+              }}
+              className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/50 transition-colors group text-left"
+            >
+              <tool.icon className={cn("h-4 w-4", tool.color)} />
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium truncate">{tool.label}</span>
+                  {tool.isNew && (
+                    <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-green-500 text-white">NEW</span>
+                  )}
+                  {tool.isHot && (
+                    <span className="px-1.5 py-0.5 text-[9px] font-bold rounded bg-gradient-to-r from-orange-500 to-red-500 text-white">HOT</span>
+                  )}
+                </div>
+                <span className="text-xs text-muted-foreground truncate block">{tool.description}</span>
+              </div>
+              <ChevronRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+            </motion.button>
+          ))}
+        </div>
+      )}
+
+      {/* Footer shortcuts */}
+      {!selectedCategory && !searchQuery && (
+        <div className="mt-3 pt-3 border-t border-border flex items-center justify-between">
+          <span className="text-[10px] text-muted-foreground">Press ⌘K for command palette</span>
+          <div className="flex gap-1">
+            <button
+              onClick={() => onAction('terminal')}
+              className="p-1.5 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors"
+              title="Terminal"
+            >
+              <Terminal className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={() => onAction('command')}
+              className="p-1.5 rounded-lg bg-cyan-500/20 text-cyan-400 hover:bg-cyan-500/30 transition-colors"
+              title="Command Palette"
+            >
+              <Command className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={() => onAction('ai-mode')}
+              className="p-1.5 rounded-lg bg-purple-500/20 text-purple-400 hover:bg-purple-500/30 transition-colors"
+              title="AI Chat"
+            >
+              <Brain className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Chat History Panel
+function ChatHistoryPanel({
+  sessions,
+  currentSessionId,
+  onSelectSession,
+  onDeleteSession,
+  onClose,
+}: {
+  sessions: ChatSession[]
+  currentSessionId: string | null
+  onSelectSession: (session: ChatSession) => void
+  onDeleteSession: (sessionId: string) => void
+  onClose: () => void
+}) {
+  return (
+    <div className="p-3">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <History className="h-4 w-4 text-primary" />
+          <span className="text-sm font-semibold">Chat History</span>
+        </div>
+        <button onClick={onClose} className="p-1 rounded hover:bg-muted transition-colors">
+          <X className="h-4 w-4" />
+        </button>
+      </div>
+
+      {sessions.length === 0 ? (
+        <p className="text-sm text-muted-foreground text-center py-4">No chat history yet</p>
+      ) : (
+        <div className="space-y-1 max-h-[250px] overflow-y-auto">
+          {sessions.map((session) => (
+            <div
+              key={session.id}
+              className={cn(
+                "flex items-center gap-2 p-2 rounded-lg cursor-pointer transition-colors group",
+                session.id === currentSessionId ? "bg-primary/10" : "hover:bg-muted/50"
+              )}
+              onClick={() => onSelectSession(session)}
+            >
+              <MessageSquare className="h-4 w-4 text-muted-foreground shrink-0" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{session.title}</p>
+                <p className="text-xs text-muted-foreground">
+                  {new Date(session.updatedAt).toLocaleDateString()}
+                </p>
+              </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDeleteSession(session.id)
+                }}
+                className="p-1 rounded opacity-0 group-hover:opacity-100 hover:bg-red-500/20 text-red-400 transition-all"
+              >
+                <Trash2 className="h-3 w-3" />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 // ============================================
 // MEMOIZED CHAT MESSAGE ITEM COMPONENT
@@ -959,8 +1132,15 @@ const ChatMessageItem = memo(function ChatMessageItem({ message, mode }: ChatMes
 // ============================================
 
 export function AIChatbot() {
+  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
+  const [isMinimized, setIsMinimized] = useState(false)
   const [mode, setMode] = useState<ChatMode>('quick')
+  const [showQuickPicker, setShowQuickPicker] = useState(false)
+  const [showHistory, setShowHistory] = useState(false)
+  const [showSuggestions, setShowSuggestions] = useState(true)
+  const [sessions, setSessions] = useState<ChatSession[]>([])
+  const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
   const [isMounted, setIsMounted] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -973,8 +1153,13 @@ export function AIChatbot() {
   ])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isTyping, setIsTyping] = useState(false)
+  const [copiedMessageId, setCopiedMessageId] = useState<string | null>(null)
+  const [isListening, setIsListening] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const recognitionRef = useRef<any>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
 
   // Performance: useTransition for non-blocking updates
@@ -983,7 +1168,86 @@ export function AIChatbot() {
   // Performance: Streaming buffer for batched updates
   const streamingBufferRef = useRef(new StreamingBuffer())
 
-  // Initialize messages on client-side only to prevent hydration mismatch
+  // Initialize speech recognition
+  useEffect(() => {
+    if (typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+      recognitionRef.current = new SpeechRecognition()
+      recognitionRef.current.continuous = false
+      recognitionRef.current.interimResults = true
+      recognitionRef.current.lang = 'en-US'
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      recognitionRef.current.onresult = (event: any) => {
+        const transcript = Array.from(event.results)
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          .map((result: any) => result[0].transcript)
+          .join('')
+        setInput(transcript)
+      }
+
+      recognitionRef.current.onend = () => {
+        setIsListening(false)
+      }
+
+      recognitionRef.current.onerror = () => {
+        setIsListening(false)
+      }
+    }
+  }, [])
+
+  // Load chat history from localStorage
+  useEffect(() => {
+    try {
+      const savedSessions = localStorage.getItem(STORAGE_KEYS.CHAT_HISTORY)
+      if (savedSessions) {
+        const parsed = JSON.parse(savedSessions)
+        setSessions(parsed.map((s: ChatSession) => ({
+          ...s,
+          createdAt: new Date(s.createdAt),
+          updatedAt: new Date(s.updatedAt),
+          messages: s.messages.map(m => ({ ...m, timestamp: new Date(m.timestamp) }))
+        })))
+      }
+    } catch (e) {
+      console.error('Failed to load chat history:', e)
+    }
+  }, [])
+
+  // Save chat history to localStorage
+  const saveToHistory = useCallback((msgs: Message[], sessionMode: ChatMode) => {
+    if (msgs.length <= 1) return
+
+    const sessionId = currentSessionId || `session-${Date.now()}`
+    const title = msgs.find(m => m.role === 'user')?.content.slice(0, 30) || 'New Chat'
+
+    const newSession: ChatSession = {
+      id: sessionId,
+      title: title + (title.length >= 30 ? '...' : ''),
+      messages: msgs,
+      mode: sessionMode,
+      createdAt: currentSessionId
+        ? sessions.find(s => s.id === currentSessionId)?.createdAt || new Date()
+        : new Date(),
+      updatedAt: new Date()
+    }
+
+    setSessions(prev => {
+      const existing = prev.findIndex(s => s.id === sessionId)
+      const updated = existing >= 0
+        ? [...prev.slice(0, existing), newSession, ...prev.slice(existing + 1)]
+        : [newSession, ...prev].slice(0, 20) // Keep last 20 sessions
+
+      localStorage.setItem(STORAGE_KEYS.CHAT_HISTORY, JSON.stringify(updated))
+      return updated
+    })
+
+    if (!currentSessionId) {
+      setCurrentSessionId(sessionId)
+    }
+  }, [currentSessionId, sessions])
+
+  // Initialize messages on client-side only
   useEffect(() => {
     setMessages([
       {
@@ -1012,13 +1276,102 @@ export function AIChatbot() {
     startTransition(() => {
       scrollToBottom()
     })
-  }, [messages, scrollToBottom])
+  }, [messages, scrollToBottom, isTyping])
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !isMinimized) {
       inputRef.current?.focus()
     }
-  }, [isOpen])
+  }, [isOpen, isMinimized])
+
+  // Toggle voice input
+  const toggleVoiceInput = () => {
+    if (!recognitionRef.current) {
+      alert('Speech recognition is not supported in your browser')
+      return
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop()
+      setIsListening(false)
+    } else {
+      recognitionRef.current.start()
+      setIsListening(true)
+    }
+  }
+
+  // Copy message to clipboard
+  const copyMessage = async (content: string, messageId: string) => {
+    try {
+      await navigator.clipboard.writeText(content)
+      setCopiedMessageId(messageId)
+      setTimeout(() => setCopiedMessageId(null), 2000)
+    } catch (e) {
+      console.error('Failed to copy:', e)
+    }
+  }
+
+  // Export chat
+  const exportChat = () => {
+    const text = messages
+      .map(m => `[${m.role.toUpperCase()}]: ${m.content}`)
+      .join('\n\n')
+
+    const blob = new Blob([text], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `chat-${new Date().toISOString().split('T')[0]}.txt`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  // Handle feedback
+  const handleFeedback = (messageId: string, feedback: 'up' | 'down') => {
+    setMessages(prev => prev.map(m =>
+      m.id === messageId
+        ? { ...m, feedback: m.feedback === feedback ? null : feedback }
+        : m
+    ))
+  }
+
+  // Handle navigation
+  const handleNavigate = useCallback((href: string) => {
+    setIsOpen(false)
+    router.push(href)
+  }, [router])
+
+  // Handle special actions
+  const handleAction = useCallback((action: string) => {
+    setShowQuickPicker(false)
+
+    switch (action) {
+      case 'terminal':
+        setIsOpen(false)
+        const terminalEvent = new KeyboardEvent('keydown', { key: 't' })
+        document.dispatchEvent(terminalEvent)
+        break
+      case 'command':
+        setIsOpen(false)
+        const cmdEvent = new KeyboardEvent('keydown', { key: 'k', metaKey: true })
+        document.dispatchEvent(cmdEvent)
+        break
+      case 'shortcuts':
+        setIsOpen(false)
+        const shortcutEvent = new KeyboardEvent('keydown', { key: '?' })
+        document.dispatchEvent(shortcutEvent)
+        break
+      case 'search':
+        setIsOpen(false)
+        const searchEvent = new KeyboardEvent('keydown', { key: 'k', metaKey: true })
+        document.dispatchEvent(searchEvent)
+        break
+      case 'ai-mode':
+        setShowQuickPicker(false)
+        switchMode('ai')
+        break
+    }
+  }, [])
 
   // Cleanup streaming buffer on unmount
   useEffect(() => {
@@ -1047,6 +1400,8 @@ export function AIChatbot() {
     setMessages((prev) => [...prev, userMessage, assistantMessage])
     setInput('')
     setIsLoading(true)
+    setIsTyping(true)
+    setShowSuggestions(false)
 
     // Accumulated content for batched updates
     let accumulatedContent = ''
@@ -1091,6 +1446,8 @@ export function AIChatbot() {
 
       if (!reader) throw new Error('No reader available')
 
+      setIsTyping(false)
+
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
@@ -1121,9 +1478,15 @@ export function AIChatbot() {
 
       // Flush any remaining content in buffer
       streamingBufferRef.current.flush()
+      // Save to history after completion
+      setMessages(prev => {
+        saveToHistory(prev, mode)
+        return prev
+      })
     } catch (error) {
       console.error('AI Chat Error:', error)
       streamingBufferRef.current.clear()
+      setIsTyping(false)
       setMessages(prev => {
         const updated = [...prev]
         const lastMessage = updated[updated.length - 1]
@@ -1139,6 +1502,7 @@ export function AIChatbot() {
       })
     } finally {
       setIsLoading(false)
+      setIsTyping(false)
     }
   }, [messages, startTransition])
 
@@ -1164,6 +1528,8 @@ export function AIChatbot() {
     setMessages((prev) => [...prev, userMessage, assistantMessage])
     setInput('')
     setIsLoading(true)
+    setIsTyping(true)
+    setShowSuggestions(false)
 
     try {
       const response = await fetch('/api/ai/agent', {
@@ -1190,6 +1556,8 @@ export function AIChatbot() {
 
       const toolExecutions: ToolExecution[] = []
       const images: string[] = []
+
+      setIsTyping(false)
 
       while (true) {
         const { done, value } = await reader.read()
@@ -1230,7 +1598,6 @@ export function AIChatbot() {
                   lastExecution.result = parsed.result
                   lastExecution.isLoading = false
 
-                  // Check result type and handle accordingly
                   const parsedResult = parseSpecialResult(parsed.result || '')
                   if (parsedResult.type === 'image' || parsedResult.type === 'qr') {
                     images.push(parsedResult.content)
@@ -1283,8 +1650,15 @@ export function AIChatbot() {
           }
         }
       }
+
+      // Save to history after completion
+      setMessages(prev => {
+        saveToHistory(prev, mode)
+        return prev
+      })
     } catch (error) {
       console.error('Agent Chat Error:', error)
+      setIsTyping(false)
       setMessages(prev => {
         const updated = [...prev]
         const lastMessage = updated[updated.length - 1]
@@ -1300,11 +1674,17 @@ export function AIChatbot() {
       })
     } finally {
       setIsLoading(false)
+      setIsTyping(false)
     }
   }, [messages, startTransition])
 
   // Send message with Quick mode (pattern matching) - memoized
   const sendQuickMessage = useCallback((content: string) => {
+    if (content.toLowerCase().includes('quick menu') || content.toLowerCase().includes('show menu')) {
+      setShowQuickPicker(true)
+      return
+    }
+
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
@@ -1322,8 +1702,13 @@ export function AIChatbot() {
       quickReplies
     }
 
-    setMessages((prev) => [...prev, userMessage, assistantMessage])
+    setMessages((prev) => {
+      const updated = [...prev, userMessage, assistantMessage]
+      saveToHistory(updated, mode)
+      return updated
+    })
     setInput('')
+    setShowSuggestions(false)
   }, [])
 
   // Memoized sendMessage handler
@@ -1350,7 +1735,7 @@ export function AIChatbot() {
   const getWelcomeMessage = useCallback((chatMode: ChatMode) => {
     switch (chatMode) {
       case 'agent':
-        return "Hi! I'm IbnuGPT Agent with 25 superpowers! 🚀\n\n📸 **Generate:** Images, QR codes, Memes, PDFs, Presentations, Color Palettes, Passwords, Hashtags, Emojis\n📚 **Knowledge:** Wikipedia, Dictionary, Random facts, Crypto prices, Daily quotes\n🔧 **Utility:** Calculator, Unit converter, Date calculator, URL shortener, Code generator, Text analysis, Translate\n\nTry: \"Give me a motivational quote\" or \"Shorten this URL\" or \"How many days until Christmas?\""
+        return "Hi! I'm IbnuGPT Agent with 25 superpowers!\n\n**Generate:** Images, QR codes, PDFs, Presentations\n**Knowledge:** Wikipedia, Dictionary, Crypto prices\n**Utility:** Calculator, Translator, URL shortener\n\nTry: \"Generate a motivational quote\" or \"Shorten this URL\""
       case 'ai':
         return "Hi! I'm IbnuGPT powered by Llama 3.3 (via Groq). I can answer any questions with AI intelligence. What would you like to know?"
       default:
@@ -1360,6 +1745,7 @@ export function AIChatbot() {
 
   // Memoized clear chat handler
   const clearChat = useCallback(() => {
+    setCurrentSessionId(null)
     setMessages([
       {
         id: '1',
@@ -1369,11 +1755,15 @@ export function AIChatbot() {
         quickReplies: mode === 'quick' ? INITIAL_QUICK_REPLIES : undefined
       }
     ])
+    setShowSuggestions(true)
   }, [mode, getWelcomeMessage])
 
   // Memoized switch mode handler
   const switchMode = useCallback((newMode: ChatMode) => {
     setMode(newMode)
+    setShowQuickPicker(false)
+    setShowHistory(false)
+    setCurrentSessionId(null)
     setMessages([
       {
         id: '1',
@@ -1383,13 +1773,33 @@ export function AIChatbot() {
         quickReplies: newMode === 'quick' ? INITIAL_QUICK_REPLIES : undefined
       }
     ])
+    setShowSuggestions(true)
   }, [getWelcomeMessage])
+
+  const loadSession = useCallback((session: ChatSession) => {
+    setCurrentSessionId(session.id)
+    setMode(session.mode)
+    setMessages(session.messages)
+    setShowHistory(false)
+    setShowSuggestions(false)
+  }, [])
+
+  const deleteSession = useCallback((sessionId: string) => {
+    setSessions(prev => {
+      const updated = prev.filter(s => s.id !== sessionId)
+      localStorage.setItem(STORAGE_KEYS.CHAT_HISTORY, JSON.stringify(updated))
+      return updated
+    })
+    if (currentSessionId === sessionId) {
+      clearChat()
+    }
+  }, [currentSessionId, clearChat])
 
   // Memoized derived state for quick replies
   const lastMessage = useMemo(() => messages[messages.length - 1], [messages])
   const showQuickReplies = useMemo(
-    () => mode === 'quick' && lastMessage?.role === 'assistant' && lastMessage?.quickReplies,
-    [mode, lastMessage]
+    () => mode === 'quick' && lastMessage?.role === 'assistant' && lastMessage?.quickReplies && !showQuickPicker && !showHistory,
+    [mode, lastMessage, showQuickPicker, showHistory]
   )
 
   return (
@@ -1416,16 +1826,22 @@ export function AIChatbot() {
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              height: isMinimized ? 60 : 600,
+            }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
             className={cn(
               'fixed bottom-6 right-6 z-50',
-              'w-[400px] max-w-[calc(100vw-3rem)] h-[600px] max-h-[calc(100vh-6rem)]',
+              'w-[400px] max-w-[calc(100vw-3rem)]',
               'flex flex-col rounded-2xl overflow-hidden',
               'bg-background/95 backdrop-blur-xl border border-border',
               'shadow-2xl shadow-black/20'
             )}
+            style={{ maxHeight: isMinimized ? 60 : 'calc(100vh - 6rem)' }}
           >
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-border bg-card/50">
@@ -1451,27 +1867,48 @@ export function AIChatbot() {
                   </h3>
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
                     {mode === 'agent' ? (
-                      <>
-                        <Wand2 className="h-3 w-3" />
-                        Image Gen + Tools
-                      </>
+                      <><Wand2 className="h-3 w-3" />Image Gen + Tools</>
                     ) : mode === 'ai' ? (
-                      <>
-                        <Brain className="h-3 w-3" />
-                        AI Powered (Llama 3.3)
-                      </>
+                      <><Brain className="h-3 w-3" />AI Powered (Llama 3.3)</>
                     ) : (
-                      <>
-                        <Sparkles className="h-3 w-3" />
-                        Quick Answers
-                      </>
+                      <><Sparkles className="h-3 w-3" />Quick Answers</>
                     )}
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Button size="icon" variant="ghost" onClick={clearChat} className="h-8 w-8">
+              <div className="flex items-center gap-1">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => setShowQuickPicker(!showQuickPicker)}
+                  className={cn("h-8 w-8", showQuickPicker && "bg-muted")}
+                  title="Quick Actions"
+                >
+                  <Grid3X3 className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => setShowHistory(!showHistory)}
+                  className={cn("h-8 w-8", showHistory && "bg-muted")}
+                  title="Chat History"
+                >
+                  <History className="h-4 w-4" />
+                </Button>
+                <Button size="icon" variant="ghost" onClick={exportChat} className="h-8 w-8" title="Export Chat">
+                  <Download className="h-4 w-4" />
+                </Button>
+                <Button size="icon" variant="ghost" onClick={clearChat} className="h-8 w-8" title="Clear Chat">
                   <Trash2 className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => setIsMinimized(!isMinimized)}
+                  className="h-8 w-8"
+                  title={isMinimized ? "Expand" : "Minimize"}
+                >
+                  {isMinimized ? <Maximize2 className="h-4 w-4" /> : <Minimize2 className="h-4 w-4" />}
                 </Button>
                 <Button size="icon" variant="ghost" onClick={() => setIsOpen(false)} className="h-8 w-8">
                   <X className="h-4 w-4" />
@@ -1479,115 +1916,329 @@ export function AIChatbot() {
               </div>
             </div>
 
-            {/* Mode Selector */}
-            <div className="flex p-2 gap-1.5 border-b border-border bg-muted/30">
-              <button
-                onClick={() => switchMode('quick')}
-                className={cn(
-                  "flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-[10px] font-medium transition-all",
-                  mode === 'quick'
-                    ? "bg-cyber-cyan/20 text-cyber-cyan border border-cyber-cyan/30"
-                    : "text-muted-foreground hover:bg-muted"
-                )}
-              >
-                <Zap className="h-3 w-3" />
-                Quick
-              </button>
-              <button
-                onClick={() => switchMode('ai')}
-                className={cn(
-                  "flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-[10px] font-medium transition-all",
-                  mode === 'ai'
-                    ? "bg-cyber-purple/20 text-cyber-purple border border-cyber-purple/30"
-                    : "text-muted-foreground hover:bg-muted"
-                )}
-              >
-                <Brain className="h-3 w-3" />
-                AI Chat
-              </button>
-              <button
-                onClick={() => switchMode('agent')}
-                className={cn(
-                  "flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-[10px] font-medium transition-all",
-                  mode === 'agent'
-                    ? "bg-gradient-to-r from-pink-500/20 to-orange-500/20 text-orange-400 border border-orange-500/30"
-                    : "text-muted-foreground hover:bg-muted"
-                )}
-              >
-                <Wand2 className="h-3 w-3" />
-                Agent
-              </button>
-            </div>
-
-            {/* Messages - Using memoized ChatMessageItem for performance */}
-            <div
-              ref={messagesContainerRef}
-              className="flex-1 overflow-y-auto p-4 space-y-4"
-              style={{ contain: 'strict' }} // CSS containment for performance
-            >
-              {messages.map((message) => (
-                <ChatMessageItem key={message.id} message={message} mode={mode} />
-              ))}
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Quick Replies */}
-            {showQuickReplies && (
-              <div className="px-4 pb-2">
-                <div className="flex flex-wrap gap-2">
-                  {lastMessage.quickReplies?.map((reply, index) => (
-                    <button
-                      key={index}
-                      onClick={() => sendMessage(reply.value)}
-                      className="text-xs px-3 py-1.5 rounded-full bg-cyber-cyan/10 text-cyber-cyan hover:bg-cyber-cyan/20 transition-colors border border-cyber-cyan/20"
-                    >
-                      {reply.label}
-                    </button>
-                  ))}
+            {!isMinimized && (
+              <>
+                {/* Mode Selector */}
+                <div className="flex p-2 gap-1.5 border-b border-border bg-muted/30">
+                  <button
+                    onClick={() => switchMode('quick')}
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-[10px] font-medium transition-all",
+                      mode === 'quick'
+                        ? "bg-cyber-cyan/20 text-cyber-cyan border border-cyber-cyan/30"
+                        : "text-muted-foreground hover:bg-muted"
+                    )}
+                  >
+                    <Zap className="h-3 w-3" />Quick
+                  </button>
+                  <button
+                    onClick={() => switchMode('ai')}
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-[10px] font-medium transition-all",
+                      mode === 'ai'
+                        ? "bg-cyber-purple/20 text-cyber-purple border border-cyber-purple/30"
+                        : "text-muted-foreground hover:bg-muted"
+                    )}
+                  >
+                    <Brain className="h-3 w-3" />AI Chat
+                  </button>
+                  <button
+                    onClick={() => switchMode('agent')}
+                    className={cn(
+                      "flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-[10px] font-medium transition-all",
+                      mode === 'agent'
+                        ? "bg-gradient-to-r from-pink-500/20 to-orange-500/20 text-orange-400 border border-orange-500/30"
+                        : "text-muted-foreground hover:bg-muted"
+                    )}
+                  >
+                    <Wand2 className="h-3 w-3" />Agent
+                  </button>
                 </div>
-              </div>
-            )}
 
-            {/* Input */}
-            <div className="p-4 border-t border-border bg-card/50">
-              <div className="flex gap-2">
-                <input
-                  ref={inputRef}
-                  type="text"
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder={mode === 'ai' ? "Ask anything..." : "Ask me anything..."}
-                  disabled={isLoading}
-                  className={cn(
-                    'flex-1 px-4 py-2.5 rounded-xl',
-                    'bg-muted border-0 outline-none',
-                    'text-sm placeholder:text-muted-foreground',
-                    'focus:ring-2 focus:ring-primary/20',
-                    'disabled:opacity-50'
+                {/* Quick Picker / History Panel */}
+                <AnimatePresence>
+                  {showQuickPicker && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="border-b border-border bg-card/30 overflow-hidden"
+                    >
+                      <QuickToolPicker
+                        onNavigate={handleNavigate}
+                        onAction={handleAction}
+                        onClose={() => setShowQuickPicker(false)}
+                      />
+                    </motion.div>
                   )}
-                />
-                <Button
-                  size="icon"
-                  onClick={() => sendMessage(input)}
-                  disabled={!input.trim() || isLoading}
-                  className="shrink-0"
-                >
-                  {isLoading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Send className="h-4 w-4" />
+                  {showHistory && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="border-b border-border bg-card/30 overflow-hidden"
+                    >
+                      <ChatHistoryPanel
+                        sessions={sessions}
+                        currentSessionId={currentSessionId}
+                        onSelectSession={loadSession}
+                        onDeleteSession={deleteSession}
+                        onClose={() => setShowHistory(false)}
+                      />
+                    </motion.div>
                   )}
-                </Button>
-              </div>
-              {(mode === 'ai' || mode === 'agent') && (
-                <p className="text-[10px] text-muted-foreground mt-2 text-center">
-                  {mode === 'agent'
-                    ? 'Groq (Free) + Pollinations.ai (Free Image Gen)'
-                    : 'Powered by Groq (Free) • Llama 3.3 70B'}
-                </p>
-              )}
-            </div>
+                </AnimatePresence>
+
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                  {messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={cn(
+                        'flex gap-3',
+                        message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          'w-8 h-8 rounded-full flex items-center justify-center shrink-0',
+                          message.role === 'user'
+                            ? 'bg-primary'
+                            : mode === 'agent' ? 'bg-gradient-to-r from-pink-500 to-orange-500' : mode === 'ai' ? 'bg-cyber-purple' : 'bg-cyber-gradient'
+                        )}
+                      >
+                        {message.role === 'user' ? (
+                          <User className="h-4 w-4 text-white" />
+                        ) : mode === 'agent' ? (
+                          <Wand2 className="h-4 w-4 text-white" />
+                        ) : mode === 'ai' ? (
+                          <Brain className="h-4 w-4 text-white" />
+                        ) : (
+                          <Bot className="h-4 w-4 text-white" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div
+                          className={cn(
+                            'rounded-2xl px-4 py-2.5 inline-block max-w-full',
+                            message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                          )}
+                        >
+                          {message.role === 'assistant' ? (
+                            <div className="text-sm space-y-2">
+                              {/* Tool Executions */}
+                              {message.toolExecutions && message.toolExecutions.length > 0 && (
+                                <div className="space-y-1.5 mb-2">
+                                  {message.toolExecutions.map((exec, idx) => (
+                                    <div key={idx} className="flex items-center gap-2 text-xs bg-black/10 rounded-lg px-2 py-1.5">
+                                      {exec.isLoading ? (
+                                        <Loader2 className="h-3 w-3 animate-spin text-orange-400" />
+                                      ) : (
+                                        <span className="text-green-400">✓</span>
+                                      )}
+                                      <span className="capitalize text-muted-foreground">{exec.tool.replace(/_/g, ' ')}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Generated Images */}
+                              {message.images && message.images.length > 0 && (
+                                <div className="space-y-2 mb-2">
+                                  {message.images.map((imgUrl, idx) => (
+                                    <div key={idx} className="relative rounded-lg overflow-hidden">
+                                      <Image
+                                        src={imgUrl}
+                                        alt="Generated image"
+                                        width={280}
+                                        height={280}
+                                        className="rounded-lg"
+                                        unoptimized
+                                      />
+                                      <a
+                                        href={imgUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="absolute bottom-2 right-2 text-xs bg-black/50 text-white px-2 py-1 rounded hover:bg-black/70"
+                                      >
+                                        Open Full
+                                      </a>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              {/* Text Content */}
+                              <div className="whitespace-pre-line">
+                                {message.content ? message.content.split('\n').map((line, i) => {
+                                  const parts = line.split(/(\*\*[^*]+\*\*)/g)
+                                  return (
+                                    <p key={i} className={line.startsWith('-') || line.startsWith('•') ? 'ml-2' : ''}>
+                                      {parts.map((part, j) => {
+                                        if (part.startsWith('**') && part.endsWith('**')) {
+                                          return <strong key={j}>{part.slice(2, -2)}</strong>
+                                        }
+                                        return part
+                                      })}
+                                    </p>
+                                  )
+                                }) : (
+                                  !message.toolExecutions?.length && !message.images?.length && (
+                                    <span className="flex items-center gap-2">
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                      Thinking...
+                                    </span>
+                                  )
+                                )}
+                              </div>
+                            </div>
+                          ) : (
+                            <p className="text-sm">{message.content}</p>
+                          )}
+                        </div>
+
+                        {/* Message Actions */}
+                        {message.role === 'assistant' && message.content && (
+                          <div className="flex items-center gap-1 mt-1">
+                            <button
+                              onClick={() => copyMessage(message.content, message.id)}
+                              className="p-1 rounded hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"
+                              title="Copy"
+                            >
+                              {copiedMessageId === message.id ? (
+                                <Check className="h-3 w-3 text-green-400" />
+                              ) : (
+                                <Copy className="h-3 w-3" />
+                              )}
+                            </button>
+                            <button
+                              onClick={() => handleFeedback(message.id, 'up')}
+                              className={cn(
+                                "p-1 rounded hover:bg-muted/50 transition-colors",
+                                message.feedback === 'up' ? "text-green-400" : "text-muted-foreground hover:text-foreground"
+                              )}
+                              title="Good response"
+                            >
+                              <ThumbsUp className="h-3 w-3" />
+                            </button>
+                            <button
+                              onClick={() => handleFeedback(message.id, 'down')}
+                              className={cn(
+                                "p-1 rounded hover:bg-muted/50 transition-colors",
+                                message.feedback === 'down' ? "text-red-400" : "text-muted-foreground hover:text-foreground"
+                              )}
+                              title="Bad response"
+                            >
+                              <ThumbsDown className="h-3 w-3" />
+                            </button>
+                            {mode !== 'quick' && (
+                              <button
+                                onClick={() => sendMessage(message.content)}
+                                className="p-1 rounded hover:bg-muted/50 text-muted-foreground hover:text-foreground transition-colors"
+                                title="Regenerate"
+                              >
+                                <RotateCcw className="h-3 w-3" />
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Typing Indicator */}
+                  {isTyping && <TypingIndicator />}
+
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* Quick Replies */}
+                {showQuickReplies && (
+                  <div className="px-4 pb-2">
+                    <div className="flex flex-wrap gap-2">
+                      {lastMessage.quickReplies?.map((reply, index) => (
+                        <button
+                          key={index}
+                          onClick={() => sendMessage(reply.value)}
+                          className="text-xs px-3 py-1.5 rounded-full bg-cyber-cyan/10 text-cyber-cyan hover:bg-cyber-cyan/20 transition-colors border border-cyber-cyan/20"
+                        >
+                          {reply.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Suggested Prompts */}
+                {showSuggestions && messages.length <= 1 && (
+                  <div className="px-4 pb-2">
+                    <p className="text-xs text-muted-foreground mb-2">Suggested prompts:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {SUGGESTED_PROMPTS[mode].map((prompt, index) => (
+                        <button
+                          key={index}
+                          onClick={() => sendMessage(prompt)}
+                          className="text-xs px-3 py-1.5 rounded-full bg-muted hover:bg-muted/80 transition-colors truncate max-w-[180px]"
+                        >
+                          {prompt}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Input */}
+                <div className="p-4 border-t border-border bg-card/50">
+                  <div className="flex gap-2">
+                    <input
+                      ref={inputRef}
+                      type="text"
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder={mode === 'ai' ? "Ask anything..." : "Ask me anything..."}
+                      disabled={isLoading}
+                      className={cn(
+                        'flex-1 px-4 py-2.5 rounded-xl',
+                        'bg-muted border-0 outline-none',
+                        'text-sm placeholder:text-muted-foreground',
+                        'focus:ring-2 focus:ring-primary/20',
+                        'disabled:opacity-50'
+                      )}
+                    />
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      onClick={toggleVoiceInput}
+                      disabled={isLoading}
+                      className={cn("shrink-0", isListening && "text-red-500 bg-red-500/10")}
+                      title={isListening ? "Stop listening" : "Voice input"}
+                    >
+                      {isListening ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
+                    </Button>
+                    <Button
+                      size="icon"
+                      onClick={() => sendMessage(input)}
+                      disabled={!input.trim() || isLoading}
+                      className="shrink-0"
+                    >
+                      {isLoading ? (
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      ) : (
+                        <Send className="h-4 w-4" />
+                      )}
+                    </Button>
+                  </div>
+                  {(mode === 'ai' || mode === 'agent') && (
+                    <p className="text-[10px] text-muted-foreground mt-2 text-center">
+                      {mode === 'agent'
+                        ? 'Groq (Free) + Pollinations.ai (Free Image Gen)'
+                        : 'Powered by Groq (Free) • Llama 3.3 70B'}
+                    </p>
+                  )}
+                </div>
+              </>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
