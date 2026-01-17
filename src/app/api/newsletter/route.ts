@@ -54,7 +54,8 @@ export async function POST(req: NextRequest) {
             where: { email },
             data: {
               status: 'ACTIVE',
-              subscribedAt: new Date(),
+              confirmedAt: new Date(),
+              unsubscribedAt: null,
             },
           })
           isNew = false

@@ -41,10 +41,9 @@ export async function POST(req: NextRequest) {
       return apiError(formatZodErrors(validation.errors), 400)
     }
 
-    const { name, email, subject, message } = validation.data
+    const { name = '', email = '', subject = '', message = '' } = validation.data || {}
 
     // Get request metadata
-    const ip = getClientIp(req)
     const userAgent = req.headers.get('user-agent') || undefined
 
     // Save to database
@@ -56,10 +55,9 @@ export async function POST(req: NextRequest) {
           email,
           subject,
           message,
-          ip,
           userAgent,
-          status: 'PENDING',
-          priority: determinePriority(subject, message),
+          status: 'NEW',
+          priority: determinePriority(subject || '', message),
         },
       })
       submissionId = submission.id
@@ -167,7 +165,7 @@ export async function GET(req: NextRequest) {
 // HELPERS
 // =============================================================================
 
-function determinePriority(subject: string, message: string): string {
+function determinePriority(subject: string, message: string): 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' {
   const urgentKeywords = ['urgent', 'asap', 'emergency', 'immediately', 'critical']
   const highKeywords = ['job', 'opportunity', 'collaboration', 'partnership', 'business']
 
@@ -181,5 +179,5 @@ function determinePriority(subject: string, message: string): string {
     return 'HIGH'
   }
 
-  return 'NORMAL'
+  return 'MEDIUM'
 }
