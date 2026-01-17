@@ -3887,6 +3887,544 @@ export function WhaleAlertSimulator() {
 }
 
 // ============================================
+// ORDER BOOK SIMULATOR
+// ============================================
+
+export function OrderBookSimulator() {
+  const [spread, setSpread] = useState('0.1')
+  const [midPrice, setMidPrice] = useState('60000')
+  const [depth, setDepth] = useState(10)
+
+  const generateOrderBook = useCallback(() => {
+    const mid = parseFloat(midPrice)
+    const spreadPercent = parseFloat(spread) / 100
+
+    const bids: { price: number; amount: number; total: number }[] = []
+    const asks: { price: number; amount: number; total: number }[] = []
+
+    let bidTotal = 0
+    let askTotal = 0
+
+    for (let i = 0; i < depth; i++) {
+      const bidPrice = mid * (1 - spreadPercent / 2 - (i * 0.001))
+      const askPrice = mid * (1 + spreadPercent / 2 + (i * 0.001))
+      const bidAmount = Math.random() * 2 + 0.1
+      const askAmount = Math.random() * 2 + 0.1
+
+      bidTotal += bidAmount
+      askTotal += askAmount
+
+      bids.push({ price: bidPrice, amount: bidAmount, total: bidTotal })
+      asks.unshift({ price: askPrice, amount: askAmount, total: askTotal })
+    }
+
+    return { bids, asks, maxTotal: Math.max(bidTotal, askTotal) }
+  }, [midPrice, spread, depth])
+
+  const { bids, asks, maxTotal } = generateOrderBook()
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center">
+          <Layers className="w-5 h-5 text-indigo-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Order Book Simulator</h3>
+          <p className="text-xs text-muted-foreground">Visualize market depth</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Mid Price</label>
+            <input
+              type="number"
+              value={midPrice}
+              onChange={(e) => setMidPrice(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-indigo-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Spread (%)</label>
+            <input
+              type="number"
+              value={spread}
+              onChange={(e) => setSpread(e.target.value)}
+              step="0.01"
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-indigo-500 focus:outline-none text-sm"
+            />
+          </div>
+        </div>
+
+        {/* Order Book Display */}
+        <div className="grid grid-cols-2 gap-1 text-xs">
+          {/* Asks (Sell Orders) */}
+          <div className="space-y-0.5">
+            <div className="flex justify-between text-muted-foreground px-2 py-1">
+              <span>Price</span>
+              <span>Amount</span>
+            </div>
+            {asks.slice(-5).map((ask, i) => (
+              <div key={i} className="relative flex justify-between px-2 py-1">
+                <div
+                  className="absolute inset-y-0 right-0 bg-red-500/20"
+                  style={{ width: `${(ask.total / maxTotal) * 100}%` }}
+                />
+                <span className="relative text-red-500 font-mono">{ask.price.toFixed(2)}</span>
+                <span className="relative font-mono">{ask.amount.toFixed(4)}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Bids (Buy Orders) */}
+          <div className="space-y-0.5">
+            <div className="flex justify-between text-muted-foreground px-2 py-1">
+              <span>Price</span>
+              <span>Amount</span>
+            </div>
+            {bids.slice(0, 5).map((bid, i) => (
+              <div key={i} className="relative flex justify-between px-2 py-1">
+                <div
+                  className="absolute inset-y-0 left-0 bg-green-500/20"
+                  style={{ width: `${(bid.total / maxTotal) * 100}%` }}
+                />
+                <span className="relative text-green-500 font-mono">{bid.price.toFixed(2)}</span>
+                <span className="relative font-mono">{bid.amount.toFixed(4)}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="p-3 bg-muted/50 rounded-lg text-center">
+          <p className="text-xs text-muted-foreground">Spread</p>
+          <p className="text-lg font-bold">${((parseFloat(midPrice) * parseFloat(spread)) / 100).toFixed(2)}</p>
+          <p className="text-xs text-muted-foreground">({spread}%)</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// FUNDING RATE CALCULATOR
+// ============================================
+
+export function FundingRateCalculator() {
+  const [positionSize, setPositionSize] = useState('10000')
+  const [fundingRate, setFundingRate] = useState('0.01')
+  const [fundingInterval, setFundingInterval] = useState('8')
+  const [holdingDays, setHoldingDays] = useState('30')
+  const [result, setResult] = useState<{
+    perPayment: number
+    dailyCost: number
+    totalCost: number
+    annualizedRate: number
+  } | null>(null)
+
+  const calculate = useCallback(() => {
+    const size = parseFloat(positionSize)
+    const rate = parseFloat(fundingRate) / 100
+    const interval = parseFloat(fundingInterval)
+    const days = parseFloat(holdingDays)
+
+    if (isNaN(size) || isNaN(rate) || isNaN(interval) || isNaN(days)) {
+      setResult(null)
+      return
+    }
+
+    const paymentsPerDay = 24 / interval
+    const perPayment = size * rate
+    const dailyCost = perPayment * paymentsPerDay
+    const totalCost = dailyCost * days
+    const annualizedRate = rate * paymentsPerDay * 365 * 100
+
+    setResult({ perPayment, dailyCost, totalCost, annualizedRate })
+  }, [positionSize, fundingRate, fundingInterval, holdingDays])
+
+  useEffect(() => {
+    calculate()
+  }, [calculate])
+
+  const isPositive = parseFloat(fundingRate) >= 0
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
+          <Timer className="w-5 h-5 text-orange-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Funding Rate Calculator</h3>
+          <p className="text-xs text-muted-foreground">Perpetual futures funding costs</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Position Size ($)</label>
+            <input
+              type="number"
+              value={positionSize}
+              onChange={(e) => setPositionSize(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-orange-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Funding Rate (%)</label>
+            <input
+              type="number"
+              value={fundingRate}
+              onChange={(e) => setFundingRate(e.target.value)}
+              step="0.001"
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-orange-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Interval (hours)</label>
+            <input
+              type="number"
+              value={fundingInterval}
+              onChange={(e) => setFundingInterval(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-orange-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Holding Days</label>
+            <input
+              type="number"
+              value={holdingDays}
+              onChange={(e) => setHoldingDays(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-orange-500 focus:outline-none text-sm"
+            />
+          </div>
+        </div>
+
+        {result && (
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 bg-muted/50 rounded-lg text-center">
+                <p className="text-xs text-muted-foreground">Per Payment</p>
+                <p className={cn('text-lg font-bold', isPositive ? 'text-red-500' : 'text-green-500')}>
+                  {isPositive ? '-' : '+'}${Math.abs(result.perPayment).toFixed(2)}
+                </p>
+              </div>
+              <div className="p-3 bg-muted/50 rounded-lg text-center">
+                <p className="text-xs text-muted-foreground">Daily Cost</p>
+                <p className={cn('text-lg font-bold', isPositive ? 'text-red-500' : 'text-green-500')}>
+                  {isPositive ? '-' : '+'}${Math.abs(result.dailyCost).toFixed(2)}
+                </p>
+              </div>
+            </div>
+
+            <div className={cn(
+              'p-4 rounded-lg text-center',
+              isPositive ? 'bg-red-500/10' : 'bg-green-500/10'
+            )}>
+              <p className="text-xs text-muted-foreground">Total Cost ({holdingDays} days)</p>
+              <p className={cn('text-2xl font-bold', isPositive ? 'text-red-500' : 'text-green-500')}>
+                {isPositive ? '-' : '+'}${Math.abs(result.totalCost).toFixed(2)}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Annualized: {result.annualizedRate.toFixed(2)}% APR
+              </p>
+            </div>
+
+            <p className="text-xs text-muted-foreground">
+              {isPositive
+                ? 'Positive funding: Longs pay shorts'
+                : 'Negative funding: Shorts pay longs'}
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// CRYPTO CORRELATION MATRIX
+// ============================================
+
+const CRYPTO_CORRELATIONS = {
+  BTC: { BTC: 1, ETH: 0.85, SOL: 0.78, BNB: 0.72, XRP: 0.65 },
+  ETH: { BTC: 0.85, ETH: 1, SOL: 0.82, BNB: 0.75, XRP: 0.68 },
+  SOL: { BTC: 0.78, ETH: 0.82, SOL: 1, BNB: 0.70, XRP: 0.62 },
+  BNB: { BTC: 0.72, ETH: 0.75, SOL: 0.70, BNB: 1, XRP: 0.58 },
+  XRP: { BTC: 0.65, ETH: 0.68, SOL: 0.62, BNB: 0.58, XRP: 1 },
+}
+
+const CRYPTO_LIST = ['BTC', 'ETH', 'SOL', 'BNB', 'XRP']
+
+export function CryptoCorrelationMatrix() {
+  const getCorrelationColor = (value: number) => {
+    if (value === 1) return 'bg-blue-500'
+    if (value >= 0.8) return 'bg-green-500'
+    if (value >= 0.6) return 'bg-green-400'
+    if (value >= 0.4) return 'bg-yellow-500'
+    if (value >= 0.2) return 'bg-orange-500'
+    return 'bg-red-500'
+  }
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center">
+          <Network className="w-5 h-5 text-violet-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Correlation Matrix</h3>
+          <p className="text-xs text-muted-foreground">Asset price correlations</p>
+        </div>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs">
+          <thead>
+            <tr>
+              <th className="p-2"></th>
+              {CRYPTO_LIST.map(crypto => (
+                <th key={crypto} className="p-2 font-bold">{crypto}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {CRYPTO_LIST.map(row => (
+              <tr key={row}>
+                <td className="p-2 font-bold">{row}</td>
+                {CRYPTO_LIST.map(col => {
+                  const value = CRYPTO_CORRELATIONS[row as keyof typeof CRYPTO_CORRELATIONS][col as keyof typeof CRYPTO_CORRELATIONS['BTC']]
+                  return (
+                    <td key={col} className="p-1">
+                      <div className={cn(
+                        'w-full aspect-square rounded flex items-center justify-center text-white font-mono',
+                        getCorrelationColor(value)
+                      )}>
+                        {value.toFixed(2)}
+                      </div>
+                    </td>
+                  )
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="mt-4 flex justify-center gap-2 flex-wrap">
+        {[
+          { label: 'Very High', color: 'bg-green-500' },
+          { label: 'High', color: 'bg-green-400' },
+          { label: 'Medium', color: 'bg-yellow-500' },
+          { label: 'Low', color: 'bg-orange-500' },
+          { label: 'Very Low', color: 'bg-red-500' },
+        ].map(item => (
+          <div key={item.label} className="flex items-center gap-1">
+            <div className={cn('w-3 h-3 rounded', item.color)} />
+            <span className="text-xs text-muted-foreground">{item.label}</span>
+          </div>
+        ))}
+      </div>
+
+      <p className="text-xs text-muted-foreground text-center mt-3">
+        High correlation means assets move together. Diversify with low-correlation assets.
+      </p>
+    </div>
+  )
+}
+
+// ============================================
+// MARKET DOMINANCE CHART
+// ============================================
+
+const DOMINANCE_DATA = [
+  { name: 'Bitcoin', symbol: 'BTC', dominance: 52.3, color: 'bg-orange-500' },
+  { name: 'Ethereum', symbol: 'ETH', dominance: 17.8, color: 'bg-blue-500' },
+  { name: 'Stablecoins', symbol: 'USDT/C', dominance: 8.2, color: 'bg-green-500' },
+  { name: 'BNB', symbol: 'BNB', dominance: 3.4, color: 'bg-yellow-500' },
+  { name: 'Solana', symbol: 'SOL', dominance: 2.8, color: 'bg-purple-500' },
+  { name: 'XRP', symbol: 'XRP', dominance: 2.5, color: 'bg-gray-500' },
+  { name: 'Others', symbol: 'ALT', dominance: 13, color: 'bg-muted' },
+]
+
+export function MarketDominanceChart() {
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
+          <CircleDot className="w-5 h-5 text-orange-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Market Dominance</h3>
+          <p className="text-xs text-muted-foreground">Crypto market share breakdown</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {/* Dominance Bar */}
+        <div className="h-8 rounded-full overflow-hidden flex">
+          {DOMINANCE_DATA.map((item, index) => (
+            <div
+              key={item.symbol}
+              className={cn('h-full transition-all', item.color)}
+              style={{ width: `${item.dominance}%` }}
+              title={`${item.name}: ${item.dominance}%`}
+            />
+          ))}
+        </div>
+
+        {/* Legend */}
+        <div className="grid grid-cols-2 gap-2">
+          {DOMINANCE_DATA.map(item => (
+            <div key={item.symbol} className="flex items-center gap-2 p-2 bg-muted/30 rounded">
+              <div className={cn('w-3 h-3 rounded-full', item.color)} />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{item.name}</p>
+              </div>
+              <span className="text-sm font-bold">{item.dominance}%</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="p-3 bg-orange-500/10 rounded-lg">
+          <p className="text-sm text-center">
+            <span className="text-orange-500 font-bold">BTC Dominance: {DOMINANCE_DATA[0].dominance}%</span>
+          </p>
+          <p className="text-xs text-muted-foreground text-center mt-1">
+            High BTC dominance often indicates a risk-off market
+          </p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// GRID TRADING CALCULATOR
+// ============================================
+
+export function GridTradingCalculator() {
+  const [upperPrice, setUpperPrice] = useState('70000')
+  const [lowerPrice, setLowerPrice] = useState('50000')
+  const [gridCount, setGridCount] = useState('10')
+  const [investment, setInvestment] = useState('10000')
+  const [result, setResult] = useState<{
+    gridSpacing: number
+    profitPerGrid: number
+    totalProfit: number
+    breakeven: number
+  } | null>(null)
+
+  const calculate = useCallback(() => {
+    const upper = parseFloat(upperPrice)
+    const lower = parseFloat(lowerPrice)
+    const grids = parseInt(gridCount)
+    const invest = parseFloat(investment)
+
+    if (isNaN(upper) || isNaN(lower) || isNaN(grids) || isNaN(invest) || grids < 2) {
+      setResult(null)
+      return
+    }
+
+    const range = upper - lower
+    const gridSpacing = range / grids
+    const gridSpacingPercent = (gridSpacing / lower) * 100
+    const perGridInvestment = invest / grids
+    const profitPerGrid = perGridInvestment * (gridSpacingPercent / 100)
+    const totalProfit = profitPerGrid * (grids - 1)
+    const breakeven = (grids - 1) * 2 // Number of trades to break even on fees
+
+    setResult({ gridSpacing, profitPerGrid, totalProfit, breakeven })
+  }, [upperPrice, lowerPrice, gridCount, investment])
+
+  useEffect(() => {
+    calculate()
+  }, [calculate])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-teal-500/10 flex items-center justify-center">
+          <Box className="w-5 h-5 text-teal-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Grid Trading Calculator</h3>
+          <p className="text-xs text-muted-foreground">Calculate grid bot parameters</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Upper Price ($)</label>
+            <input
+              type="number"
+              value={upperPrice}
+              onChange={(e) => setUpperPrice(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-teal-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Lower Price ($)</label>
+            <input
+              type="number"
+              value={lowerPrice}
+              onChange={(e) => setLowerPrice(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-teal-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Grid Count</label>
+            <input
+              type="number"
+              value={gridCount}
+              onChange={(e) => setGridCount(e.target.value)}
+              min="2"
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-teal-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Investment ($)</label>
+            <input
+              type="number"
+              value={investment}
+              onChange={(e) => setInvestment(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-teal-500 focus:outline-none text-sm"
+            />
+          </div>
+        </div>
+
+        {result && (
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 bg-muted/50 rounded-lg text-center">
+                <p className="text-xs text-muted-foreground">Grid Spacing</p>
+                <p className="text-lg font-bold">${result.gridSpacing.toFixed(2)}</p>
+              </div>
+              <div className="p-3 bg-green-500/10 rounded-lg text-center">
+                <p className="text-xs text-muted-foreground">Profit/Grid</p>
+                <p className="text-lg font-bold text-green-500">${result.profitPerGrid.toFixed(2)}</p>
+              </div>
+            </div>
+
+            <div className="p-4 bg-teal-500/10 rounded-lg text-center">
+              <p className="text-xs text-muted-foreground">Max Profit (Full Range)</p>
+              <p className="text-2xl font-bold text-teal-500">${result.totalProfit.toFixed(2)}</p>
+            </div>
+
+            <p className="text-xs text-muted-foreground">
+              Tip: Grid trading works best in sideways markets. Avoid during strong trends.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
 // PROFIT/LOSS CALCULATOR WITH TAX
 // ============================================
 
@@ -4050,7 +4588,7 @@ const TOOL_CATEGORIES = [
   { id: 'portfolio', label: 'Portfolio', icon: PiggyBank },
   { id: 'defi', label: 'DeFi', icon: TrendingUp },
   { id: 'web3', label: 'Web3', icon: Globe },
-  { id: 'calculator', label: 'Calculator', icon: Calculator },
+  { id: 'advanced', label: 'Advanced', icon: Zap },
 ]
 
 export function CryptoToolsGrid() {
@@ -4079,6 +4617,9 @@ export function CryptoToolsGrid() {
             <FibonacciCalculator />
             <LiquidationCalculator />
             <ProfitLossCalculator />
+            <OrderBookSimulator />
+            <FundingRateCalculator />
+            <GridTradingCalculator />
           </div>
         )
       case 'portfolio':
@@ -4111,9 +4652,11 @@ export function CryptoToolsGrid() {
             <GasFeeEstimator />
           </div>
         )
-      case 'calculator':
+      case 'advanced':
         return (
           <div className="grid md:grid-cols-2 gap-6">
+            <CryptoCorrelationMatrix />
+            <MarketDominanceChart />
             <CryptoUnitConverter />
             <MarketCapCalculator />
             <MiningCalculator />
