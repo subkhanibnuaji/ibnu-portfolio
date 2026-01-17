@@ -4,12 +4,14 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import {
   Bitcoin, Wallet, TrendingUp, Shield, Globe, Zap, ArrowRight,
-  Coins, BarChart3, Lock, Network, FileCode, Cpu
+  Coins, BarChart3, Lock, Network, FileCode, Cpu, Wrench,
+  Calculator, ArrowRightLeft
 } from 'lucide-react'
 import { BitcoinWidget } from '@/components/pillars/bitcoin-widget'
 import { CryptoPriceTicker } from '@/components/pillars/crypto-price-ticker'
 import { CryptoPriceGrid } from '@/components/pillars/crypto-price-grid'
 import { NewsFeed } from '@/components/pillars/news-feed'
+import { CryptoToolsGrid } from '@/components/crypto/crypto-tools'
 
 const features = [
   {
@@ -92,6 +94,27 @@ export default function BlockchainCryptoPage() {
             Explore the decentralized revolution. Real-time cryptocurrency prices, blockchain news,
             and insights into the future of digital finance.
           </p>
+
+          {/* Tool Badges */}
+          <div className="flex flex-wrap justify-center gap-3 mt-8">
+            {[
+              { icon: ArrowRightLeft, label: 'Unit Converter' },
+              { icon: Calculator, label: 'ROI Calculator' },
+              { icon: Wallet, label: 'Address Validator' },
+              { icon: Coins, label: 'Gas Estimator' },
+            ].map((badge, index) => (
+              <motion.div
+                key={badge.label}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.3 + index * 0.1 }}
+                className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm"
+              >
+                <badge.icon className="w-4 h-4 text-cyber-orange" />
+                <span className="font-medium">{badge.label}</span>
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
       </section>
 
@@ -144,6 +167,28 @@ export default function BlockchainCryptoPage() {
           </div>
         </div>
         <CryptoPriceGrid />
+      </section>
+
+      {/* Crypto Tools Section */}
+      <section className="container mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-8"
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-lg bg-cyber-orange/10 flex items-center justify-center">
+              <Wrench className="w-5 h-5 text-cyber-orange" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold">Crypto Tools</h2>
+              <p className="text-sm text-muted-foreground">Free utilities for crypto investors</p>
+            </div>
+          </div>
+        </motion.div>
+
+        <CryptoToolsGrid />
       </section>
 
       {/* Features Section */}
