@@ -29,8 +29,8 @@ export {
   StringOutputParser,
 } from './langchain';
 
-// LangChain AIMessage (separate export to avoid collision)
-export { AIMessage as LangChainAIMessage } from './langchain';
+// LangChain AIMessage (already exported as LangChainAIMessage to avoid collision)
+export { LangChainAIMessage } from './langchain';
 
 // RAG utilities
 export * from './rag';

@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import { ToolsLayoutClient } from './layout-client'
 
 export const metadata: Metadata = {
   title: 'Tools - Ibnu Portfolio',
@@ -15,5 +16,5 @@ export default function ToolsLayout({
 }: {
   children: React.ReactNode
 }) {
-  return children
+  return <ToolsLayoutClient>{children}</ToolsLayoutClient>
 }

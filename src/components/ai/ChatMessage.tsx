@@ -38,7 +38,7 @@ function ChatMessageComponent({
   isStreaming = false,
   isLoading = false,
 }: ChatMessageProps) {
-  // Use either isStreaming or isLoading
+  // Support both isStreaming and isLoading
   const streaming = isStreaming || isLoading;
   const [copied, setCopied] = useState(false);
 

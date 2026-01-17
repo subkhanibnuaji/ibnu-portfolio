@@ -13,12 +13,36 @@ import {
   Bot,
   Blocks,
   Filter,
-  ArrowRight
+  ArrowRight,
+  Smartphone,
+  Download
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
+// Last updated: 2026-01-16
 const projects = [
+  {
+    id: 'mobile-app',
+    title: 'Ibnu Portfolio Mobile App',
+    description: 'Cross-platform mobile app for Android with interactive UI and offline support.',
+    longDesc: 'A complete mobile application built with React Native and Expo that showcases my portfolio. Features include dark theme, smooth animations, offline data caching, and automatic updates from the backend API.',
+    category: 'Personal',
+    status: 'Active',
+    featured: false,
+    technologies: ['React Native', 'Expo', 'TypeScript', 'Zustand', 'React Query'],
+    features: [
+      'Cross-platform (Android, iOS, Web)',
+      'Interactive 3D phone mockup on web',
+      'Offline data caching',
+      'Dark theme with smooth animations',
+      'Auto-sync with portfolio backend'
+    ],
+    impact: 'Provides easy access to portfolio on mobile devices with downloadable APK',
+    liveUrl: '/mobile',
+    githubUrl: null,
+    isInternal: true
+  },
   {
     id: 'hub-pkp',
     title: 'HUB PKP - Klinik Rumah',
@@ -134,7 +158,7 @@ const projects = [
     ],
     impact: 'Demonstrates Web3 development capabilities on ICP',
     liveUrl: null,
-    githubUrl: 'https://github.com/subkhanibnuaji'
+    githubUrl: null
   },
   {
     id: 'animo',
@@ -159,6 +183,7 @@ const projects = [
 
 const categories = [
   { value: 'all', label: 'All Projects', icon: Folder },
+  { value: 'Personal', label: 'Personal', icon: Smartphone },
   { value: 'Government', label: 'Government', icon: Building2 },
   { value: 'Healthcare', label: 'Healthcare', icon: Heart },
   { value: 'Enterprise', label: 'Enterprise', icon: Bot },
@@ -306,74 +331,89 @@ export default function ProjectsPage() {
             animate="visible"
             className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {filteredProjects.filter(p => !p.featured).map((project) => (
-              <motion.div
-                key={project.id}
-                variants={itemVariants}
-                layout
-              >
-                <Link href={`/projects/${project.id}`} className="block h-full">
-                  <div className="glass rounded-xl p-6 flex flex-col h-full group hover:border-cyber-cyan/30 transition-colors">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center gap-2">
-                        <span className={cn(
-                          'px-2 py-1 rounded text-xs font-medium',
-                          project.status === 'Active'
-                            ? 'bg-cyber-green/20 text-cyber-green'
-                            : project.status === 'In Development'
-                            ? 'bg-cyber-cyan/20 text-cyber-cyan'
-                            : 'bg-muted text-muted-foreground'
-                        )}>
-                          {project.status}
-                        </span>
+            {filteredProjects.filter(p => !p.featured).map((project) => {
+              const projectUrl = (project as { isInternal?: boolean }).isInternal && project.liveUrl
+                ? project.liveUrl
+                : `/projects/${project.id}`
+
+              return (
+                <motion.div
+                  key={project.id}
+                  variants={itemVariants}
+                  layout
+                >
+                  <Link href={projectUrl} className="block h-full">
+                    <div className={cn(
+                      "glass rounded-xl p-6 flex flex-col h-full group hover:border-cyber-cyan/30 transition-colors",
+                      (project as { isInternal?: boolean }).isInternal && "border-cyber-green/30 bg-gradient-to-br from-cyber-green/5 to-transparent"
+                    )}>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <span className={cn(
+                            'px-2 py-1 rounded text-xs font-medium',
+                            project.status === 'Active'
+                              ? 'bg-cyber-green/20 text-cyber-green'
+                              : project.status === 'In Development'
+                              ? 'bg-cyber-cyan/20 text-cyber-cyan'
+                              : 'bg-muted text-muted-foreground'
+                          )}>
+                            {project.status}
+                          </span>
+                          {(project as { isInternal?: boolean }).isInternal && (
+                            <span className="px-2 py-1 rounded text-xs font-medium bg-cyber-purple/20 text-cyber-purple flex items-center gap-1">
+                              <Download className="h-3 w-3" />
+                              APK
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                          {project.githubUrl && (
+                            <a
+                              href={project.githubUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-2 rounded-lg hover:bg-muted transition-colors"
+                            >
+                              <Github className="h-4 w-4" />
+                            </a>
+                          )}
+                          {project.liveUrl && !(project as { isInternal?: boolean }).isInternal && (
+                            <a
+                              href={project.liveUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-2 rounded-lg hover:bg-muted transition-colors"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </a>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-                        {project.githubUrl && (
-                          <a
-                            href={project.githubUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-2 rounded-lg hover:bg-muted transition-colors"
-                          >
-                            <Github className="h-4 w-4" />
-                          </a>
-                        )}
-                        {project.liveUrl && (
-                          <a
-                            href={project.liveUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-2 rounded-lg hover:bg-muted transition-colors"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </a>
+
+                      <h3 className="text-lg font-bold mb-2 group-hover:text-cyber-cyan transition-colors">
+                        {project.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-4 flex-1">
+                        {project.description}
+                      </p>
+
+                      <div className="flex flex-wrap gap-1.5 mt-auto">
+                        {project.technologies.slice(0, 4).map((tech, i) => (
+                          <span key={i} className="px-2 py-0.5 rounded-full bg-muted text-xs">
+                            {tech}
+                          </span>
+                        ))}
+                        {project.technologies.length > 4 && (
+                          <span className="px-2 py-0.5 rounded-full bg-muted text-xs">
+                            +{project.technologies.length - 4}
+                          </span>
                         )}
                       </div>
                     </div>
-
-                    <h3 className="text-lg font-bold mb-2 group-hover:text-cyber-cyan transition-colors">
-                      {project.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-4 flex-1">
-                      {project.description}
-                    </p>
-
-                    <div className="flex flex-wrap gap-1.5 mt-auto">
-                      {project.technologies.slice(0, 4).map((tech, i) => (
-                        <span key={i} className="px-2 py-0.5 rounded-full bg-muted text-xs">
-                          {tech}
-                        </span>
-                      ))}
-                      {project.technologies.length > 4 && (
-                        <span className="px-2 py-0.5 rounded-full bg-muted text-xs">
-                          +{project.technologies.length - 4}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
+                  </Link>
+                </motion.div>
+              )
+            })}
           </motion.div>
         </AnimatePresence>
 

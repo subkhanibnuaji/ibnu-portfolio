@@ -18,11 +18,9 @@ import { cn } from '@/lib/utils';
 
 export interface ChatInputProps {
   onSend?: (message: string) => void;
-  // Controlled mode props
+  onSubmit?: (e?: React.FormEvent) => void; // Alternative to onSend
   value?: string;
   onChange?: (value: string) => void;
-  onSubmit?: (e?: FormEvent) => void;
-  // Common props
   isLoading?: boolean;
   disabled?: boolean;
   placeholder?: string;
@@ -37,9 +35,9 @@ export interface ChatInputProps {
 
 export function ChatInput({
   onSend,
+  onSubmit,
   value: controlledValue,
   onChange: controlledOnChange,
-  onSubmit: controlledOnSubmit,
   isLoading = false,
   disabled = false,
   placeholder = 'Type your message...',
@@ -50,7 +48,7 @@ export function ChatInput({
   const [internalInput, setInternalInput] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Support both controlled and uncontrolled modes
+  // Use controlled value if provided, otherwise internal state
   const isControlled = controlledValue !== undefined;
   const input = isControlled ? controlledValue : internalInput;
   const setInput = isControlled
@@ -75,12 +73,14 @@ export function ChatInput({
     e?.preventDefault();
     if (!input.trim() || isLoading || disabled) return;
 
-    // Support controlled mode with onSubmit
-    if (controlledOnSubmit) {
-      controlledOnSubmit(e);
+    // Support both onSubmit and onSend
+    if (onSubmit) {
+      onSubmit(e);
     } else if (onSend) {
       onSend(input.trim());
-      setInput('');
+      if (!isControlled) {
+        setInternalInput('');
+      }
     }
 
     // Reset textarea height

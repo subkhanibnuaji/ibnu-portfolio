@@ -1,12 +1,83 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo, useTransition, memo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Bot, X, Send, User, Trash2, Sparkles, Brain, Zap, Loader2 } from 'lucide-react'
+import Image from 'next/image'
+import { Bot, X, Send, User, Trash2, Sparkles, Brain, Zap, Loader2, Wand2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { generatePDF, generatePPT, type PDFData, type PPTData } from '@/lib/ai/file-generators'
 
-type ChatMode = 'quick' | 'ai'
+// ============================================
+// PERFORMANCE UTILITIES
+// ============================================
+
+// Batched state updater using requestAnimationFrame to prevent INP issues
+class StreamingBuffer {
+  private buffer: string = ''
+  private rafId: number | null = null
+  private callback: ((content: string) => void) | null = null
+
+  setCallback(cb: (content: string) => void) {
+    this.callback = cb
+  }
+
+  append(chunk: string) {
+    this.buffer += chunk
+    if (!this.rafId) {
+      this.rafId = requestAnimationFrame(() => {
+        if (this.callback && this.buffer) {
+          this.callback(this.buffer)
+          this.buffer = ''
+        }
+        this.rafId = null
+      })
+    }
+  }
+
+  flush() {
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId)
+      this.rafId = null
+    }
+    if (this.callback && this.buffer) {
+      this.callback(this.buffer)
+      this.buffer = ''
+    }
+  }
+
+  clear() {
+    this.buffer = ''
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId)
+      this.rafId = null
+    }
+  }
+}
+
+// Throttle utility for scroll handlers
+function throttle<T extends (...args: Parameters<T>) => void>(
+  func: T,
+  limit: number
+): T {
+  let inThrottle = false
+  return ((...args: Parameters<T>) => {
+    if (!inThrottle) {
+      func(...args)
+      inThrottle = true
+      setTimeout(() => (inThrottle = false), limit)
+    }
+  }) as T
+}
+
+type ChatMode = 'quick' | 'ai' | 'agent'
+
+interface ToolExecution {
+  tool: string
+  input: Record<string, unknown>
+  result?: string
+  isLoading?: boolean
+}
 
 interface Message {
   id: string
@@ -14,6 +85,65 @@ interface Message {
   content: string
   timestamp: Date
   quickReplies?: QuickReply[]
+  toolExecutions?: ToolExecution[]
+  images?: string[]
+}
+
+// Parse special results (images, QR codes, files)
+type ResultType = 'text' | 'image' | 'qr' | 'pdf' | 'ppt'
+
+interface ParsedResult {
+  type: ResultType
+  content: string
+  meta?: string
+  data?: PDFData | PPTData
+}
+
+function parseSpecialResult(result: string): ParsedResult {
+  if (result.startsWith('IMAGE_GENERATED:')) {
+    const parts = result.replace('IMAGE_GENERATED:', '').split('|')
+    return { type: 'image', content: parts[0], meta: parts[1] }
+  }
+  if (result.startsWith('QR_GENERATED:')) {
+    const parts = result.replace('QR_GENERATED:', '').split('|')
+    return { type: 'qr', content: parts[0], meta: parts[1] }
+  }
+  if (result.startsWith('PDF_GENERATE:')) {
+    try {
+      const data = JSON.parse(result.replace('PDF_GENERATE:', ''))
+      return { type: 'pdf', content: '', data }
+    } catch {
+      return { type: 'text', content: result }
+    }
+  }
+  if (result.startsWith('PPT_GENERATE:')) {
+    try {
+      const data = JSON.parse(result.replace('PPT_GENERATE:', ''))
+      return { type: 'ppt', content: '', data }
+    } catch {
+      return { type: 'text', content: result }
+    }
+  }
+  return { type: 'text', content: result }
+}
+
+// Handle file generation (async for PPT which uses API)
+async function handleFileGeneration(result: string): Promise<boolean> {
+  const parsed = parseSpecialResult(result)
+  if (parsed.type === 'pdf' && parsed.data) {
+    await generatePDF(parsed.data as PDFData)
+    return true
+  }
+  if (parsed.type === 'ppt' && parsed.data) {
+    try {
+      await generatePPT(parsed.data as PPTData)
+      return true
+    } catch (error) {
+      console.error('PPT generation failed:', error)
+      return false
+    }
+  }
+  return false
 }
 
 interface QuickReply {
@@ -567,10 +697,10 @@ Built with modern technologies:
 - NextAuth.js
 - Resend (emails)
 
-Fully open source!`,
+Built with modern best practices!`,
     quickReplies: [
       { label: 'Skills', value: 'What are your skills?' },
-      { label: 'GitHub', value: 'Where is the source code?' }
+      { label: 'Projects', value: 'What projects have you built?' }
     ]
   },
   funfacts: {
@@ -694,6 +824,140 @@ const INITIAL_QUICK_REPLIES: QuickReply[] = [
   { label: 'Interests', value: 'What are your interests?' }
 ]
 
+// ============================================
+// MEMOIZED CHAT MESSAGE ITEM COMPONENT
+// ============================================
+
+interface ChatMessageItemProps {
+  message: Message
+  mode: ChatMode
+}
+
+const ChatMessageItem = memo(function ChatMessageItem({ message, mode }: ChatMessageItemProps) {
+  return (
+    <div
+      className={cn(
+        'flex gap-3',
+        message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
+      )}
+      style={{ contain: 'content' }} // CSS containment for performance
+    >
+      <div
+        className={cn(
+          'w-8 h-8 rounded-full flex items-center justify-center shrink-0',
+          message.role === 'user'
+            ? 'bg-primary'
+            : mode === 'agent' ? 'bg-gradient-to-r from-pink-500 to-orange-500' : mode === 'ai' ? 'bg-cyber-purple' : 'bg-cyber-gradient'
+        )}
+      >
+        {message.role === 'user' ? (
+          <User className="h-4 w-4 text-white" />
+        ) : mode === 'agent' ? (
+          <Wand2 className="h-4 w-4 text-white" />
+        ) : mode === 'ai' ? (
+          <Brain className="h-4 w-4 text-white" />
+        ) : (
+          <Bot className="h-4 w-4 text-white" />
+        )}
+      </div>
+      <div
+        className={cn(
+          'max-w-[80%] rounded-2xl px-4 py-2.5',
+          message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
+        )}
+        style={{ contain: 'layout style' }} // CSS containment
+      >
+        {message.role === 'assistant' ? (
+          <div className="text-sm space-y-2">
+            {/* Tool Executions */}
+            {message.toolExecutions && message.toolExecutions.length > 0 && (
+              <div className="space-y-1.5 mb-2">
+                {message.toolExecutions.map((exec, idx) => (
+                  <div key={idx} className="flex items-center gap-2 text-xs bg-black/10 rounded-lg px-2 py-1.5">
+                    {exec.isLoading ? (
+                      <Loader2 className="h-3 w-3 animate-spin text-orange-400" />
+                    ) : (
+                      <span className="text-green-400">✓</span>
+                    )}
+                    <span className="capitalize text-muted-foreground">{exec.tool.replace(/_/g, ' ')}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Generated Images */}
+            {message.images && message.images.length > 0 && (
+              <div className="space-y-2 mb-2">
+                {message.images.map((imgUrl, idx) => (
+                  <div key={idx} className="relative rounded-lg overflow-hidden">
+                    <Image
+                      src={imgUrl}
+                      alt="Generated image"
+                      width={280}
+                      height={280}
+                      className="rounded-lg"
+                      unoptimized
+                      loading="lazy"
+                    />
+                    <a
+                      href={imgUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute bottom-2 right-2 text-xs bg-black/50 text-white px-2 py-1 rounded hover:bg-black/70"
+                    >
+                      Open Full
+                    </a>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Text Content */}
+            <div className="whitespace-pre-line">
+              {message.content ? message.content.split('\n').map((line, i) => {
+                // Handle bold text
+                const parts = line.split(/(\*\*[^*]+\*\*)/g)
+                return (
+                  <p key={i} className={line.startsWith('-') || line.startsWith('•') ? 'ml-2' : ''}>
+                    {parts.map((part, j) => {
+                      if (part.startsWith('**') && part.endsWith('**')) {
+                        return <strong key={j}>{part.slice(2, -2)}</strong>
+                      }
+                      return part
+                    })}
+                  </p>
+                )
+              }) : (
+                !message.toolExecutions?.length && !message.images?.length && (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Thinking...
+                  </span>
+                )
+              )}
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm">{message.content}</p>
+        )}
+      </div>
+    </div>
+  )
+}, (prevProps, nextProps) => {
+  // Custom comparison for memo - only re-render if these change
+  return (
+    prevProps.message.id === nextProps.message.id &&
+    prevProps.message.content === nextProps.message.content &&
+    prevProps.message.toolExecutions?.length === nextProps.message.toolExecutions?.length &&
+    prevProps.message.images?.length === nextProps.message.images?.length &&
+    prevProps.mode === nextProps.mode
+  )
+})
+
+// ============================================
+// MAIN CHATBOT COMPONENT
+// ============================================
+
 export function AIChatbot() {
   const [isOpen, setIsOpen] = useState(false)
   const [mode, setMode] = useState<ChatMode>('quick')
@@ -711,10 +975,16 @@ export function AIChatbot() {
   const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
+
+  // Performance: useTransition for non-blocking updates
+  const [, startTransition] = useTransition()
+
+  // Performance: Streaming buffer for batched updates
+  const streamingBufferRef = useRef(new StreamingBuffer())
 
   // Initialize messages on client-side only to prevent hydration mismatch
   useEffect(() => {
-    setIsMounted(true)
     setMessages([
       {
         id: '1',
@@ -726,12 +996,22 @@ export function AIChatbot() {
     ])
   }, [])
 
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [])
+  // Performance: Throttled scroll to bottom
+  const scrollToBottom = useMemo(
+    () =>
+      throttle(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
+        }
+      }, 100),
+    []
+  )
 
+  // Scroll on new messages (with transition for non-blocking)
   useEffect(() => {
-    scrollToBottom()
+    startTransition(() => {
+      scrollToBottom()
+    })
   }, [messages, scrollToBottom])
 
   useEffect(() => {
@@ -740,8 +1020,15 @@ export function AIChatbot() {
     }
   }, [isOpen])
 
-  // Send message with AI mode (using Groq API)
-  const sendAIMessage = async (content: string) => {
+  // Cleanup streaming buffer on unmount
+  useEffect(() => {
+    return () => {
+      streamingBufferRef.current.clear()
+    }
+  }, [])
+
+  // Send message with AI mode (using Groq API) - OPTIMIZED with batched updates
+  const sendAIMessage = useCallback(async (content: string) => {
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
@@ -749,8 +1036,9 @@ export function AIChatbot() {
       timestamp: new Date()
     }
 
+    const assistantMessageId = (Date.now() + 1).toString()
     const assistantMessage: Message = {
-      id: (Date.now() + 1).toString(),
+      id: assistantMessageId,
       role: 'assistant',
       content: '',
       timestamp: new Date()
@@ -759,6 +1047,26 @@ export function AIChatbot() {
     setMessages((prev) => [...prev, userMessage, assistantMessage])
     setInput('')
     setIsLoading(true)
+
+    // Accumulated content for batched updates
+    let accumulatedContent = ''
+
+    // Setup streaming buffer callback for batched updates
+    streamingBufferRef.current.setCallback((batchedContent) => {
+      accumulatedContent += batchedContent
+      // Use startTransition for non-blocking UI update
+      startTransition(() => {
+        setMessages(prev => {
+          const updated = [...prev]
+          const lastMessage = updated[updated.length - 1]
+          if (lastMessage.role === 'assistant' && lastMessage.id === assistantMessageId) {
+            // Create new object to trigger re-render
+            updated[updated.length - 1] = { ...lastMessage, content: accumulatedContent }
+          }
+          return updated
+        })
+      })
+    })
 
     try {
       const response = await fetch('/api/simple-llm', {
@@ -798,14 +1106,8 @@ export function AIChatbot() {
             try {
               const parsed = JSON.parse(data)
               if (parsed.content) {
-                setMessages(prev => {
-                  const updated = [...prev]
-                  const lastMessage = updated[updated.length - 1]
-                  if (lastMessage.role === 'assistant') {
-                    lastMessage.content += parsed.content
-                  }
-                  return updated
-                })
+                // Use streaming buffer for batched updates (prevents INP issues)
+                streamingBufferRef.current.append(parsed.content)
               }
               if (parsed.error) {
                 throw new Error(parsed.error)
@@ -816,25 +1118,193 @@ export function AIChatbot() {
           }
         }
       }
+
+      // Flush any remaining content in buffer
+      streamingBufferRef.current.flush()
     } catch (error) {
       console.error('AI Chat Error:', error)
+      streamingBufferRef.current.clear()
       setMessages(prev => {
         const updated = [...prev]
         const lastMessage = updated[updated.length - 1]
         if (lastMessage.role === 'assistant') {
-          lastMessage.content = error instanceof Error
-            ? `Error: ${error.message}\n\nTip: Make sure GROQ_API_KEY is set. Get free key at console.groq.com`
-            : 'Sorry, an error occurred. Please try again.'
+          updated[updated.length - 1] = {
+            ...lastMessage,
+            content: error instanceof Error
+              ? `Error: ${error.message}\n\nTip: Make sure GROQ_API_KEY is set. Get free key at console.groq.com`
+              : 'Sorry, an error occurred. Please try again.'
+          }
         }
         return updated
       })
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [messages, startTransition])
 
-  // Send message with Quick mode (pattern matching)
-  const sendQuickMessage = (content: string) => {
+  // Send message with Agent mode (using tools including image generation) - OPTIMIZED
+  const sendAgentMessage = useCallback(async (content: string) => {
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: content.trim(),
+      timestamp: new Date()
+    }
+
+    const assistantMessageId = (Date.now() + 1).toString()
+    const assistantMessage: Message = {
+      id: assistantMessageId,
+      role: 'assistant',
+      content: '',
+      timestamp: new Date(),
+      toolExecutions: [],
+      images: []
+    }
+
+    setMessages((prev) => [...prev, userMessage, assistantMessage])
+    setInput('')
+    setIsLoading(true)
+
+    try {
+      const response = await fetch('/api/ai/agent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [...messages, userMessage].map(m => ({
+            role: m.role,
+            content: m.content
+          })),
+          model: 'llama-3.3-70b-versatile'
+        })
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Failed to get response')
+      }
+
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+
+      if (!reader) throw new Error('No reader available')
+
+      const toolExecutions: ToolExecution[] = []
+      const images: string[] = []
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        const chunk = decoder.decode(value)
+        const lines = chunk.split('\n')
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6)
+            if (data === '[DONE]') continue
+
+            try {
+              const parsed = JSON.parse(data)
+
+              if (parsed.type === 'tool_call') {
+                const execution: ToolExecution = {
+                  tool: parsed.tool,
+                  input: parsed.input,
+                  isLoading: true
+                }
+                toolExecutions.push(execution)
+                // Use startTransition for non-blocking update
+                startTransition(() => {
+                  setMessages(prev => {
+                    const updated = [...prev]
+                    const lastMessage = updated[updated.length - 1]
+                    if (lastMessage.role === 'assistant' && lastMessage.id === assistantMessageId) {
+                      updated[updated.length - 1] = { ...lastMessage, toolExecutions: [...toolExecutions] }
+                    }
+                    return updated
+                  })
+                })
+              } else if (parsed.type === 'tool_result') {
+                const lastExecution = toolExecutions[toolExecutions.length - 1]
+                if (lastExecution) {
+                  lastExecution.result = parsed.result
+                  lastExecution.isLoading = false
+
+                  // Check result type and handle accordingly
+                  const parsedResult = parseSpecialResult(parsed.result || '')
+                  if (parsedResult.type === 'image' || parsedResult.type === 'qr') {
+                    images.push(parsedResult.content)
+                  } else if (parsedResult.type === 'pdf' || parsedResult.type === 'ppt') {
+                    // Trigger file download (async, don't block)
+                    handleFileGeneration(parsed.result || '').catch(err => {
+                      console.error('File generation error:', err)
+                    })
+                  }
+
+                  // Use startTransition for non-blocking update
+                  startTransition(() => {
+                    setMessages(prev => {
+                      const updated = [...prev]
+                      const lastMessage = updated[updated.length - 1]
+                      if (lastMessage.role === 'assistant' && lastMessage.id === assistantMessageId) {
+                        updated[updated.length - 1] = {
+                          ...lastMessage,
+                          toolExecutions: [...toolExecutions],
+                          images: [...images]
+                        }
+                      }
+                      return updated
+                    })
+                  })
+                }
+              } else if (parsed.type === 'response' || parsed.type === 'text') {
+                // Use startTransition for non-blocking update
+                startTransition(() => {
+                  setMessages(prev => {
+                    const updated = [...prev]
+                    const lastMessage = updated[updated.length - 1]
+                    if (lastMessage.role === 'assistant' && lastMessage.id === assistantMessageId) {
+                      updated[updated.length - 1] = {
+                        ...lastMessage,
+                        content: parsed.content || '',
+                        toolExecutions: [...toolExecutions],
+                        images: [...images]
+                      }
+                    }
+                    return updated
+                  })
+                })
+              } else if (parsed.type === 'error') {
+                throw new Error(parsed.error)
+              }
+            } catch {
+              // Skip invalid JSON
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Agent Chat Error:', error)
+      setMessages(prev => {
+        const updated = [...prev]
+        const lastMessage = updated[updated.length - 1]
+        if (lastMessage.role === 'assistant') {
+          updated[updated.length - 1] = {
+            ...lastMessage,
+            content: error instanceof Error
+              ? `Error: ${error.message}\n\nTip: Make sure GROQ_API_KEY is set. Get free key at console.groq.com`
+              : 'Sorry, an error occurred. Please try again.'
+          }
+        }
+        return updated
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }, [messages, startTransition])
+
+  // Send message with Quick mode (pattern matching) - memoized
+  const sendQuickMessage = useCallback((content: string) => {
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
@@ -854,57 +1324,74 @@ export function AIChatbot() {
 
     setMessages((prev) => [...prev, userMessage, assistantMessage])
     setInput('')
-  }
+  }, [])
 
-  const sendMessage = (content: string) => {
+  // Memoized welcome message getter
+  const getWelcomeMessage = useCallback((chatMode: ChatMode) => {
+    switch (chatMode) {
+      case 'agent':
+        return "Hi! I'm IbnuGPT Agent with superpowers! I can:\n• Generate images from text\n• Generate QR codes\n• Create memes\n• Generate PDF documents\n• Create PowerPoint presentations\n• Calculate math & get time\n• Translate text & generate code\n\nTry: \"Generate a QR code for heyibnu.com\" or \"Create a PDF about AI\""
+      case 'ai':
+        return "Hi! I'm IbnuGPT powered by Llama 3.3 (via Groq). I can answer any questions with AI intelligence. What would you like to know?"
+      default:
+        return "Hi! I'm Ibnu's portfolio assistant. I can help you learn about his background, projects, skills, and interests. What would you like to know?"
+    }
+  }, [])
+
+  // Memoized sendMessage handler
+  const sendMessage = useCallback((content: string) => {
     if (!content.trim() || isLoading) return
 
-    if (mode === 'ai') {
+    if (mode === 'agent') {
+      sendAgentMessage(content)
+    } else if (mode === 'ai') {
       sendAIMessage(content)
     } else {
       sendQuickMessage(content)
     }
-  }
+  }, [mode, isLoading, sendAgentMessage, sendAIMessage, sendQuickMessage])
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  // Memoized keyboard handler
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       sendMessage(input)
     }
-  }
+  }, [sendMessage, input])
 
-  const clearChat = () => {
+  // Memoized clear chat handler
+  const clearChat = useCallback(() => {
     setMessages([
       {
         id: '1',
         role: 'assistant',
-        content: mode === 'ai'
-          ? "Hi! I'm IbnuGPT powered by AI. Ask me anything and I'll do my best to help!"
-          : "Hi! I'm Ibnu's portfolio assistant. What would you like to know?",
+        content: getWelcomeMessage(mode),
         timestamp: new Date(),
         quickReplies: mode === 'quick' ? INITIAL_QUICK_REPLIES : undefined
       }
     ])
-  }
+  }, [mode, getWelcomeMessage])
 
-  const switchMode = (newMode: ChatMode) => {
+  // Memoized switch mode handler
+  const switchMode = useCallback((newMode: ChatMode) => {
     setMode(newMode)
     setMessages([
       {
         id: '1',
         role: 'assistant',
-        content: newMode === 'ai'
-          ? "Hi! I'm IbnuGPT powered by Llama 3.3 (via Groq). I can answer any questions with AI intelligence. What would you like to know?"
-          : "Hi! I'm Ibnu's portfolio assistant. I can help you learn about his background, projects, skills, and interests. What would you like to know?",
+        content: getWelcomeMessage(newMode),
         timestamp: new Date(),
         quickReplies: newMode === 'quick' ? INITIAL_QUICK_REPLIES : undefined
       }
     ])
-  }
+  }, [getWelcomeMessage])
 
-  // Get the last message's quick replies
-  const lastMessage = messages[messages.length - 1]
-  const showQuickReplies = mode === 'quick' && lastMessage?.role === 'assistant' && lastMessage?.quickReplies
+  // Memoized derived state for quick replies
+  const lastMessage = useMemo(() => messages[messages.length - 1], [messages])
+  const showQuickReplies = useMemo(
+    () => mode === 'quick' && lastMessage?.role === 'assistant' && lastMessage?.quickReplies,
+    [mode, lastMessage]
+  )
 
   return (
     <>
@@ -947,9 +1434,11 @@ export function AIChatbot() {
                 <div className="relative">
                   <div className={cn(
                     "w-10 h-10 rounded-full flex items-center justify-center",
-                    mode === 'ai' ? "bg-cyber-purple" : "bg-cyber-gradient"
+                    mode === 'agent' ? "bg-gradient-to-r from-pink-500 to-orange-500" : mode === 'ai' ? "bg-cyber-purple" : "bg-cyber-gradient"
                   )}>
-                    {mode === 'ai' ? (
+                    {mode === 'agent' ? (
+                      <Wand2 className="h-5 w-5 text-white" />
+                    ) : mode === 'ai' ? (
                       <Brain className="h-5 w-5 text-white" />
                     ) : (
                       <Bot className="h-5 w-5 text-white" />
@@ -959,10 +1448,15 @@ export function AIChatbot() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-sm">
-                    {mode === 'ai' ? 'IbnuGPT' : 'Portfolio Assistant'}
+                    {mode === 'agent' ? 'IbnuGPT Agent' : mode === 'ai' ? 'IbnuGPT' : 'Portfolio Assistant'}
                   </h3>
                   <p className="text-xs text-muted-foreground flex items-center gap-1">
-                    {mode === 'ai' ? (
+                    {mode === 'agent' ? (
+                      <>
+                        <Wand2 className="h-3 w-3" />
+                        Image Gen + Tools
+                      </>
+                    ) : mode === 'ai' ? (
                       <>
                         <Brain className="h-3 w-3" />
                         AI Powered (Llama 3.3)
@@ -987,92 +1481,53 @@ export function AIChatbot() {
             </div>
 
             {/* Mode Selector */}
-            <div className="flex p-2 gap-2 border-b border-border bg-muted/30">
+            <div className="flex p-2 gap-1.5 border-b border-border bg-muted/30">
               <button
                 onClick={() => switchMode('quick')}
                 className={cn(
-                  "flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all",
+                  "flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-[10px] font-medium transition-all",
                   mode === 'quick'
                     ? "bg-cyber-cyan/20 text-cyber-cyan border border-cyber-cyan/30"
                     : "text-muted-foreground hover:bg-muted"
                 )}
               >
-                <Zap className="h-3.5 w-3.5" />
-                Quick Answers
+                <Zap className="h-3 w-3" />
+                Quick
               </button>
               <button
                 onClick={() => switchMode('ai')}
                 className={cn(
-                  "flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-medium transition-all",
+                  "flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-[10px] font-medium transition-all",
                   mode === 'ai'
                     ? "bg-cyber-purple/20 text-cyber-purple border border-cyber-purple/30"
                     : "text-muted-foreground hover:bg-muted"
                 )}
               >
-                <Brain className="h-3.5 w-3.5" />
+                <Brain className="h-3 w-3" />
                 AI Chat
+              </button>
+              <button
+                onClick={() => switchMode('agent')}
+                className={cn(
+                  "flex-1 flex items-center justify-center gap-1.5 px-2 py-1.5 rounded-lg text-[10px] font-medium transition-all",
+                  mode === 'agent'
+                    ? "bg-gradient-to-r from-pink-500/20 to-orange-500/20 text-orange-400 border border-orange-500/30"
+                    : "text-muted-foreground hover:bg-muted"
+                )}
+              >
+                <Wand2 className="h-3 w-3" />
+                Agent
               </button>
             </div>
 
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {/* Messages - Using memoized ChatMessageItem for performance */}
+            <div
+              ref={messagesContainerRef}
+              className="flex-1 overflow-y-auto p-4 space-y-4"
+              style={{ contain: 'strict' }} // CSS containment for performance
+            >
               {messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={cn(
-                    'flex gap-3',
-                    message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
-                  )}
-                >
-                  <div
-                    className={cn(
-                      'w-8 h-8 rounded-full flex items-center justify-center shrink-0',
-                      message.role === 'user'
-                        ? 'bg-primary'
-                        : mode === 'ai' ? 'bg-cyber-purple' : 'bg-cyber-gradient'
-                    )}
-                  >
-                    {message.role === 'user' ? (
-                      <User className="h-4 w-4 text-white" />
-                    ) : mode === 'ai' ? (
-                      <Brain className="h-4 w-4 text-white" />
-                    ) : (
-                      <Bot className="h-4 w-4 text-white" />
-                    )}
-                  </div>
-                  <div
-                    className={cn(
-                      'max-w-[80%] rounded-2xl px-4 py-2.5',
-                      message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                    )}
-                  >
-                    {message.role === 'assistant' ? (
-                      <div className="text-sm whitespace-pre-line">
-                        {message.content ? message.content.split('\n').map((line, i) => {
-                          // Handle bold text
-                          const parts = line.split(/(\*\*[^*]+\*\*)/g)
-                          return (
-                            <p key={i} className={line.startsWith('-') ? 'ml-2' : ''}>
-                              {parts.map((part, j) => {
-                                if (part.startsWith('**') && part.endsWith('**')) {
-                                  return <strong key={j}>{part.slice(2, -2)}</strong>
-                                }
-                                return part
-                              })}
-                            </p>
-                          )
-                        }) : (
-                          <span className="flex items-center gap-2">
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                            Thinking...
-                          </span>
-                        )}
-                      </div>
-                    ) : (
-                      <p className="text-sm">{message.content}</p>
-                    )}
-                  </div>
-                </div>
+                <ChatMessageItem key={message.id} message={message} mode={mode} />
               ))}
               <div ref={messagesEndRef} />
             </div>
@@ -1126,9 +1581,11 @@ export function AIChatbot() {
                   )}
                 </Button>
               </div>
-              {mode === 'ai' && (
+              {(mode === 'ai' || mode === 'agent') && (
                 <p className="text-[10px] text-muted-foreground mt-2 text-center">
-                  Powered by Groq (Free) • Llama 3.3 70B
+                  {mode === 'agent'
+                    ? 'Groq (Free) + Pollinations.ai (Free Image Gen)'
+                    : 'Powered by Groq (Free) • Llama 3.3 70B'}
                 </p>
               )}
             </div>

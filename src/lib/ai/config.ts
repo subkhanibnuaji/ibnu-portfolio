@@ -52,10 +52,10 @@ export const AI_MODELS = {
   },
 } as const;
 
+export type GroqModelId = keyof typeof AI_MODELS.groq;
+
 // Alias for backward compatibility
 export const GROQ_MODELS = AI_MODELS.groq;
-
-export type GroqModelId = keyof typeof AI_MODELS.groq;
 
 // ============================================
 // DEFAULT SETTINGS

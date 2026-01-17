@@ -1,4 +1,5 @@
 import { Metadata } from 'next'
+import { AIToolsLayoutClient } from './layout-client'
 
 export const metadata: Metadata = {
   title: 'AI Tools - Ibnu Portfolio',
@@ -15,5 +16,5 @@ export default function AIToolsLayout({
 }: {
   children: React.ReactNode
 }) {
-  return children
+  return <AIToolsLayoutClient>{children}</AIToolsLayoutClient>
 }

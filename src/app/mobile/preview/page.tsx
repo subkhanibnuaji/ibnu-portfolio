@@ -163,23 +163,19 @@ export default function MobilePreviewPage() {
                   <h3 className="text-lg font-semibold mb-2">Preview Unavailable</h3>
                   <p className="text-muted-foreground text-center max-w-md mb-4">
                     The mobile app preview is currently being set up.
-                    You can still view the source code or run it locally.
+                    Please try again later or download the APK directly.
                   </p>
                   <div className="flex gap-3">
                     <Button variant="outline" onClick={handleRefresh} className="gap-2">
                       <RefreshCw className="h-4 w-4" />
                       Try Again
                     </Button>
-                    <a
-                      href="https://github.com/subkhanibnuaji/ibnu-portfolio/tree/main/mobile-app"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                    <Link href="/mobile">
                       <Button variant="gradient" className="gap-2">
-                        View Source
+                        Download APK
                         <ExternalLink className="h-4 w-4" />
                       </Button>
-                    </a>
+                    </Link>
                   </div>
                 </div>
               )}
