@@ -1326,18 +1326,6 @@ export function AIChatbot() {
     setInput('')
   }, [])
 
-  // Memoized welcome message getter
-  const getWelcomeMessage = useCallback((chatMode: ChatMode) => {
-    switch (chatMode) {
-      case 'agent':
-        return "Hi! I'm IbnuGPT Agent with superpowers! I can:\n• Generate images from text\n• Generate QR codes\n• Create memes\n• Generate PDF documents\n• Create PowerPoint presentations\n• Calculate math & get time\n• Translate text & generate code\n\nTry: \"Generate a QR code for heyibnu.com\" or \"Create a PDF about AI\""
-      case 'ai':
-        return "Hi! I'm IbnuGPT powered by Llama 3.3 (via Groq). I can answer any questions with AI intelligence. What would you like to know?"
-      default:
-        return "Hi! I'm Ibnu's portfolio assistant. I can help you learn about his background, projects, skills, and interests. What would you like to know?"
-    }
-  }, [])
-
   // Memoized sendMessage handler
   const sendMessage = useCallback((content: string) => {
     if (!content.trim() || isLoading) return
@@ -1358,6 +1346,17 @@ export function AIChatbot() {
       sendMessage(input)
     }
   }, [sendMessage, input])
+
+  const getWelcomeMessage = useCallback((chatMode: ChatMode) => {
+    switch (chatMode) {
+      case 'agent':
+        return "Hi! I'm IbnuGPT Agent with 25 superpowers! 🚀\n\n📸 **Generate:** Images, QR codes, Memes, PDFs, Presentations, Color Palettes, Passwords, Hashtags, Emojis\n📚 **Knowledge:** Wikipedia, Dictionary, Random facts, Crypto prices, Daily quotes\n🔧 **Utility:** Calculator, Unit converter, Date calculator, URL shortener, Code generator, Text analysis, Translate\n\nTry: \"Give me a motivational quote\" or \"Shorten this URL\" or \"How many days until Christmas?\""
+      case 'ai':
+        return "Hi! I'm IbnuGPT powered by Llama 3.3 (via Groq). I can answer any questions with AI intelligence. What would you like to know?"
+      default:
+        return "Hi! I'm Ibnu's portfolio assistant. I can help you learn about his background, projects, skills, and interests. What would you like to know?"
+    }
+  }, [])
 
   // Memoized clear chat handler
   const clearChat = useCallback(() => {

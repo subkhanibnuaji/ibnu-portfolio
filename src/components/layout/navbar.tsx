@@ -107,6 +107,7 @@ const NAV_LINKS = [
   { href: '/', label: 'Home' },
   { href: '/about', label: 'About' },
   { href: '/certifications', label: 'Credentials' },
+  { href: '/mobile', label: 'Mobile' },
 ]
 
 interface DropdownItem {
@@ -376,7 +377,7 @@ export function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-16 z-[53] p-4 md:hidden"
+            className="fixed inset-x-0 top-16 z-30 p-4 md:hidden"
           >
             <div className="rounded-2xl bg-background/95 backdrop-blur-xl border border-border p-4 shadow-xl max-h-[80vh] overflow-y-auto">
               <nav className="flex flex-col gap-1">
