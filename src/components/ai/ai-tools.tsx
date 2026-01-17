@@ -1001,6 +1001,1037 @@ export function SystemPromptLibrary() {
 }
 
 // ============================================
+// EMBEDDINGS SIMILARITY CALCULATOR
+// ============================================
+
+// Simple word-based embedding simulation (in production, use actual embeddings API)
+function getWordFrequency(text: string): Map<string, number> {
+  const words = text.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 2)
+  const freq = new Map<string, number>()
+  words.forEach(word => {
+    freq.set(word, (freq.get(word) || 0) + 1)
+  })
+  return freq
+}
+
+function cosineSimilarity(freq1: Map<string, number>, freq2: Map<string, number>): number {
+  const allWords = new Set([...freq1.keys(), ...freq2.keys()])
+  let dotProduct = 0
+  let magnitude1 = 0
+  let magnitude2 = 0
+
+  allWords.forEach(word => {
+    const v1 = freq1.get(word) || 0
+    const v2 = freq2.get(word) || 0
+    dotProduct += v1 * v2
+    magnitude1 += v1 * v1
+    magnitude2 += v2 * v2
+  })
+
+  if (magnitude1 === 0 || magnitude2 === 0) return 0
+  return dotProduct / (Math.sqrt(magnitude1) * Math.sqrt(magnitude2))
+}
+
+export function EmbeddingsSimilarityCalculator() {
+  const [text1, setText1] = useState('')
+  const [text2, setText2] = useState('')
+  const [similarity, setSimilarity] = useState<number | null>(null)
+  const [sharedWords, setSharedWords] = useState<string[]>([])
+
+  useEffect(() => {
+    if (text1.trim() && text2.trim()) {
+      const freq1 = getWordFrequency(text1)
+      const freq2 = getWordFrequency(text2)
+      const sim = cosineSimilarity(freq1, freq2)
+      setSimilarity(sim)
+
+      // Find shared words
+      const shared = [...freq1.keys()].filter(w => freq2.has(w)).slice(0, 10)
+      setSharedWords(shared)
+    } else {
+      setSimilarity(null)
+      setSharedWords([])
+    }
+  }, [text1, text2])
+
+  const getSimilarityColor = (sim: number) => {
+    if (sim >= 0.8) return 'text-green-500'
+    if (sim >= 0.5) return 'text-yellow-500'
+    if (sim >= 0.3) return 'text-orange-500'
+    return 'text-red-500'
+  }
+
+  const getSimilarityLabel = (sim: number) => {
+    if (sim >= 0.8) return 'Very Similar'
+    if (sim >= 0.5) return 'Moderately Similar'
+    if (sim >= 0.3) return 'Somewhat Similar'
+    return 'Different'
+  }
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-violet-500/10 flex items-center justify-center">
+          <Sparkles className="w-5 h-5 text-violet-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Embeddings Similarity</h3>
+          <p className="text-xs text-muted-foreground">Calculate text similarity using cosine distance</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Text A</label>
+            <textarea
+              value={text1}
+              onChange={(e) => setText1(e.target.value)}
+              placeholder="Enter first text..."
+              rows={3}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-violet-500 focus:outline-none resize-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Text B</label>
+            <textarea
+              value={text2}
+              onChange={(e) => setText2(e.target.value)}
+              placeholder="Enter second text..."
+              rows={3}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-violet-500 focus:outline-none resize-none text-sm"
+            />
+          </div>
+        </div>
+
+        {similarity !== null && (
+          <div className="space-y-3">
+            <div className="p-4 bg-muted/50 rounded-lg text-center">
+              <p className="text-xs text-muted-foreground mb-1">Cosine Similarity</p>
+              <p className={cn('text-3xl font-bold', getSimilarityColor(similarity))}>
+                {(similarity * 100).toFixed(1)}%
+              </p>
+              <p className="text-sm text-muted-foreground">{getSimilarityLabel(similarity)}</p>
+            </div>
+
+            {/* Similarity Bar */}
+            <div className="h-3 bg-muted rounded-full overflow-hidden">
+              <div
+                className={cn(
+                  'h-full rounded-full transition-all duration-500',
+                  similarity >= 0.8 ? 'bg-green-500' :
+                  similarity >= 0.5 ? 'bg-yellow-500' :
+                  similarity >= 0.3 ? 'bg-orange-500' : 'bg-red-500'
+                )}
+                style={{ width: `${similarity * 100}%` }}
+              />
+            </div>
+
+            {sharedWords.length > 0 && (
+              <div>
+                <p className="text-xs text-muted-foreground mb-1">Shared keywords:</p>
+                <div className="flex flex-wrap gap-1">
+                  {sharedWords.map(word => (
+                    <span key={word} className="px-2 py-0.5 bg-violet-500/10 text-violet-500 rounded text-xs">
+                      {word}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// CONTEXT WINDOW VISUALIZER
+// ============================================
+
+const CONTEXT_WINDOWS = [
+  { model: 'GPT-3.5 Turbo', tokens: 16385, color: 'bg-green-500' },
+  { model: 'GPT-4', tokens: 8192, color: 'bg-blue-500' },
+  { model: 'GPT-4 Turbo', tokens: 128000, color: 'bg-purple-500' },
+  { model: 'GPT-4o', tokens: 128000, color: 'bg-cyan-500' },
+  { model: 'Claude 3 Haiku', tokens: 200000, color: 'bg-orange-500' },
+  { model: 'Claude 3.5 Sonnet', tokens: 200000, color: 'bg-pink-500' },
+  { model: 'Claude 3 Opus', tokens: 200000, color: 'bg-red-500' },
+  { model: 'Gemini 1.5 Pro', tokens: 1000000, color: 'bg-yellow-500' },
+  { model: 'Llama 3.1', tokens: 128000, color: 'bg-indigo-500' },
+]
+
+export function ContextWindowVisualizer() {
+  const [inputText, setInputText] = useState('')
+  const [selectedModel, setSelectedModel] = useState(CONTEXT_WINDOWS[5]) // Claude 3.5 Sonnet
+
+  const estimatedTokens = Math.ceil(inputText.length / 4)
+  const usagePercent = Math.min((estimatedTokens / selectedModel.tokens) * 100, 100)
+  const remainingTokens = Math.max(selectedModel.tokens - estimatedTokens, 0)
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+          <BarChart2 className="w-5 h-5 text-cyan-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Context Window Visualizer</h3>
+          <p className="text-xs text-muted-foreground">Visualize context usage across models</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <textarea
+          value={inputText}
+          onChange={(e) => setInputText(e.target.value)}
+          placeholder="Paste your prompt to visualize context usage..."
+          rows={4}
+          className="w-full px-4 py-3 bg-muted/50 border border-border rounded-lg focus:border-cyan-500 focus:outline-none resize-none text-sm"
+        />
+
+        {/* Model Selection */}
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {CONTEXT_WINDOWS.map((model) => (
+            <button
+              key={model.model}
+              onClick={() => setSelectedModel(model)}
+              className={cn(
+                'px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors',
+                selectedModel.model === model.model
+                  ? 'bg-cyan-500 text-white'
+                  : 'bg-muted/50 hover:bg-muted text-muted-foreground'
+              )}
+            >
+              {model.model}
+            </button>
+          ))}
+        </div>
+
+        {/* Usage Stats */}
+        <div className="grid grid-cols-3 gap-3">
+          <div className="p-3 bg-muted/50 rounded-lg text-center">
+            <p className="text-xl font-bold text-cyan-500">{estimatedTokens.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground">Tokens Used</p>
+          </div>
+          <div className="p-3 bg-muted/50 rounded-lg text-center">
+            <p className="text-xl font-bold text-green-500">{remainingTokens.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground">Remaining</p>
+          </div>
+          <div className="p-3 bg-muted/50 rounded-lg text-center">
+            <p className="text-xl font-bold">{selectedModel.tokens.toLocaleString()}</p>
+            <p className="text-xs text-muted-foreground">Max Tokens</p>
+          </div>
+        </div>
+
+        {/* Visual Progress Bar */}
+        <div className="space-y-2">
+          <div className="flex justify-between text-xs">
+            <span className="text-muted-foreground">{selectedModel.model}</span>
+            <span className={usagePercent > 90 ? 'text-red-500' : 'text-muted-foreground'}>
+              {usagePercent.toFixed(1)}% used
+            </span>
+          </div>
+          <div className="h-4 bg-muted rounded-full overflow-hidden">
+            <div
+              className={cn(
+                'h-full rounded-full transition-all duration-300',
+                usagePercent > 90 ? 'bg-red-500' : usagePercent > 70 ? 'bg-yellow-500' : selectedModel.color
+              )}
+              style={{ width: `${usagePercent}%` }}
+            />
+          </div>
+          {usagePercent > 90 && (
+            <p className="text-xs text-red-500">Warning: Near context limit. Consider using a model with larger context window.</p>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// API COST CALCULATOR
+// ============================================
+
+const API_PRICING = [
+  { provider: 'OpenAI', model: 'GPT-4o', inputPrice: 2.50, outputPrice: 10.00, cached: 1.25 },
+  { provider: 'OpenAI', model: 'GPT-4o mini', inputPrice: 0.15, outputPrice: 0.60, cached: 0.075 },
+  { provider: 'OpenAI', model: 'GPT-4 Turbo', inputPrice: 10.00, outputPrice: 30.00, cached: null },
+  { provider: 'OpenAI', model: 'o1', inputPrice: 15.00, outputPrice: 60.00, cached: 7.50 },
+  { provider: 'OpenAI', model: 'o1-mini', inputPrice: 3.00, outputPrice: 12.00, cached: 1.50 },
+  { provider: 'Anthropic', model: 'Claude 3.5 Sonnet', inputPrice: 3.00, outputPrice: 15.00, cached: 0.30 },
+  { provider: 'Anthropic', model: 'Claude 3 Opus', inputPrice: 15.00, outputPrice: 75.00, cached: 1.50 },
+  { provider: 'Anthropic', model: 'Claude 3 Haiku', inputPrice: 0.25, outputPrice: 1.25, cached: 0.03 },
+  { provider: 'Google', model: 'Gemini 1.5 Pro', inputPrice: 3.50, outputPrice: 10.50, cached: null },
+  { provider: 'Google', model: 'Gemini 1.5 Flash', inputPrice: 0.075, outputPrice: 0.30, cached: null },
+]
+
+export function APICostCalculator() {
+  const [inputTokens, setInputTokens] = useState('1000')
+  const [outputTokens, setOutputTokens] = useState('500')
+  const [requestsPerDay, setRequestsPerDay] = useState('100')
+  const [sortBy, setSortBy] = useState<'total' | 'input' | 'output'>('total')
+
+  const inputT = parseInt(inputTokens) || 0
+  const outputT = parseInt(outputTokens) || 0
+  const requests = parseInt(requestsPerDay) || 0
+
+  const calculations = API_PRICING.map(pricing => {
+    const inputCost = (inputT / 1000000) * pricing.inputPrice
+    const outputCost = (outputT / 1000000) * pricing.outputPrice
+    const totalPerRequest = inputCost + outputCost
+    const dailyCost = totalPerRequest * requests
+    const monthlyCost = dailyCost * 30
+
+    return {
+      ...pricing,
+      inputCost,
+      outputCost,
+      totalPerRequest,
+      dailyCost,
+      monthlyCost,
+    }
+  }).sort((a, b) => {
+    if (sortBy === 'input') return a.inputCost - b.inputCost
+    if (sortBy === 'output') return a.outputCost - b.outputCost
+    return a.totalPerRequest - b.totalPerRequest
+  })
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+          <Settings className="w-5 h-5 text-green-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">API Cost Calculator</h3>
+          <p className="text-xs text-muted-foreground">Estimate API costs across providers</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="grid grid-cols-3 gap-3">
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Input Tokens</label>
+            <input
+              type="number"
+              value={inputTokens}
+              onChange={(e) => setInputTokens(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-green-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Output Tokens</label>
+            <input
+              type="number"
+              value={outputTokens}
+              onChange={(e) => setOutputTokens(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-green-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Requests/Day</label>
+            <input
+              type="number"
+              value={requestsPerDay}
+              onChange={(e) => setRequestsPerDay(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-green-500 focus:outline-none text-sm"
+            />
+          </div>
+        </div>
+
+        {/* Sort Options */}
+        <div className="flex gap-2">
+          {[
+            { key: 'total', label: 'By Total' },
+            { key: 'input', label: 'By Input' },
+            { key: 'output', label: 'By Output' },
+          ].map((option) => (
+            <button
+              key={option.key}
+              onClick={() => setSortBy(option.key as typeof sortBy)}
+              className={cn(
+                'px-3 py-1 rounded-lg text-xs font-medium transition-colors',
+                sortBy === option.key
+                  ? 'bg-green-500 text-white'
+                  : 'bg-muted/50 hover:bg-muted text-muted-foreground'
+              )}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Results */}
+        <div className="space-y-2 max-h-64 overflow-y-auto">
+          {calculations.map((calc, idx) => (
+            <div key={calc.model} className={cn(
+              'p-3 rounded-lg',
+              idx === 0 ? 'bg-green-500/10 border border-green-500/30' : 'bg-muted/30'
+            )}>
+              <div className="flex justify-between items-center mb-1">
+                <span className="font-medium text-sm">{calc.model}</span>
+                <span className="text-xs text-muted-foreground">{calc.provider}</span>
+              </div>
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                <div>
+                  <span className="text-muted-foreground">Per request: </span>
+                  <span className="font-mono text-green-500">${calc.totalPerRequest.toFixed(4)}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Daily: </span>
+                  <span className="font-mono text-yellow-500">${calc.dailyCost.toFixed(2)}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Monthly: </span>
+                  <span className="font-mono text-orange-500">${calc.monthlyCost.toFixed(2)}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// RAG CHUNKING PREVIEW
+// ============================================
+
+export function RAGChunkingPreview() {
+  const [text, setText] = useState('')
+  const [chunkSize, setChunkSize] = useState('500')
+  const [overlap, setOverlap] = useState('50')
+  const [chunks, setChunks] = useState<string[]>([])
+
+  const chunkText = useCallback(() => {
+    if (!text.trim()) {
+      setChunks([])
+      return
+    }
+
+    const size = parseInt(chunkSize) || 500
+    const overlapSize = parseInt(overlap) || 50
+    const result: string[] = []
+    let start = 0
+
+    while (start < text.length) {
+      const end = Math.min(start + size, text.length)
+      result.push(text.slice(start, end))
+      start = end - overlapSize
+      if (start >= text.length) break
+    }
+
+    setChunks(result)
+  }, [text, chunkSize, overlap])
+
+  useEffect(() => {
+    chunkText()
+  }, [chunkText])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+          <FileText className="w-5 h-5 text-amber-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">RAG Chunking Preview</h3>
+          <p className="text-xs text-muted-foreground">Preview text chunking for RAG pipelines</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Paste your document text to preview chunking..."
+          rows={4}
+          className="w-full px-4 py-3 bg-muted/50 border border-border rounded-lg focus:border-amber-500 focus:outline-none resize-none text-sm"
+        />
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Chunk Size (chars)</label>
+            <input
+              type="number"
+              value={chunkSize}
+              onChange={(e) => setChunkSize(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-amber-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Overlap (chars)</label>
+            <input
+              type="number"
+              value={overlap}
+              onChange={(e) => setOverlap(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-amber-500 focus:outline-none text-sm"
+            />
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-4 gap-2">
+          <div className="p-2 bg-muted/50 rounded-lg text-center">
+            <p className="text-lg font-bold text-amber-500">{chunks.length}</p>
+            <p className="text-xs text-muted-foreground">Chunks</p>
+          </div>
+          <div className="p-2 bg-muted/50 rounded-lg text-center">
+            <p className="text-lg font-bold">{text.length}</p>
+            <p className="text-xs text-muted-foreground">Total Chars</p>
+          </div>
+          <div className="p-2 bg-muted/50 rounded-lg text-center">
+            <p className="text-lg font-bold">{Math.ceil(text.length / 4)}</p>
+            <p className="text-xs text-muted-foreground">Est. Tokens</p>
+          </div>
+          <div className="p-2 bg-muted/50 rounded-lg text-center">
+            <p className="text-lg font-bold">{parseInt(overlap) > 0 ? Math.round((parseInt(overlap) / parseInt(chunkSize)) * 100) : 0}%</p>
+            <p className="text-xs text-muted-foreground">Overlap %</p>
+          </div>
+        </div>
+
+        {/* Chunk Preview */}
+        {chunks.length > 0 && (
+          <div className="space-y-2 max-h-48 overflow-y-auto">
+            {chunks.map((chunk, idx) => (
+              <div key={idx} className="p-3 bg-muted/30 rounded-lg">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="text-xs font-medium text-amber-500">Chunk {idx + 1}</span>
+                  <span className="text-xs text-muted-foreground">{chunk.length} chars</span>
+                </div>
+                <p className="text-xs text-muted-foreground line-clamp-2">{chunk}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// LLM BENCHMARK COMPARISON
+// ============================================
+
+const BENCHMARK_DATA = [
+  { model: 'GPT-4o', mmlu: 88.7, humanEval: 90.2, mathBench: 76.6, reasoning: 92.5 },
+  { model: 'GPT-4 Turbo', mmlu: 86.4, humanEval: 87.0, mathBench: 72.6, reasoning: 90.1 },
+  { model: 'Claude 3.5 Sonnet', mmlu: 88.7, humanEval: 92.0, mathBench: 78.3, reasoning: 94.2 },
+  { model: 'Claude 3 Opus', mmlu: 86.8, humanEval: 84.9, mathBench: 70.1, reasoning: 91.5 },
+  { model: 'Gemini 1.5 Pro', mmlu: 85.9, humanEval: 84.1, mathBench: 74.7, reasoning: 89.3 },
+  { model: 'Llama 3.1 405B', mmlu: 88.6, humanEval: 89.0, mathBench: 73.8, reasoning: 88.0 },
+  { model: 'o1', mmlu: 91.8, humanEval: 94.8, mathBench: 94.8, reasoning: 97.2 },
+  { model: 'o1-mini', mmlu: 85.2, humanEval: 92.4, mathBench: 90.0, reasoning: 93.1 },
+]
+
+export function LLMBenchmarkComparison() {
+  const [sortBy, setSortBy] = useState<'mmlu' | 'humanEval' | 'mathBench' | 'reasoning'>('reasoning')
+
+  const sortedData = [...BENCHMARK_DATA].sort((a, b) => b[sortBy] - a[sortBy])
+
+  const benchmarks = [
+    { key: 'mmlu', label: 'MMLU', description: 'Knowledge' },
+    { key: 'humanEval', label: 'HumanEval', description: 'Coding' },
+    { key: 'mathBench', label: 'MATH', description: 'Math' },
+    { key: 'reasoning', label: 'Reasoning', description: 'Logic' },
+  ]
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+          <Brain className="w-5 h-5 text-blue-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">LLM Benchmark Comparison</h3>
+          <p className="text-xs text-muted-foreground">Compare models across key benchmarks</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {/* Benchmark Selection */}
+        <div className="flex gap-2 overflow-x-auto pb-2">
+          {benchmarks.map((b) => (
+            <button
+              key={b.key}
+              onClick={() => setSortBy(b.key as typeof sortBy)}
+              className={cn(
+                'px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors',
+                sortBy === b.key
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-muted/50 hover:bg-muted text-muted-foreground'
+              )}
+            >
+              {b.label} ({b.description})
+            </button>
+          ))}
+        </div>
+
+        {/* Results */}
+        <div className="space-y-2">
+          {sortedData.map((model, idx) => (
+            <div key={model.model} className={cn(
+              'p-3 rounded-lg',
+              idx === 0 ? 'bg-blue-500/10 border border-blue-500/30' : 'bg-muted/30'
+            )}>
+              <div className="flex justify-between items-center mb-2">
+                <div className="flex items-center gap-2">
+                  {idx === 0 && <span className="text-xs bg-yellow-500/20 text-yellow-500 px-1.5 py-0.5 rounded">Best</span>}
+                  <span className="font-medium text-sm">{model.model}</span>
+                </div>
+                <span className="text-lg font-bold text-blue-500">{model[sortBy]}%</span>
+              </div>
+              <div className="grid grid-cols-4 gap-2 text-xs">
+                {benchmarks.map(b => (
+                  <div key={b.key} className={cn(
+                    'text-center p-1 rounded',
+                    b.key === sortBy ? 'bg-blue-500/20' : ''
+                  )}>
+                    <p className="text-muted-foreground">{b.label}</p>
+                    <p className="font-mono">{model[b.key as keyof typeof model]}%</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// TEMPERATURE & TOP-P VISUALIZER
+// ============================================
+
+export function TemperatureVisualizer() {
+  const [temperature, setTemperature] = useState(0.7)
+  const [topP, setTopP] = useState(0.9)
+
+  const sampleOutputs = [
+    {
+      temp: 0,
+      output: 'The capital of France is Paris. Paris is the largest city in France and has been the capital since the 10th century.',
+    },
+    {
+      temp: 0.3,
+      output: 'Paris is the capital of France. It\'s a beautiful city known for the Eiffel Tower and rich history.',
+    },
+    {
+      temp: 0.7,
+      output: 'France\'s capital is the lovely Paris! A city where art, culture, and croissants meet in perfect harmony.',
+    },
+    {
+      temp: 1.0,
+      output: 'Ah, Paris! The City of Light beckons with its bohemian cafes, the Seine\'s gentle whispers, and dreams spun from golden sunsets.',
+    },
+    {
+      temp: 1.5,
+      output: 'France dances with Paris - a kaleidoscope where baguettes waltz with impressionist dreams under technicolor moons!',
+    },
+  ]
+
+  const getClosestOutput = () => {
+    const closest = sampleOutputs.reduce((prev, curr) =>
+      Math.abs(curr.temp - temperature) < Math.abs(prev.temp - temperature) ? curr : prev
+    )
+    return closest.output
+  }
+
+  const getCreativityLevel = () => {
+    if (temperature <= 0.2) return { level: 'Deterministic', color: 'text-blue-500', desc: 'Consistent, predictable outputs' }
+    if (temperature <= 0.5) return { level: 'Conservative', color: 'text-green-500', desc: 'Slight variation, mostly focused' }
+    if (temperature <= 0.8) return { level: 'Balanced', color: 'text-yellow-500', desc: 'Good mix of creativity and coherence' }
+    if (temperature <= 1.2) return { level: 'Creative', color: 'text-orange-500', desc: 'More varied, imaginative outputs' }
+    return { level: 'Wild', color: 'text-red-500', desc: 'Highly random, may lose coherence' }
+  }
+
+  const creativity = getCreativityLevel()
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
+          <Zap className="w-5 h-5 text-red-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Temperature & Top-P Visualizer</h3>
+          <p className="text-xs text-muted-foreground">Understand sampling parameters</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {/* Temperature Slider */}
+        <div>
+          <div className="flex justify-between items-center mb-2">
+            <label className="text-sm font-medium">Temperature</label>
+            <span className="text-sm font-mono bg-muted px-2 py-0.5 rounded">{temperature.toFixed(1)}</span>
+          </div>
+          <input
+            type="range"
+            min="0"
+            max="2"
+            step="0.1"
+            value={temperature}
+            onChange={(e) => setTemperature(parseFloat(e.target.value))}
+            className="w-full accent-red-500"
+          />
+          <div className="flex justify-between text-xs text-muted-foreground mt-1">
+            <span>Focused</span>
+            <span>Creative</span>
+            <span>Random</span>
+          </div>
+        </div>
+
+        {/* Top-P Slider */}
+        <div>
+          <div className="flex justify-between items-center mb-2">
+            <label className="text-sm font-medium">Top-P (nucleus)</label>
+            <span className="text-sm font-mono bg-muted px-2 py-0.5 rounded">{topP.toFixed(1)}</span>
+          </div>
+          <input
+            type="range"
+            min="0.1"
+            max="1"
+            step="0.1"
+            value={topP}
+            onChange={(e) => setTopP(parseFloat(e.target.value))}
+            className="w-full accent-purple-500"
+          />
+          <div className="flex justify-between text-xs text-muted-foreground mt-1">
+            <span>Narrow</span>
+            <span>Wide</span>
+          </div>
+        </div>
+
+        {/* Creativity Level */}
+        <div className="p-3 bg-muted/50 rounded-lg">
+          <div className="flex justify-between items-center">
+            <span className="text-sm">Creativity Level:</span>
+            <span className={cn('font-medium', creativity.color)}>{creativity.level}</span>
+          </div>
+          <p className="text-xs text-muted-foreground mt-1">{creativity.desc}</p>
+        </div>
+
+        {/* Sample Output */}
+        <div className="p-3 bg-muted/30 rounded-lg">
+          <p className="text-xs text-muted-foreground mb-2">Sample output at this temperature:</p>
+          <p className="text-sm italic">&ldquo;{getClosestOutput()}&rdquo;</p>
+        </div>
+
+        {/* Recommendations */}
+        <div className="text-xs text-muted-foreground space-y-1">
+          <p className="font-medium">Recommended settings:</p>
+          <div className="grid grid-cols-2 gap-2">
+            <span className="px-2 py-1 bg-muted rounded">Code: temp=0</span>
+            <span className="px-2 py-1 bg-muted rounded">Analysis: temp=0.3</span>
+            <span className="px-2 py-1 bg-muted rounded">Chat: temp=0.7</span>
+            <span className="px-2 py-1 bg-muted rounded">Creative: temp=1.0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// PROMPT INJECTION TESTER
+// ============================================
+
+const INJECTION_PATTERNS = [
+  { pattern: /ignore (previous|all|above)/i, risk: 'high', type: 'Instruction Override' },
+  { pattern: /forget (everything|all|your)/i, risk: 'high', type: 'Memory Wipe' },
+  { pattern: /you are now/i, risk: 'high', type: 'Role Hijacking' },
+  { pattern: /new instructions?:/i, risk: 'high', type: 'Instruction Injection' },
+  { pattern: /disregard/i, risk: 'medium', type: 'Instruction Override' },
+  { pattern: /pretend (you|to be)/i, risk: 'medium', type: 'Role Play Exploit' },
+  { pattern: /act as (if|a)/i, risk: 'medium', type: 'Role Play Exploit' },
+  { pattern: /system prompt/i, risk: 'medium', type: 'Prompt Extraction' },
+  { pattern: /reveal your/i, risk: 'medium', type: 'Prompt Extraction' },
+  { pattern: /bypass/i, risk: 'medium', type: 'Security Bypass' },
+  { pattern: /jailbreak/i, risk: 'high', type: 'Jailbreak Attempt' },
+  { pattern: /DAN|do anything now/i, risk: 'high', type: 'Jailbreak Attempt' },
+  { pattern: /\[.*\]\(.*\)/i, risk: 'low', type: 'Hidden Link' },
+  { pattern: /<script|javascript:/i, risk: 'medium', type: 'XSS Attempt' },
+]
+
+export function PromptInjectionTester() {
+  const [prompt, setPrompt] = useState('')
+  const [results, setResults] = useState<{
+    pattern: string
+    risk: string
+    type: string
+    match: string
+  }[]>([])
+
+  useEffect(() => {
+    if (!prompt.trim()) {
+      setResults([])
+      return
+    }
+
+    const detected: typeof results = []
+    INJECTION_PATTERNS.forEach(({ pattern, risk, type }) => {
+      const match = prompt.match(pattern)
+      if (match) {
+        detected.push({
+          pattern: pattern.source,
+          risk,
+          type,
+          match: match[0],
+        })
+      }
+    })
+    setResults(detected)
+  }, [prompt])
+
+  const getRiskColor = (risk: string) => {
+    switch (risk) {
+      case 'high': return 'text-red-500 bg-red-500/10'
+      case 'medium': return 'text-yellow-500 bg-yellow-500/10'
+      case 'low': return 'text-blue-500 bg-blue-500/10'
+      default: return 'text-muted-foreground bg-muted'
+    }
+  }
+
+  const overallRisk = results.some(r => r.risk === 'high') ? 'High' :
+                      results.some(r => r.risk === 'medium') ? 'Medium' :
+                      results.length > 0 ? 'Low' : 'None'
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
+          <RefreshCw className="w-5 h-5 text-red-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Prompt Injection Tester</h3>
+          <p className="text-xs text-muted-foreground">Detect potential injection attacks</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <textarea
+          value={prompt}
+          onChange={(e) => setPrompt(e.target.value)}
+          placeholder="Paste a user prompt to check for injection patterns..."
+          rows={4}
+          className="w-full px-4 py-3 bg-muted/50 border border-border rounded-lg focus:border-red-500 focus:outline-none resize-none text-sm"
+        />
+
+        {/* Overall Risk */}
+        <div className={cn(
+          'p-3 rounded-lg flex items-center justify-between',
+          overallRisk === 'High' ? 'bg-red-500/10' :
+          overallRisk === 'Medium' ? 'bg-yellow-500/10' :
+          overallRisk === 'Low' ? 'bg-blue-500/10' : 'bg-green-500/10'
+        )}>
+          <span className="text-sm font-medium">Overall Risk:</span>
+          <span className={cn(
+            'font-bold',
+            overallRisk === 'High' ? 'text-red-500' :
+            overallRisk === 'Medium' ? 'text-yellow-500' :
+            overallRisk === 'Low' ? 'text-blue-500' : 'text-green-500'
+          )}>
+            {overallRisk}
+          </span>
+        </div>
+
+        {/* Detected Patterns */}
+        {results.length > 0 ? (
+          <div className="space-y-2">
+            <p className="text-xs font-medium text-muted-foreground">Detected patterns ({results.length}):</p>
+            {results.map((result, idx) => (
+              <div key={idx} className="p-3 bg-muted/30 rounded-lg">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="font-medium text-sm">{result.type}</span>
+                  <span className={cn('text-xs px-2 py-0.5 rounded', getRiskColor(result.risk))}>
+                    {result.risk.toUpperCase()}
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Matched: <span className="font-mono text-red-400">&ldquo;{result.match}&rdquo;</span>
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : prompt.trim() && (
+          <div className="p-3 bg-green-500/10 rounded-lg text-center">
+            <p className="text-sm text-green-500">No injection patterns detected</p>
+          </div>
+        )}
+
+        {/* Tips */}
+        <div className="text-xs text-muted-foreground">
+          <p className="font-medium mb-1">Prevention tips:</p>
+          <ul className="list-disc list-inside space-y-0.5">
+            <li>Use system prompts to define strict boundaries</li>
+            <li>Validate and sanitize user inputs</li>
+            <li>Implement output filtering</li>
+            <li>Use prompt templates with fixed structure</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// FINE-TUNING DATA FORMATTER
+// ============================================
+
+export function FineTuningDataFormatter() {
+  const [systemPrompt, setSystemPrompt] = useState('')
+  const [userMessage, setUserMessage] = useState('')
+  const [assistantResponse, setAssistantResponse] = useState('')
+  const [format, setFormat] = useState<'openai' | 'anthropic' | 'alpaca'>('openai')
+  const [output, setOutput] = useState('')
+  const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    if (!userMessage.trim() || !assistantResponse.trim()) {
+      setOutput('')
+      return
+    }
+
+    let formatted = ''
+
+    switch (format) {
+      case 'openai':
+        formatted = JSON.stringify({
+          messages: [
+            ...(systemPrompt ? [{ role: 'system', content: systemPrompt }] : []),
+            { role: 'user', content: userMessage },
+            { role: 'assistant', content: assistantResponse },
+          ],
+        }, null, 2)
+        break
+
+      case 'anthropic':
+        formatted = JSON.stringify({
+          system: systemPrompt || undefined,
+          messages: [
+            { role: 'user', content: userMessage },
+            { role: 'assistant', content: assistantResponse },
+          ],
+        }, null, 2)
+        break
+
+      case 'alpaca':
+        formatted = JSON.stringify({
+          instruction: systemPrompt || 'You are a helpful assistant.',
+          input: userMessage,
+          output: assistantResponse,
+        }, null, 2)
+        break
+    }
+
+    setOutput(formatted)
+  }, [systemPrompt, userMessage, assistantResponse, format])
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(output)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+          <Type className="w-5 h-5 text-emerald-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Fine-Tuning Data Formatter</h3>
+          <p className="text-xs text-muted-foreground">Format training data for different providers</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {/* Format Selection */}
+        <div className="flex gap-2">
+          {[
+            { key: 'openai', label: 'OpenAI' },
+            { key: 'anthropic', label: 'Anthropic' },
+            { key: 'alpaca', label: 'Alpaca' },
+          ].map((f) => (
+            <button
+              key={f.key}
+              onClick={() => setFormat(f.key as typeof format)}
+              className={cn(
+                'px-3 py-1.5 rounded-lg text-xs font-medium transition-colors',
+                format === f.key
+                  ? 'bg-emerald-500 text-white'
+                  : 'bg-muted/50 hover:bg-muted text-muted-foreground'
+              )}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Input Fields */}
+        <div>
+          <label className="text-xs text-muted-foreground mb-1 block">System Prompt (optional)</label>
+          <textarea
+            value={systemPrompt}
+            onChange={(e) => setSystemPrompt(e.target.value)}
+            placeholder="You are a helpful assistant..."
+            rows={2}
+            className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-emerald-500 focus:outline-none resize-none text-sm"
+          />
+        </div>
+
+        <div>
+          <label className="text-xs text-muted-foreground mb-1 block">User Message *</label>
+          <textarea
+            value={userMessage}
+            onChange={(e) => setUserMessage(e.target.value)}
+            placeholder="What the user asks..."
+            rows={2}
+            className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-emerald-500 focus:outline-none resize-none text-sm"
+          />
+        </div>
+
+        <div>
+          <label className="text-xs text-muted-foreground mb-1 block">Assistant Response *</label>
+          <textarea
+            value={assistantResponse}
+            onChange={(e) => setAssistantResponse(e.target.value)}
+            placeholder="Expected assistant response..."
+            rows={2}
+            className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-emerald-500 focus:outline-none resize-none text-sm"
+          />
+        </div>
+
+        {/* Output */}
+        {output && (
+          <div>
+            <div className="flex justify-between items-center mb-1">
+              <label className="text-xs text-muted-foreground">Formatted Output ({format}):</label>
+              <button
+                onClick={handleCopy}
+                className="text-xs text-emerald-500 hover:underline flex items-center gap-1"
+              >
+                {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                {copied ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+            <pre className="p-3 bg-muted/50 rounded-lg overflow-x-auto text-xs font-mono max-h-40">
+              {output}
+            </pre>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
 // AI TOOLS GRID
 // ============================================
 
@@ -1009,6 +2040,8 @@ const TOOL_CATEGORIES = [
   { id: 'prompts', label: 'Prompts', icon: Wand2 },
   { id: 'text', label: 'Text', icon: BookOpen },
   { id: 'schema', label: 'Schema', icon: Code },
+  { id: 'llm', label: 'LLM Tools', icon: Brain },
+  { id: 'safety', label: 'Safety', icon: RefreshCw },
   { id: 'advanced', label: 'Advanced', icon: Sparkles },
 ]
 
@@ -1019,8 +2052,9 @@ export function AIToolsGrid() {
     switch (activeCategory) {
       case 'tokens':
         return (
-          <div className="grid md:grid-cols-1 gap-6">
+          <div className="grid md:grid-cols-2 gap-6">
             <TokenCounter />
+            <ContextWindowVisualizer />
           </div>
         )
       case 'prompts':
@@ -1039,8 +2073,25 @@ export function AIToolsGrid() {
         )
       case 'schema':
         return (
-          <div className="grid md:grid-cols-1 gap-6">
+          <div className="grid md:grid-cols-2 gap-6">
             <JSONSchemaGenerator />
+            <FineTuningDataFormatter />
+          </div>
+        )
+      case 'llm':
+        return (
+          <div className="grid md:grid-cols-2 gap-6">
+            <LLMBenchmarkComparison />
+            <APICostCalculator />
+            <TemperatureVisualizer />
+            <RAGChunkingPreview />
+          </div>
+        )
+      case 'safety':
+        return (
+          <div className="grid md:grid-cols-2 gap-6">
+            <PromptInjectionTester />
+            <EmbeddingsSimilarityCalculator />
           </div>
         )
       case 'advanced':
