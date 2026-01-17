@@ -249,9 +249,53 @@ Setelah selesai, report dengan format:
 |--------|-----|
 | GitHub PRs | https://github.com/subkhanibnuaji/ibnu-portfolio/pulls |
 | Vercel Dashboard | https://vercel.com/dashboard |
+| **TEST ENDPOINT** | https://ibnu-portfolio-ashen.vercel.app/api/telegram/test |
 | Webhook Health | https://ibnu-portfolio-ashen.vercel.app/api/telegram/webhook |
 | Set Webhook | https://api.telegram.org/bot8472300010:AAGgFp0I95mj_lYM8dmYJzXGYrQFXd_M-0k/setWebhook?url=https://ibnu-portfolio-ashen.vercel.app/api/telegram/webhook |
 | Webhook Info | https://api.telegram.org/bot8472300010:AAGgFp0I95mj_lYM8dmYJzXGYrQFXd_M-0k/getWebhookInfo |
 | Delete Webhook | https://api.telegram.org/bot8472300010:AAGgFp0I95mj_lYM8dmYJzXGYrQFXd_M-0k/deleteWebhook |
 | Bot Link | https://t.me/IbnuGPT_Bot |
 | Telegram Web | https://web.telegram.org/ |
+
+---
+
+## NEW: TEST ENDPOINT
+
+Buka URL ini untuk test konfigurasi bot secara lengkap:
+
+```
+https://ibnu-portfolio-ashen.vercel.app/api/telegram/test
+```
+
+Response akan menunjukkan:
+- Status environment variables (TELEGRAM_BOT_TOKEN, GROQ_API_KEY)
+- Bot info dari Telegram API
+- Webhook status
+
+Contoh response sukses:
+```json
+{
+  "timestamp": "2024-01-17T...",
+  "tests": {
+    "envVars": {
+      "TELEGRAM_BOT_TOKEN": "configured (8472300010...)",
+      "GROQ_API_KEY": "configured (gsk_...)"
+    },
+    "botInfo": {
+      "status": "success",
+      "id": 8472300010,
+      "username": "IbnuGPT_Bot",
+      "firstName": "IbnuGPT Bot",
+      "link": "https://t.me/IbnuGPT_Bot"
+    },
+    "webhookInfo": {
+      "status": "success",
+      "url": "https://ibnu-portfolio-ashen.vercel.app/api/telegram/webhook",
+      "pendingUpdates": 0,
+      "lastError": null
+    }
+  },
+  "status": "ok",
+  "message": "All tests passed! Bot is ready."
+}
+```
