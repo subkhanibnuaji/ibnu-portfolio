@@ -18,11 +18,9 @@ import { cn } from '@/lib/utils';
 
 export interface ChatInputProps {
   onSend?: (message: string) => void;
-  // Controlled mode props
+  onSubmit?: (e?: FormEvent) => void;
   value?: string;
   onChange?: (value: string) => void;
-  onSubmit?: (e?: FormEvent) => void;
-  // Common props
   isLoading?: boolean;
   disabled?: boolean;
   placeholder?: string;
@@ -39,9 +37,9 @@ export interface ChatInputProps {
 
 export function ChatInput({
   onSend,
+  onSubmit,
   value: controlledValue,
   onChange: controlledOnChange,
-  onSubmit,
   isLoading = false,
   disabled = false,
   placeholder = 'Type your message...',

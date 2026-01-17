@@ -151,7 +151,6 @@ export function ToolOutput({ tool, input, result, isLoading, toolCall, status, c
   const toolError = toolCall?.error;
   const hasToolError = !!toolError;
   const computedStatus = status || (isLoading ? 'running' : (toolResult ? 'success' : 'running'));
-  const hasArgs = Object.keys(toolArgs).length > 0;
 
   const Icon = TOOL_ICONS[toolName] || Wrench;
 
@@ -220,7 +219,7 @@ export function ToolOutput({ tool, input, result, isLoading, toolCall, status, c
       {isExpanded ? (
         <div className="px-4 pb-3 space-y-2">
           {/* Arguments */}
-          {hasArgs ? (
+          {hasToolArgs ? (
             <div>
               <p className="text-xs text-muted-foreground mb-1">Input:</p>
               <pre className="text-xs bg-black/20 rounded p-2 overflow-x-auto">
