@@ -961,6 +961,7 @@ const ChatMessageItem = memo(function ChatMessageItem({ message, mode }: ChatMes
 export function AIChatbot() {
   const [isOpen, setIsOpen] = useState(false)
   const [mode, setMode] = useState<ChatMode>('quick')
+  const [isMounted, setIsMounted] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',

@@ -5,6 +5,9 @@ import { CanvasFixProvider } from '@/components/providers/canvas-fix-provider'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { SessionProvider } from '@/components/providers/session-provider'
 import { Toaster } from '@/components/ui/sonner'
+import { SiteNavigator } from '@/components/site-navigator'
+import { ScrollCapabilitiesPopup } from '@/components/effects/scroll-capabilities-popup'
+import { WelcomeTour } from '@/components/onboarding/welcome-tour'
 import { AchievementSystem } from '@/components/gamification/achievement-system'
 import { QuickActionsFAB } from '@/components/ui/quick-actions-fab'
 import { SiteStatsWidget } from '@/components/widgets/site-stats-widget'
@@ -118,6 +121,7 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               {children}
+              <SiteNavigator />
               <Toaster richColors position="bottom-right" />
               <AchievementSystem />
               <QuickActionsFAB />

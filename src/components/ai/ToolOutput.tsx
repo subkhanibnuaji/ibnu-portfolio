@@ -181,7 +181,7 @@ export function ToolOutput({ tool, input, result, isLoading, toolCall, status, c
       </button>
 
       {/* Content */}
-      {isExpanded && (
+      {isExpanded ? (
         <div className="px-4 pb-3 space-y-2">
           {/* Arguments */}
           {hasToolArgs && (
@@ -248,7 +248,7 @@ export function ToolOutput({ tool, input, result, isLoading, toolCall, status, c
             </div>
           )}
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
