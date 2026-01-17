@@ -59,7 +59,9 @@ function ChatMessageComponent({
     if (!id) return;
     const newFeedback = localFeedback === type ? null : type;
     setLocalFeedback(newFeedback);
-    onFeedback?.(id, newFeedback);
+    if (id) {
+      onFeedback?.(id, newFeedback);
+    }
   };
 
   const isUser = role === 'user';

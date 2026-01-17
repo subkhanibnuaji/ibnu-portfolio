@@ -1326,7 +1326,6 @@ export function AIChatbot() {
     setInput('')
   }, [])
 
-
   // Memoized sendMessage handler
   const sendMessage = useCallback((content: string) => {
     if (!content.trim() || isLoading) return
@@ -1359,6 +1358,7 @@ export function AIChatbot() {
     }
   }, [])
 
+  // Memoized clear chat handler
   const clearChat = useCallback(() => {
     setMessages([
       {
