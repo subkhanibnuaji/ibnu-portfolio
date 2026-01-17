@@ -4,10 +4,12 @@ import { motion } from 'framer-motion'
 import Link from 'next/link'
 import {
   Shield, ShieldAlert, Lock, Bug, Eye, Fingerprint, Server, Key,
-  AlertTriangle, FileWarning, Wifi, Database, Terminal, Skull, ArrowRight
+  AlertTriangle, FileWarning, Wifi, Database, Terminal, Skull, ArrowRight,
+  Wrench, Hash, Binary, Network
 } from 'lucide-react'
 import { NewsFeed } from '@/components/pillars/news-feed'
 import { SecurityStatsWidget, ThreatIndicator } from '@/components/pillars/security-stats'
+import { SecurityToolsGrid } from '@/components/security/security-tools'
 
 const securityDomains = [
   {
@@ -70,6 +72,14 @@ const certifications = [
   { name: 'CISSP', level: 'Expert' },
 ]
 
+const toolCategories = [
+  { icon: Shield, name: 'Password Tools', description: 'Strength analyzer & generator' },
+  { icon: Hash, name: 'Hash Generator', description: 'MD5, SHA-1, SHA-256, SHA-512' },
+  { icon: Binary, name: 'Encoding Tools', description: 'Base64, URL encode/decode' },
+  { icon: Lock, name: 'Encryption', description: 'AES-256 encryption tool' },
+  { icon: Network, name: 'Network Tools', description: 'Subnet calculator & more' },
+]
+
 export default function CyberSecurityPage() {
   return (
     <main className="min-h-screen py-24">
@@ -90,9 +100,47 @@ export default function CyberSecurityPage() {
           </h1>
           <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
             Stay informed about the latest cybersecurity threats, vulnerabilities, and defense strategies.
-            Real-time news from trusted security researchers and organizations.
+            Use our free security tools and stay updated with real-time news from trusted sources.
           </p>
+
+          {/* Quick Tool Categories */}
+          <div className="flex flex-wrap justify-center gap-3 mt-8">
+            {toolCategories.map((cat, i) => (
+              <motion.div
+                key={cat.name}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: i * 0.1 }}
+                className="flex items-center gap-2 px-4 py-2 bg-card border border-border rounded-lg text-sm"
+              >
+                <cat.icon className="w-4 h-4 text-security-safe" />
+                <span className="font-medium">{cat.name}</span>
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
+      </section>
+
+      {/* Security Tools Section - NEW */}
+      <section className="container mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-8"
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-lg bg-security-safe/10 flex items-center justify-center">
+              <Wrench className="w-5 h-5 text-security-safe" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold">Security Tools</h2>
+              <p className="text-sm text-muted-foreground">Free, browser-based cybersecurity utilities</p>
+            </div>
+          </div>
+        </motion.div>
+
+        <SecurityToolsGrid />
       </section>
 
       {/* Security Stats */}
@@ -238,10 +286,10 @@ export default function CyberSecurityPage() {
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              { title: 'Use Strong Passwords', desc: 'Unique passwords with 12+ characters' },
-              { title: 'Enable 2FA', desc: 'Add extra layer of authentication' },
-              { title: 'Keep Software Updated', desc: 'Patch vulnerabilities promptly' },
-              { title: 'Backup Regularly', desc: 'Protect against data loss' },
+              { title: 'Use Strong Passwords', desc: 'Unique passwords with 12+ characters', tip: 'Use our password generator above!' },
+              { title: 'Enable 2FA', desc: 'Add extra layer of authentication', tip: 'TOTP apps are more secure than SMS' },
+              { title: 'Keep Software Updated', desc: 'Patch vulnerabilities promptly', tip: 'Enable automatic updates when possible' },
+              { title: 'Backup Regularly', desc: 'Protect against data loss', tip: 'Follow the 3-2-1 backup rule' },
             ].map((practice, index) => (
               <div
                 key={practice.title}
@@ -251,10 +299,61 @@ export default function CyberSecurityPage() {
                   <span className="text-security-safe font-bold">{index + 1}</span>
                 </div>
                 <h4 className="font-semibold mb-1">{practice.title}</h4>
-                <p className="text-sm text-muted-foreground">{practice.desc}</p>
+                <p className="text-sm text-muted-foreground mb-2">{practice.desc}</p>
+                <p className="text-xs text-security-safe">{practice.tip}</p>
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* OWASP Top 10 Quick Reference */}
+      <section className="container mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-8"
+        >
+          <h2 className="text-3xl font-bold mb-4">OWASP Top 10 (2021)</h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            The most critical web application security risks you should know about.
+          </p>
+        </motion.div>
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-5 gap-4">
+          {[
+            { rank: 'A01', name: 'Broken Access Control', severity: 'critical' },
+            { rank: 'A02', name: 'Cryptographic Failures', severity: 'critical' },
+            { rank: 'A03', name: 'Injection', severity: 'high' },
+            { rank: 'A04', name: 'Insecure Design', severity: 'high' },
+            { rank: 'A05', name: 'Security Misconfiguration', severity: 'high' },
+            { rank: 'A06', name: 'Vulnerable Components', severity: 'medium' },
+            { rank: 'A07', name: 'Auth Failures', severity: 'high' },
+            { rank: 'A08', name: 'Data Integrity Failures', severity: 'medium' },
+            { rank: 'A09', name: 'Logging Failures', severity: 'medium' },
+            { rank: 'A10', name: 'SSRF', severity: 'medium' },
+          ].map((item, index) => (
+            <motion.div
+              key={item.rank}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.05 }}
+              className="p-4 bg-card border border-border rounded-xl hover:border-primary/30 transition-all"
+            >
+              <div className="flex items-center gap-2 mb-2">
+                <span className={`px-2 py-0.5 rounded text-xs font-bold ${
+                  item.severity === 'critical' ? 'bg-red-500/20 text-red-500' :
+                  item.severity === 'high' ? 'bg-orange-500/20 text-orange-500' :
+                  'bg-yellow-500/20 text-yellow-500'
+                }`}>
+                  {item.rank}
+                </span>
+              </div>
+              <p className="font-medium text-sm">{item.name}</p>
+            </motion.div>
+          ))}
         </div>
       </section>
 
