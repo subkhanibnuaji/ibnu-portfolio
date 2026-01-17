@@ -40,7 +40,7 @@ const projects = [
     ],
     impact: 'Provides easy access to portfolio on mobile devices with downloadable APK',
     liveUrl: '/mobile',
-    githubUrl: 'https://github.com/subkhanibnuaji/ibnu-portfolio/tree/main/mobile-app',
+    githubUrl: null,
     isInternal: true
   },
   {
@@ -158,7 +158,7 @@ const projects = [
     ],
     impact: 'Demonstrates Web3 development capabilities on ICP',
     liveUrl: null,
-    githubUrl: 'https://github.com/subkhanibnuaji'
+    githubUrl: null
   },
   {
     id: 'animo',

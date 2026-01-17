@@ -559,48 +559,19 @@ export default function MobilePage() {
           </div>
         </motion.section>
 
-        {/* Developer Section */}
+        {/* Web Preview Section */}
         <motion.section
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
+          className="text-center"
         >
-          <h3 className="text-2xl font-bold mb-8 text-center">For Developers</h3>
-          <div className="glass rounded-2xl p-6 md:p-8">
-            <div className="font-mono text-sm bg-zinc-950 rounded-xl p-6 overflow-x-auto">
-              <div className="text-zinc-500"># Clone repository</div>
-              <div className="text-cyber-cyan mb-4">git clone https://github.com/subkhanibnuaji/ibnu-portfolio.git</div>
-
-              <div className="text-zinc-500"># Masuk ke folder mobile app</div>
-              <div className="text-cyber-cyan mb-4">cd ibnu-portfolio/mobile-app</div>
-
-              <div className="text-zinc-500"># Install dependencies</div>
-              <div className="text-cyber-cyan mb-4">npm install</div>
-
-              <div className="text-zinc-500"># Jalankan di development mode</div>
-              <div className="text-cyber-green">npm start</div>
-              <div className="text-zinc-500 mt-2"># Pilih: a = Android, i = iOS, w = Web</div>
-            </div>
-
-            <div className="mt-6 flex flex-wrap gap-3 justify-center">
-              <a
-                href="https://github.com/subkhanibnuaji/ibnu-portfolio/tree/main/mobile-app"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Button variant="outline" className="gap-2">
-                  <Github className="h-4 w-4" />
-                  View Source Code
-                </Button>
-              </a>
-              <Link href="/mobile/preview">
-                <Button variant="outline" className="gap-2">
-                  <MonitorSmartphone className="h-4 w-4" />
-                  Web Preview
-                </Button>
-              </Link>
-            </div>
-          </div>
+          <Link href="/mobile/preview">
+            <Button variant="outline" size="lg" className="gap-2">
+              <MonitorSmartphone className="h-5 w-5" />
+              Web Preview
+            </Button>
+          </Link>
         </motion.section>
       </div>
     </PageLayout>
