@@ -20,6 +20,7 @@ import { ChatGroq } from '@langchain/groq';
 import { HumanMessage, AIMessage, SystemMessage, BaseMessage } from '@langchain/core/messages';
 import { AI_MODELS, AI_DEFAULTS, type GroqModelId } from './config';
 import * as SuperApp from './telegram-features';
+import * as Advanced from './telegram-advanced';
 
 // ============================================
 // TYPES
@@ -930,52 +931,47 @@ Just send any message to start! 💬`;
 export async function handleHelp(chatId: number): Promise<void> {
   botStats.commandUsage['help'] = (botStats.commandUsage['help'] || 0) + 1;
 
-  const helpMessage = `📖 <b>IbnuGPT Super App - Complete Guide</b>
+  const helpMessage = `📖 <b>IbnuGPT World-Class Bot</b>
 
 <b>🚀 Quick Access:</b>
-• /menu - Interactive menu
-• /start - Welcome message
+/menu /start /help /about
 
 <b>🤖 AI Features:</b>
-• /model - Switch AI model
-• /persona - Change personality
-• /run js [code] - Execute code
-• /imagine [prompt] - Generate AI image
-• /translate [lang] [text] - Translate
+/model /persona /run /imagine /translate
 
 <b>🔍 Search & Research:</b>
-• /search [query] - Web search
-• /summarize [url] - Summarize page
-• /news [category] - Latest news
+/search /summarize /news
 
-<b>🌍 Info & Weather:</b>
-• /weather [city] - Weather info
-• /crypto [symbol] - Crypto prices
+<b>🌍 Info:</b>
+/weather /crypto /ip /dns
 
-<b>🛠️ Utility Tools:</b>
-• /calc [expr] - Calculator
-• /convert [val] [from] to [to]
-• /currency [amt] [from] to [to]
-• /qr [text] - Generate QR code
-• /shorten [url] - URL shortener
+<b>🎨 Media:</b>
+/meme /gif /screenshot /qr
+
+<b>🛠️ Utility:</b>
+/calc /convert /currency /shorten
 
 <b>📝 Productivity:</b>
-• /notes - Manage notes
-• /todo - Todo list
+/notes /todo /poll
 
-<b>🎮 Games & Fun:</b>
-• /trivia - Trivia quiz
-• /math - Math quiz
-• /word - Word guess game
-• /joke - Random joke
-• /quote - Inspirational quote
-• /horoscope [sign] - Horoscope
+<b>🎮 Games:</b>
+/trivia /math /word /hangman
+/rps /emoji /guess /riddle
 
-<b>💻 Developer Tools:</b>
-• /dev - All dev tools
-• /json, /base64, /hash
-• /uuid, /password, /color
+<b>🏆 Competition:</b>
+/leaderboard /daily
 
+<b>🎲 Random:</b>
+/flip /dice /8ball /decide
+
+<b>📊 Text Tools:</b>
+/textstats /reverse /mock
+
+<b>💻 Dev Tools:</b>
+/json /base64 /hash /uuid
+/password /color /lorem
+
+<b>80+ Commands Available!</b>
 Use /menu for interactive buttons!`;
 
   await sendMessage(chatId, helpMessage);
@@ -1861,6 +1857,592 @@ export async function handleCrypto(chatId: number, symbol: string): Promise<void
   }
 }
 
+// ============================================
+// WORLD-CLASS ADVANCED FEATURES
+// ============================================
+
+// Meme Generator
+export async function handleMeme(chatId: number, args: string): Promise<void> {
+  const parts = args.split('|').map(p => p.trim());
+
+  if (parts.length < 3) {
+    const templates = Advanced.getMemeTemplates();
+    await sendMessage(chatId, `😂 <b>Meme Generator</b>
+
+<b>Usage:</b> /meme template | top text | bottom text
+
+<b>Available Templates:</b>
+${templates}
+
+<b>Example:</b>
+/meme drake | When code works | When code works on first try`);
+    return;
+  }
+
+  const [template, topText, bottomText] = parts;
+  await sendChatAction(chatId, 'upload_photo');
+  await sendMessage(chatId, '😂 Creating your meme...');
+
+  const result = await Advanced.generateMeme(template, topText, bottomText);
+
+  if (result.success && result.imageUrl) {
+    await callTelegramAPI('sendPhoto', {
+      chat_id: chatId,
+      photo: result.imageUrl,
+      caption: `😂 <b>Meme Generated!</b>\n\nTemplate: ${template}`,
+      parse_mode: 'HTML',
+    });
+  } else {
+    await sendMessage(chatId, `❌ ${result.error}`);
+  }
+}
+
+// GIF Search
+export async function handleGifSearch(chatId: number, query: string): Promise<void> {
+  if (!query.trim()) {
+    await sendMessage(chatId, `🎬 <b>GIF Search</b>
+
+<b>Usage:</b> /gif [search query]
+
+<b>Examples:</b>
+• /gif happy
+• /gif celebration
+• /gif cat funny`);
+    return;
+  }
+
+  await sendChatAction(chatId, 'typing');
+  const result = await Advanced.searchGif(query);
+
+  if (result.success && result.gifs && result.gifs.length > 0) {
+    // Send first GIF
+    await callTelegramAPI('sendAnimation', {
+      chat_id: chatId,
+      animation: result.gifs[0].url,
+      caption: `🎬 GIF: "${query}"`,
+    });
+  } else {
+    await sendMessage(chatId, `❌ No GIFs found for "${query}"`);
+  }
+}
+
+// Screenshot Website
+export async function handleScreenshot(chatId: number, url: string): Promise<void> {
+  if (!url.trim() || !url.startsWith('http')) {
+    await sendMessage(chatId, `📸 <b>Website Screenshot</b>
+
+<b>Usage:</b> /screenshot [URL]
+
+<b>Example:</b>
+/screenshot https://github.com`);
+    return;
+  }
+
+  await sendChatAction(chatId, 'upload_photo');
+  await sendMessage(chatId, `📸 Taking screenshot of ${url}...`);
+
+  const screenshotUrl = Advanced.getScreenshotUrl(url);
+
+  await callTelegramAPI('sendPhoto', {
+    chat_id: chatId,
+    photo: screenshotUrl,
+    caption: `📸 <b>Screenshot</b>\n\nURL: ${url}`,
+    parse_mode: 'HTML',
+  });
+}
+
+// IP Lookup
+export async function handleIPLookup(chatId: number, ip: string): Promise<void> {
+  if (!ip.trim()) {
+    await sendMessage(chatId, `🌐 <b>IP Lookup</b>
+
+<b>Usage:</b> /ip [IP address]
+
+<b>Example:</b>
+/ip 8.8.8.8`);
+    return;
+  }
+
+  await sendChatAction(chatId, 'typing');
+  const result = await Advanced.ipLookup(ip);
+
+  if (result.success && result.data) {
+    const d = result.data;
+    await sendMessage(chatId, `🌐 <b>IP Lookup</b>
+
+<b>IP:</b> ${d.ip}
+<b>Country:</b> ${d.country}
+<b>City:</b> ${d.city}
+<b>Region:</b> ${d.region}
+<b>ISP:</b> ${d.isp}
+<b>Timezone:</b> ${d.timezone}
+<b>Coordinates:</b> ${d.lat}, ${d.lon}`);
+  } else {
+    await sendMessage(chatId, `❌ ${result.error}`);
+  }
+}
+
+// DNS Lookup
+export async function handleDNSLookup(chatId: number, domain: string): Promise<void> {
+  if (!domain.trim()) {
+    await sendMessage(chatId, `🔍 <b>DNS Lookup</b>
+
+<b>Usage:</b> /dns [domain]
+
+<b>Example:</b>
+/dns google.com`);
+    return;
+  }
+
+  await sendChatAction(chatId, 'typing');
+  const result = await Advanced.dnsLookup(domain);
+
+  if (result.success && result.records) {
+    let message = `🔍 <b>DNS Records for ${domain}</b>\n\n`;
+    result.records.forEach(r => {
+      message += `<b>${r.type}:</b> ${r.value}\n`;
+    });
+    await sendMessage(chatId, message);
+  } else {
+    await sendMessage(chatId, `❌ ${result.error}`);
+  }
+}
+
+// Text Statistics
+export async function handleTextStats(chatId: number, text: string): Promise<void> {
+  if (!text.trim()) {
+    await sendMessage(chatId, `📊 <b>Text Statistics</b>
+
+<b>Usage:</b> /textstats [your text]
+
+Analyzes: characters, words, sentences, reading time, word frequency, etc.`);
+    return;
+  }
+
+  const stats = Advanced.analyzeText(text);
+
+  let message = `📊 <b>Text Statistics</b>
+
+<b>Basic:</b>
+• Characters: ${stats.characters}
+• Words: ${stats.words}
+• Sentences: ${stats.sentences}
+• Paragraphs: ${stats.paragraphs}
+
+<b>Reading:</b>
+• Reading time: ${stats.readingTime}
+• Speaking time: ${stats.speakingTime}
+
+<b>Analysis:</b>
+• Avg word length: ${stats.avgWordLength}
+• Longest word: ${stats.longestWord}`;
+
+  if (stats.mostFrequentWords.length > 0) {
+    message += `\n\n<b>Most Frequent Words:</b>\n`;
+    stats.mostFrequentWords.forEach(w => {
+      message += `• ${w.word}: ${w.count}\n`;
+    });
+  }
+
+  await sendMessage(chatId, message);
+}
+
+// Hangman Game
+export async function handleHangman(chatId: number, userId: number, letter?: string): Promise<void> {
+  if (letter) {
+    const result = Advanced.guessHangman(userId, letter);
+    const drawing = Advanced.getHangmanDrawing(result.wrongGuesses);
+
+    if (result.gameOver) {
+      if (result.won) {
+        await sendMessage(chatId, `🎉 <b>You Won!</b>
+
+${drawing}
+
+Word: <b>${result.word}</b>
+
+Great job! Send /hangman to play again!`);
+        Advanced.updateLeaderboard('hangman', userId, '', 10);
+      } else {
+        await sendMessage(chatId, `💀 <b>Game Over!</b>
+
+${drawing}
+
+The word was: <b>${result.word}</b>
+
+Send /hangman to try again!`);
+      }
+    } else {
+      await sendMessage(chatId, `<pre>${drawing}</pre>
+
+Word: <b>${result.display}</b>
+Wrong guesses: ${result.wrongGuesses}/6
+
+Guess a letter: /hangman [letter]`);
+    }
+  } else {
+    const game = Advanced.startHangman(userId);
+    await sendMessage(chatId, `🎮 <b>Hangman</b>
+
+<pre>${Advanced.getHangmanDrawing(0)}</pre>
+
+Word: <b>${game.display}</b>
+
+Guess a letter: /hangman [letter]
+Example: /hangman a`);
+  }
+}
+
+// Rock Paper Scissors
+export async function handleRPS(chatId: number, userId: number, choice?: string): Promise<void> {
+  if (!choice || !['rock', 'paper', 'scissors', 'r', 'p', 's'].includes(choice.toLowerCase())) {
+    await sendMessage(chatId, `✊✋✌️ <b>Rock Paper Scissors</b>
+
+<b>Usage:</b> /rps [rock|paper|scissors]
+
+<b>Short:</b> /rps r | /rps p | /rps s
+
+<b>Reset Score:</b> /rps reset`);
+    return;
+  }
+
+  if (choice.toLowerCase() === 'reset') {
+    Advanced.resetRPS(userId);
+    await sendMessage(chatId, '✅ Score reset!');
+    return;
+  }
+
+  const fullChoice = choice.length === 1
+    ? { r: 'rock', p: 'paper', s: 'scissors' }[choice.toLowerCase()] as 'rock' | 'paper' | 'scissors'
+    : choice.toLowerCase() as 'rock' | 'paper' | 'scissors';
+
+  const result = Advanced.playRPS(userId, fullChoice);
+
+  const resultEmoji = result.result === 'win' ? '🎉 You Win!' : result.result === 'lose' ? '😢 You Lose!' : '🤝 Draw!';
+
+  await sendMessage(chatId, `✊✋✌️ <b>Rock Paper Scissors</b>
+
+You: ${result.playerChoice}
+Bot: ${result.botChoice}
+
+<b>${resultEmoji}</b>
+
+Score: You ${result.score.player} - ${result.score.bot} Bot`);
+}
+
+// Emoji Quiz
+export async function handleEmojiQuiz(chatId: number, userId: number, answer?: string): Promise<void> {
+  if (answer) {
+    const result = Advanced.answerEmojiQuiz(answer);
+    if (result.correct) {
+      await sendMessage(chatId, `✅ <b>Correct!</b> 🎉
+
+The answer was: <b>${result.answer}</b>
+
+Send /emoji for another quiz!`);
+      Advanced.updateLeaderboard('emoji', userId, '', 5);
+    } else {
+      await sendMessage(chatId, `❌ Wrong!
+
+The answer was: <b>${result.answer}</b>
+
+Send /emoji to try again!`);
+    }
+  } else {
+    const quiz = Advanced.startEmojiQuiz();
+    await sendMessage(chatId, `🎯 <b>Emoji Quiz</b>
+
+Guess what this represents:
+
+${quiz.emojis}
+
+Category: <b>${quiz.category}</b>
+
+Answer with: /emoji [your answer]`);
+  }
+}
+
+// Number Guessing Game
+export async function handleGuessNumber(chatId: number, userId: number, guess?: string): Promise<void> {
+  if (!guess) {
+    Advanced.startNumberGuess(userId, 100);
+    await sendMessage(chatId, `🔢 <b>Number Guessing Game</b>
+
+I'm thinking of a number between 1 and 100.
+Can you guess it?
+
+Guess with: /guess [number]`);
+    return;
+  }
+
+  const num = parseInt(guess);
+  if (isNaN(num)) {
+    await sendMessage(chatId, '❌ Please enter a valid number!');
+    return;
+  }
+
+  const result = Advanced.guessNumber(userId, num);
+
+  if (result.result === 'correct') {
+    await sendMessage(chatId, `🎉 <b>Correct!</b>
+
+You guessed <b>${result.number}</b> in <b>${result.attempts}</b> attempts!
+
+Send /guess to play again!`);
+    Advanced.updateLeaderboard('guess', userId, '', Math.max(1, 20 - result.attempts));
+  } else {
+    await sendMessage(chatId, `${result.result === 'higher' ? '📈 Higher!' : '📉 Lower!'}
+
+Attempts: ${result.attempts}
+Keep guessing: /guess [number]`);
+  }
+}
+
+// Riddles
+export async function handleRiddle(chatId: number, userId: number, answer?: string): Promise<void> {
+  if (answer) {
+    const result = Advanced.answerRiddle(answer);
+    if (result.correct) {
+      await sendMessage(chatId, `✅ <b>Correct!</b> 🎉
+
+The answer was: <b>${result.answer}</b>
+
+Send /riddle for another one!`);
+      Advanced.updateLeaderboard('riddle', userId, '', 10);
+    } else {
+      await sendMessage(chatId, `❌ Wrong!
+
+The answer was: <b>${result.answer}</b>
+
+Send /riddle to try again!`);
+    }
+  } else {
+    const riddle = Advanced.getRiddle();
+    await sendMessage(chatId, `🧩 <b>Riddle</b>
+
+${riddle.question}
+
+Answer with: /riddle [your answer]`);
+  }
+}
+
+// Leaderboard
+export async function handleLeaderboard(chatId: number, userId: number, gameType?: string): Promise<void> {
+  const validGames = ['hangman', 'trivia', 'math', 'emoji', 'guess', 'riddle', 'word'];
+
+  if (!gameType || !validGames.includes(gameType)) {
+    await sendMessage(chatId, `🏆 <b>Leaderboards</b>
+
+<b>View leaderboard:</b> /leaderboard [game]
+
+<b>Games:</b>
+• hangman
+• trivia
+• math
+• emoji
+• guess
+• riddle
+• word
+
+<b>Example:</b> /leaderboard trivia`);
+    return;
+  }
+
+  const entries = Advanced.getLeaderboard(gameType, 10);
+  const rank = Advanced.getUserRank(gameType, userId);
+
+  if (entries.length === 0) {
+    await sendMessage(chatId, `🏆 <b>${gameType.toUpperCase()} Leaderboard</b>
+
+No entries yet. Be the first to play!`);
+    return;
+  }
+
+  let message = `🏆 <b>${gameType.toUpperCase()} Leaderboard</b>\n\n`;
+
+  entries.forEach((entry, i) => {
+    const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`;
+    message += `${medal} ${entry.username || 'Anonymous'} - ${entry.score} pts (${entry.gamesPlayed} games)\n`;
+  });
+
+  if (rank > 0) {
+    message += `\n<b>Your Rank:</b> #${rank}`;
+  }
+
+  await sendMessage(chatId, message);
+}
+
+// Daily Challenge
+export async function handleDailyChallenge(chatId: number, userId: number, answer?: string): Promise<void> {
+  if (answer) {
+    const result = Advanced.answerDailyChallenge(userId, answer);
+
+    if (result.alreadyCompleted) {
+      await sendMessage(chatId, `⏰ You've already completed today's challenge!
+
+Come back tomorrow for a new one!`);
+      return;
+    }
+
+    if (result.correct) {
+      await sendMessage(chatId, `🎉 <b>Correct!</b>
+
+You earned <b>${result.points} points</b>!
+
+Come back tomorrow for a new challenge!`);
+      Advanced.updateLeaderboard('daily', userId, '', result.points);
+    } else {
+      await sendMessage(chatId, `❌ Wrong!
+
+The answer was: <b>${result.correctAnswer}</b>
+
+Better luck tomorrow!`);
+    }
+  } else {
+    const challenge = Advanced.getDailyChallenge();
+
+    await sendMessage(chatId, `📅 <b>Daily Challenge</b>
+
+<b>Type:</b> ${challenge.type}
+<b>Points:</b> ${challenge.points}
+
+<b>Question:</b>
+${challenge.question}
+
+${challenge.hint ? `<b>Hint:</b> ${challenge.hint}\n` : ''}
+Answer with: /daily [your answer]`);
+  }
+}
+
+// Coin Flip
+export async function handleCoinFlip(chatId: number): Promise<void> {
+  const result = Advanced.flipCoin();
+  const emoji = result === 'heads' ? '🪙' : '🔵';
+  await sendMessage(chatId, `${emoji} <b>Coin Flip</b>
+
+Result: <b>${result.toUpperCase()}</b>`);
+}
+
+// Dice Roll
+export async function handleDiceRoll(chatId: number, sides?: string): Promise<void> {
+  const numSides = parseInt(sides || '6') || 6;
+  const result = Advanced.rollDice(Math.min(numSides, 100));
+
+  await sendMessage(chatId, `🎲 <b>Dice Roll (d${numSides})</b>
+
+Result: <b>${result}</b>`);
+}
+
+// Magic 8-Ball
+export async function handleMagic8Ball(chatId: number, question: string): Promise<void> {
+  if (!question.trim()) {
+    await sendMessage(chatId, `🎱 <b>Magic 8-Ball</b>
+
+<b>Usage:</b> /8ball [your question]
+
+<b>Example:</b>
+/8ball Will I be successful?`);
+    return;
+  }
+
+  const answer = Advanced.magic8Ball();
+  await sendMessage(chatId, `🎱 <b>Magic 8-Ball</b>
+
+<b>Q:</b> ${question}
+<b>A:</b> ${answer}`);
+}
+
+// Decision Maker
+export async function handleDecide(chatId: number, options: string): Promise<void> {
+  if (!options.trim()) {
+    await sendMessage(chatId, `🤔 <b>Decision Maker</b>
+
+<b>Usage:</b> /decide option1 | option2 | option3
+
+<b>Example:</b>
+/decide Pizza | Sushi | Burger`);
+    return;
+  }
+
+  const optionsList = options.split('|').map(o => o.trim()).filter(o => o);
+
+  if (optionsList.length < 2) {
+    await sendMessage(chatId, '❌ Please provide at least 2 options separated by |');
+    return;
+  }
+
+  const choice = Advanced.makeDecision(optionsList);
+  await sendMessage(chatId, `🤔 <b>Decision Made!</b>
+
+<b>Options:</b>
+${optionsList.map((o, i) => `${i + 1}. ${o}`).join('\n')}
+
+<b>My Choice:</b> ${choice}`);
+}
+
+// Poll Creator
+export async function handlePoll(chatId: number, userId: number, args: string): Promise<void> {
+  const parts = args.split('|').map(p => p.trim());
+
+  if (parts.length < 3) {
+    await sendMessage(chatId, `📊 <b>Poll Creator</b>
+
+<b>Usage:</b> /poll Question | Option1 | Option2 | Option3
+
+<b>Example:</b>
+/poll Best programming language? | Python | JavaScript | TypeScript | Go`);
+    return;
+  }
+
+  const [question, ...options] = parts;
+  const poll = Advanced.createPoll(userId, question, options);
+
+  // Create inline keyboard for voting
+  const keyboard: TelegramInlineKeyboard = {
+    inline_keyboard: options.map((opt, i) => [{
+      text: `${opt} (0)`,
+      callback_data: `poll_${poll.id}_${i}`,
+    }]),
+  };
+
+  await sendMessage(chatId, `📊 <b>Poll</b>
+
+<b>${question}</b>
+
+Click to vote:`, { replyMarkup: keyboard });
+}
+
+// Text Reverse
+export async function handleReverse(chatId: number, text: string): Promise<void> {
+  if (!text.trim()) {
+    await sendMessage(chatId, `🔄 <b>Reverse Text</b>
+
+<b>Usage:</b> /reverse [text]`);
+    return;
+  }
+
+  const reversed = Advanced.reverseText(text);
+  await sendMessage(chatId, `🔄 <b>Reversed Text</b>
+
+<b>Original:</b> ${text}
+<b>Reversed:</b> ${reversed}`);
+}
+
+// Mocking Text (SpOnGeBoB cAsE)
+export async function handleMocking(chatId: number, text: string): Promise<void> {
+  if (!text.trim()) {
+    await sendMessage(chatId, `🧽 <b>Mocking Text</b>
+
+<b>Usage:</b> /mock [text]`);
+    return;
+  }
+
+  const mocked = Advanced.toMockingCase(text);
+  await sendMessage(chatId, `🧽 <b>Mocking Text</b>
+
+${mocked}`);
+}
+
 // Super App Menu
 export async function handleMenu(chatId: number): Promise<void> {
   const keyboard: TelegramInlineKeyboard = {
@@ -1870,7 +2452,7 @@ export async function handleMenu(chatId: number): Promise<void> {
         { text: '🔍 Search', callback_data: 'menu_search' },
       ],
       [
-        { text: '🎨 Generate Image', callback_data: 'menu_image' },
+        { text: '🎨 Image/Media', callback_data: 'menu_media' },
         { text: '🌐 Translate', callback_data: 'menu_translate' },
       ],
       [
@@ -1883,18 +2465,26 @@ export async function handleMenu(chatId: number): Promise<void> {
       ],
       [
         { text: '🛠️ Tools', callback_data: 'menu_tools' },
+        { text: '🌐 Network', callback_data: 'menu_network' },
+      ],
+      [
         { text: '🎮 Games', callback_data: 'menu_games' },
+        { text: '🏆 Compete', callback_data: 'menu_compete' },
+      ],
+      [
+        { text: '🎲 Random', callback_data: 'menu_random' },
+        { text: '📊 Text Tools', callback_data: 'menu_text' },
       ],
       [
         { text: '📝 Productivity', callback_data: 'menu_productivity' },
-        { text: '😂 Fun', callback_data: 'menu_fun' },
+        { text: '💻 Dev Tools', callback_data: 'menu_dev' },
       ],
     ],
   };
 
-  await sendMessage(chatId, `🚀 <b>IbnuGPT Super App Menu</b>
+  await sendMessage(chatId, `🚀 <b>IbnuGPT World-Class Bot</b>
 
-Choose a category:`, { replyMarkup: keyboard });
+80+ Features • Choose a category:`, { replyMarkup: keyboard });
 }
 
 // Admin commands
@@ -1977,6 +2567,14 @@ export async function handleCallbackQuery(
     const enabled = toggleWebSearch(chatId);
     await answerCallbackQuery(callbackQueryId, `🔍 Web Search: ${enabled ? 'ON' : 'OFF'}`);
     await handleSettings(chatId);
+    return;
+  }
+
+  // Handle poll voting
+  if (data.startsWith('poll_')) {
+    const [, pollId, optionIndex] = data.split('_');
+    const voted = Advanced.votePoll(pollId, parseInt(optionIndex), parseInt(callbackQueryId));
+    await answerCallbackQuery(callbackQueryId, voted ? '✅ Vote recorded!' : '❌ Failed to vote');
     return;
   }
 
@@ -2107,44 +2705,97 @@ Examples:
       break;
     case 'menu_games':
       await answerCallbackQuery(callbackQueryId);
-      await sendMessage(chatId, `🎮 <b>Games & Fun</b>
+      await sendMessage(chatId, `🎮 <b>Games</b>
 
+<b>Quiz Games:</b>
 • /trivia - Trivia quiz
 • /math - Math quiz
-• /word - Word guess game
+• /emoji - Emoji guessing
+
+<b>Word Games:</b>
+• /word - Word guess
+• /hangman - Hangman game
+• /riddle - Solve riddles
+
+<b>Action Games:</b>
+• /rps - Rock Paper Scissors
+• /guess - Number guessing`);
+      break;
+    case 'menu_media':
+      await answerCallbackQuery(callbackQueryId);
+      await sendMessage(chatId, `🎨 <b>Media & Image</b>
+
+• /imagine [prompt] - AI image generation
+• /meme template | top | bottom - Meme generator
+• /gif [query] - Search GIFs
+• /screenshot [url] - Website screenshot
+• /qr [text] - Generate QR code`);
+      break;
+    case 'menu_network':
+      await answerCallbackQuery(callbackQueryId);
+      await sendMessage(chatId, `🌐 <b>Network Tools</b>
+
+• /ip [address] - IP lookup
+• /dns [domain] - DNS lookup
+• /shorten [url] - URL shortener`);
+      break;
+    case 'menu_compete':
+      await answerCallbackQuery(callbackQueryId);
+      await sendMessage(chatId, `🏆 <b>Competition</b>
+
+• /daily - Daily challenge
+• /leaderboard [game] - View rankings
+
+<b>Available Leaderboards:</b>
+trivia, math, hangman, emoji, guess, riddle, word`);
+      break;
+    case 'menu_random':
+      await answerCallbackQuery(callbackQueryId);
+      await sendMessage(chatId, `🎲 <b>Random & Decision</b>
+
+• /flip - Coin flip
+• /dice [sides] - Roll dice
+• /8ball [question] - Magic 8-Ball
+• /decide opt1 | opt2 | opt3 - Decision maker
 • /joke - Random joke
 • /fact - Fun fact
-• /quote - Inspirational quote
-• /horoscope [sign] - Daily horoscope`);
+• /quote - Inspirational quote`);
+      break;
+    case 'menu_text':
+      await answerCallbackQuery(callbackQueryId);
+      await sendMessage(chatId, `📊 <b>Text Tools</b>
+
+• /textstats [text] - Analyze text
+• /reverse [text] - Reverse text
+• /mock [text] - SpOnGeBoB cAsE`);
+      break;
+    case 'menu_dev':
+      await answerCallbackQuery(callbackQueryId);
+      await sendMessage(chatId, `💻 <b>Developer Tools</b>
+
+• /json [json] - Format JSON
+• /base64 encode|decode [text]
+• /hash md5|sha256 [text]
+• /uuid - Generate UUID
+• /password [length] - Generate password
+• /color #hex - Color converter
+• /lorem [paragraphs] - Lorem ipsum
+• /run js [code] - Execute JavaScript`);
       break;
     case 'menu_productivity':
       await answerCallbackQuery(callbackQueryId);
       await sendMessage(chatId, `📝 <b>Productivity</b>
 
 <b>Notes:</b>
-• /notes - View all notes
+• /notes - View notes
 • /notes add Title | Content
-• /notes delete [id]
 
 <b>Todos:</b>
-• /todo - View all todos
-• /todo add Task description
-• /todo done [id]
-• /todo delete [id]`);
-      break;
-    case 'menu_fun':
-      await answerCallbackQuery(callbackQueryId);
-      await sendMessage(chatId, `😂 <b>Fun & Entertainment</b>
+• /todo - View todos
+• /todo add Task
 
-• /joke - Random programming joke
-• /fact - Fun tech fact
-• /quote - Inspirational quote
-• /horoscope [sign] - Daily horoscope
-
-<b>Games:</b>
-• /trivia - Answer trivia questions
-• /math - Solve math problems
-• /word - Guess the word`);
+<b>Polls:</b>
+• /poll Question | Opt1 | Opt2`);
       break;
 
     default:
@@ -2528,6 +3179,95 @@ export async function handleUpdate(update: TelegramUpdate): Promise<void> {
         // Admin
         case '/adminstats':
           await handleAdminStats(chat.id, userId);
+          break;
+
+        // ============================================
+        // ADVANCED WORLD-CLASS FEATURES
+        // ============================================
+
+        // Media & Fun
+        case '/meme':
+          await handleMeme(chat.id, args);
+          break;
+        case '/gif':
+          await handleGifSearch(chat.id, args);
+          break;
+        case '/screenshot':
+        case '/ss':
+          await handleScreenshot(chat.id, args);
+          break;
+
+        // Network Tools
+        case '/ip':
+          await handleIPLookup(chat.id, args);
+          break;
+        case '/dns':
+          await handleDNSLookup(chat.id, args);
+          break;
+
+        // Text Tools
+        case '/textstats':
+        case '/analyze':
+          await handleTextStats(chat.id, args);
+          break;
+        case '/reverse':
+          await handleReverse(chat.id, args);
+          break;
+        case '/mock':
+        case '/spongebob':
+          await handleMocking(chat.id, args);
+          break;
+
+        // Advanced Games
+        case '/hangman':
+          await handleHangman(chat.id, userId, args || undefined);
+          break;
+        case '/rps':
+          await handleRPS(chat.id, userId, args || undefined);
+          break;
+        case '/emoji':
+        case '/emojiquiz':
+          await handleEmojiQuiz(chat.id, userId, args || undefined);
+          break;
+        case '/guess':
+        case '/numguess':
+          await handleGuessNumber(chat.id, userId, args || undefined);
+          break;
+        case '/riddle':
+          await handleRiddle(chat.id, userId, args || undefined);
+          break;
+
+        // Competition & Progress
+        case '/leaderboard':
+        case '/lb':
+          await handleLeaderboard(chat.id, userId, args || undefined);
+          break;
+        case '/daily':
+        case '/challenge':
+          await handleDailyChallenge(chat.id, userId, args || undefined);
+          break;
+
+        // Random & Decision
+        case '/flip':
+        case '/coin':
+          await handleCoinFlip(chat.id);
+          break;
+        case '/dice':
+        case '/roll':
+          await handleDiceRoll(chat.id, args);
+          break;
+        case '/8ball':
+        case '/magic':
+          await handleMagic8Ball(chat.id, args);
+          break;
+        case '/decide':
+        case '/choice':
+          await handleDecide(chat.id, args);
+          break;
+
+        // Interactive
+        case '/poll':
+          await handlePoll(chat.id, userId, args);
           break;
 
         default:
