@@ -247,17 +247,17 @@ export function Navbar() {
     <>
       <header
         className={cn(
-          'fixed top-0 left-0 right-0 z-40 transition-all duration-300',
+          'fixed top-0 left-0 right-0 z-[52] transition-all duration-300 pointer-events-auto',
           isScrolled
             ? 'bg-background/80 dark:bg-background/70 backdrop-blur-xl border-b border-border/50 dark:border-primary/10 py-3 shadow-sm dark:shadow-primary/5'
             : 'bg-transparent py-5'
         )}
       >
-        <nav className="container flex items-center justify-between">
+        <nav className="container flex items-center justify-between pointer-events-auto">
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center gap-2 text-xl font-bold tracking-tight"
+            className="flex items-center gap-2 text-xl font-bold tracking-tight cursor-pointer"
           >
             <span className="gradient-text">IBNU</span>
             <span className="w-2 h-2 rounded-full bg-cyber-cyan animate-pulse" />
@@ -269,7 +269,7 @@ export function Navbar() {
             <Link
               href="/"
               className={cn(
-                'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+                'px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer',
                 pathname === '/'
                   ? 'text-foreground bg-muted'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
@@ -308,7 +308,7 @@ export function Navbar() {
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+                  'px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer',
                   pathname === link.href
                     ? 'text-foreground bg-muted'
                     : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
@@ -376,7 +376,7 @@ export function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-16 z-30 p-4 md:hidden"
+            className="fixed inset-x-0 top-16 z-[53] p-4 md:hidden"
           >
             <div className="rounded-2xl bg-background/95 backdrop-blur-xl border border-border p-4 shadow-xl max-h-[80vh] overflow-y-auto">
               <nav className="flex flex-col gap-1">
