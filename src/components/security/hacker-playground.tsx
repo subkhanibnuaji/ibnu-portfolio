@@ -5,7 +5,10 @@ import { motion, AnimatePresence } from 'framer-motion'
 import {
   Terminal, Play, Pause, RotateCcw, Wifi, Globe, Server,
   Shield, AlertTriangle, Check, X, Skull, Eye, Lock, Database,
-  Network, Zap, Bug, FileCode, Activity, Radio
+  Network, Zap, Bug, FileCode, Activity, Radio, Key, Folder,
+  File, ChevronRight, Binary, Cpu, HardDrive, MemoryStick,
+  Layers, Target, Trophy, Flag, Clock, Hash, Unlock, ShieldOff,
+  ArrowRight, Sparkles, Flame
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -809,10 +812,868 @@ function ThreatMonitor({ isActive }: { isActive: boolean }) {
 }
 
 // ============================================
+// PASSWORD CRACKING SIMULATION
+// ============================================
+
+function PasswordCrackSimulation({ isActive }: { isActive: boolean }) {
+  const [currentHash, setCurrentHash] = useState('')
+  const [attempts, setAttempts] = useState(0)
+  const [speed, setSpeed] = useState(0)
+  const [found, setFound] = useState<{ hash: string; password: string } | null>(null)
+  const [currentAttempt, setCurrentAttempt] = useState('')
+  const [method, setMethod] = useState('Dictionary Attack')
+  const [progress, setProgress] = useState(0)
+
+  const commonPasswords = [
+    'password', '123456', 'admin', 'letmein', 'welcome', 'monkey', 'dragon',
+    'master', 'qwerty', 'login', 'passw0rd', 'abc123', 'admin123', 'root',
+    'toor', 'pass', 'test', '12345678', 'password1', 'password123'
+  ]
+
+  const hashTypes = [
+    { name: 'MD5', hash: '5f4dcc3b5aa765d61d8327deb882cf99', password: 'password' },
+    { name: 'SHA-256', hash: '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', password: 'admin' },
+    { name: 'NTLM', hash: 'a4f49c406510bdcab6824ee7c30fd852', password: 'password123' },
+    { name: 'bcrypt', hash: '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/X4.E4yMqvH', password: 'letmein' },
+  ]
+
+  useEffect(() => {
+    if (!isActive) return
+
+    const targetHash = hashTypes[Math.floor(Math.random() * hashTypes.length)]
+    setCurrentHash(targetHash.hash)
+    setAttempts(0)
+    setFound(null)
+    setProgress(0)
+
+    let attemptCount = 0
+    const maxAttempts = 150 + Math.floor(Math.random() * 100)
+
+    const interval = setInterval(() => {
+      attemptCount++
+      setAttempts(attemptCount)
+      setSpeed(Math.floor(1000 + Math.random() * 500))
+      setProgress((attemptCount / maxAttempts) * 100)
+
+      // Generate random attempt
+      const chars = 'abcdefghijklmnopqrstuvwxyz0123456789'
+      let attempt = ''
+      if (attemptCount < maxAttempts * 0.7) {
+        // Dictionary phase
+        setMethod('Dictionary Attack')
+        attempt = commonPasswords[Math.floor(Math.random() * commonPasswords.length)]
+      } else {
+        // Brute force phase
+        setMethod('Brute Force')
+        const len = 6 + Math.floor(Math.random() * 4)
+        for (let i = 0; i < len; i++) {
+          attempt += chars[Math.floor(Math.random() * chars.length)]
+        }
+      }
+      setCurrentAttempt(attempt)
+
+      if (attemptCount >= maxAttempts) {
+        setFound({ hash: targetHash.hash, password: targetHash.password })
+        clearInterval(interval)
+
+        // Start new crack after delay
+        setTimeout(() => {
+          if (isActive) {
+            setFound(null)
+            setAttempts(0)
+            setProgress(0)
+            const newTarget = hashTypes[Math.floor(Math.random() * hashTypes.length)]
+            setCurrentHash(newTarget.hash)
+          }
+        }, 3000)
+      }
+    }, 50)
+
+    return () => clearInterval(interval)
+  }, [isActive])
+
+  return (
+    <div className="space-y-4 font-mono text-xs h-full overflow-auto">
+      {/* Header */}
+      <div className="flex items-center gap-2 text-green-400">
+        <Key className="w-4 h-4" />
+        <span className="font-bold">PASSWORD HASH CRACKER</span>
+      </div>
+
+      {/* Target Hash */}
+      <div className="p-3 bg-zinc-900/50 rounded-lg border border-green-500/20">
+        <div className="text-muted-foreground mb-1">Target Hash:</div>
+        <div className="text-cyan-400 break-all text-[10px]">{currentHash}</div>
+      </div>
+
+      {/* Progress */}
+      <div>
+        <div className="flex justify-between mb-1">
+          <span className="text-muted-foreground">{method}</span>
+          <span className="text-green-400">{progress.toFixed(1)}%</span>
+        </div>
+        <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+          <motion.div
+            className="h-full bg-gradient-to-r from-green-500 to-cyan-500"
+            animate={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="p-2 bg-zinc-900/50 rounded border border-zinc-800">
+          <div className="text-muted-foreground text-[10px]">Attempts</div>
+          <div className="text-lg font-bold text-green-400">{attempts.toLocaleString()}</div>
+        </div>
+        <div className="p-2 bg-zinc-900/50 rounded border border-zinc-800">
+          <div className="text-muted-foreground text-[10px]">Speed</div>
+          <div className="text-lg font-bold text-cyan-400">{speed}/s</div>
+        </div>
+      </div>
+
+      {/* Current Attempt */}
+      <div className="p-3 bg-zinc-900/50 rounded-lg border border-zinc-800">
+        <div className="text-muted-foreground text-[10px] mb-1">Testing:</div>
+        <div className="flex items-center gap-2">
+          <span className="text-yellow-400">{currentAttempt}</span>
+          <ArrowRight className="w-3 h-3 text-muted-foreground" />
+          <span className="text-red-400">No match</span>
+        </div>
+      </div>
+
+      {/* Rainbow Table Animation */}
+      <div className="space-y-1">
+        <div className="text-muted-foreground text-[10px]">Rainbow Table Lookup:</div>
+        {[...Array(5)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="flex items-center gap-2 text-[10px]"
+            initial={{ opacity: 0.3 }}
+            animate={{ opacity: [0.3, 1, 0.3] }}
+            transition={{ duration: 0.5, delay: i * 0.1, repeat: Infinity }}
+          >
+            <Hash className="w-3 h-3 text-purple-400" />
+            <span className="text-purple-400 font-mono">
+              {Array(32).fill(0).map(() => '0123456789abcdef'[Math.floor(Math.random() * 16)]).join('')}
+            </span>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Found Result */}
+      <AnimatePresence>
+        {found && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            className="p-4 bg-green-500/20 border border-green-500/50 rounded-lg"
+          >
+            <div className="flex items-center gap-2 text-green-400 font-bold mb-2">
+              <Unlock className="w-5 h-5" />
+              PASSWORD CRACKED!
+            </div>
+            <div className="text-2xl font-bold text-white">{found.password}</div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+// ============================================
+// BINARY DATA STREAM VISUALIZATION
+// ============================================
+
+function BinaryStreamVisualization({ isActive }: { isActive: boolean }) {
+  const [packets, setPackets] = useState<{ id: number; data: string; type: string; size: number }[]>([])
+  const [bandwidth, setBandwidth] = useState({ in: 0, out: 0 })
+  const [totalData, setTotalData] = useState(0)
+
+  useEffect(() => {
+    if (!isActive) return
+
+    const packetTypes = ['TCP', 'UDP', 'HTTP', 'HTTPS', 'DNS', 'SSH', 'FTP']
+
+    const interval = setInterval(() => {
+      // Generate random binary/hex data
+      const data = Array(32).fill(0).map(() =>
+        Math.random() > 0.5
+          ? Math.floor(Math.random() * 256).toString(16).padStart(2, '0')
+          : Math.floor(Math.random() * 2).toString()
+      ).join(' ')
+
+      const size = Math.floor(Math.random() * 1500) + 64
+
+      setPackets(prev => [{
+        id: Date.now(),
+        data,
+        type: packetTypes[Math.floor(Math.random() * packetTypes.length)],
+        size,
+      }, ...prev.slice(0, 8)])
+
+      setBandwidth({
+        in: Math.floor(Math.random() * 50) + 10,
+        out: Math.floor(Math.random() * 30) + 5,
+      })
+
+      setTotalData(prev => prev + size)
+    }, 300)
+
+    return () => clearInterval(interval)
+  }, [isActive])
+
+  return (
+    <div className="space-y-4 font-mono text-xs h-full overflow-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-cyan-400">
+          <Binary className="w-4 h-4" />
+          <span className="font-bold">PACKET CAPTURE</span>
+        </div>
+        <div className="flex items-center gap-3 text-[10px]">
+          <span className="text-green-400">↓ {bandwidth.in} MB/s</span>
+          <span className="text-orange-400">↑ {bandwidth.out} MB/s</span>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-2">
+        <div className="p-2 bg-zinc-900/50 rounded border border-cyan-500/20 text-center">
+          <Cpu className="w-4 h-4 mx-auto mb-1 text-cyan-400" />
+          <div className="text-[10px] text-muted-foreground">CPU</div>
+          <div className="text-cyan-400 font-bold">{Math.floor(Math.random() * 30 + 20)}%</div>
+        </div>
+        <div className="p-2 bg-zinc-900/50 rounded border border-purple-500/20 text-center">
+          <MemoryStick className="w-4 h-4 mx-auto mb-1 text-purple-400" />
+          <div className="text-[10px] text-muted-foreground">Memory</div>
+          <div className="text-purple-400 font-bold">{Math.floor(Math.random() * 20 + 40)}%</div>
+        </div>
+        <div className="p-2 bg-zinc-900/50 rounded border border-green-500/20 text-center">
+          <HardDrive className="w-4 h-4 mx-auto mb-1 text-green-400" />
+          <div className="text-[10px] text-muted-foreground">Captured</div>
+          <div className="text-green-400 font-bold">{(totalData / 1024).toFixed(1)} KB</div>
+        </div>
+      </div>
+
+      {/* Packet Stream */}
+      <div className="space-y-1">
+        <AnimatePresence>
+          {packets.map((packet) => (
+            <motion.div
+              key={packet.id}
+              initial={{ opacity: 0, x: -20, height: 0 }}
+              animate={{ opacity: 1, x: 0, height: 'auto' }}
+              exit={{ opacity: 0, x: 20 }}
+              className="p-2 bg-zinc-900/70 rounded border border-zinc-800 overflow-hidden"
+            >
+              <div className="flex items-center justify-between mb-1">
+                <span className={cn(
+                  "px-1.5 py-0.5 rounded text-[10px] font-bold",
+                  packet.type === 'HTTPS' && "bg-green-500/20 text-green-400",
+                  packet.type === 'HTTP' && "bg-blue-500/20 text-blue-400",
+                  packet.type === 'TCP' && "bg-cyan-500/20 text-cyan-400",
+                  packet.type === 'UDP' && "bg-purple-500/20 text-purple-400",
+                  packet.type === 'DNS' && "bg-yellow-500/20 text-yellow-400",
+                  packet.type === 'SSH' && "bg-orange-500/20 text-orange-400",
+                  packet.type === 'FTP' && "bg-red-500/20 text-red-400",
+                )}>
+                  {packet.type}
+                </span>
+                <span className="text-muted-foreground text-[10px]">{packet.size} bytes</span>
+              </div>
+              <div className="text-[10px] text-green-400/70 font-mono break-all leading-tight">
+                {packet.data}
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+
+      {/* Hex Dump Visualization */}
+      <div className="p-2 bg-zinc-900/50 rounded border border-zinc-800">
+        <div className="text-[10px] text-muted-foreground mb-1">Hex Dump:</div>
+        <div className="grid grid-cols-16 gap-0.5 text-[8px]">
+          {[...Array(64)].map((_, i) => (
+            <motion.span
+              key={i}
+              className="text-green-400"
+              animate={{ opacity: [0.3, 1, 0.3] }}
+              transition={{ duration: 0.3, delay: i * 0.02, repeat: Infinity }}
+            >
+              {Math.floor(Math.random() * 256).toString(16).padStart(2, '0')}
+            </motion.span>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// SYSTEM TAKEOVER SIMULATION
+// ============================================
+
+function SystemTakeoverSimulation({ isActive }: { isActive: boolean }) {
+  const [phase, setPhase] = useState(0)
+  const [fileTree, setFileTree] = useState<{ name: string; type: 'folder' | 'file'; accessed: boolean }[]>([])
+  const [accessLevel, setAccessLevel] = useState('guest')
+  const [systemInfo, setSystemInfo] = useState({ os: '', kernel: '', hostname: '' })
+  const [logs, setLogs] = useState<string[]>([])
+
+  const phases = [
+    'Reconnaissance',
+    'Initial Access',
+    'Privilege Escalation',
+    'Lateral Movement',
+    'Data Exfiltration',
+    'Persistence',
+  ]
+
+  const files = [
+    { name: 'etc', type: 'folder' as const },
+    { name: 'passwd', type: 'file' as const },
+    { name: 'shadow', type: 'file' as const },
+    { name: 'home', type: 'folder' as const },
+    { name: 'user', type: 'folder' as const },
+    { name: '.ssh', type: 'folder' as const },
+    { name: 'id_rsa', type: 'file' as const },
+    { name: 'var', type: 'folder' as const },
+    { name: 'log', type: 'folder' as const },
+    { name: 'auth.log', type: 'file' as const },
+    { name: 'root', type: 'folder' as const },
+    { name: '.bash_history', type: 'file' as const },
+  ]
+
+  useEffect(() => {
+    if (!isActive) return
+
+    setPhase(0)
+    setFileTree(files.map(f => ({ ...f, accessed: false })))
+    setAccessLevel('guest')
+    setLogs([])
+    setSystemInfo({
+      os: 'Ubuntu 22.04 LTS',
+      kernel: '5.15.0-generic',
+      hostname: 'target-server',
+    })
+
+    let currentPhase = 0
+    let fileIndex = 0
+
+    const phaseInterval = setInterval(() => {
+      if (currentPhase < phases.length) {
+        setPhase(currentPhase)
+        setLogs(prev => [...prev, `[*] Phase ${currentPhase + 1}: ${phases[currentPhase]}`])
+
+        // Update access level
+        if (currentPhase === 2) setAccessLevel('user')
+        if (currentPhase >= 3) setAccessLevel('root')
+
+        currentPhase++
+      } else {
+        currentPhase = 0
+        setPhase(0)
+        setFileTree(files.map(f => ({ ...f, accessed: false })))
+        setAccessLevel('guest')
+        setLogs([])
+      }
+    }, 4000)
+
+    const fileInterval = setInterval(() => {
+      if (fileIndex < files.length) {
+        setFileTree(prev => prev.map((f, i) =>
+          i === fileIndex ? { ...f, accessed: true } : f
+        ))
+        setLogs(prev => [...prev.slice(-8), `[+] Accessed: /${files[fileIndex].name}`])
+        fileIndex++
+      } else {
+        fileIndex = 0
+      }
+    }, 1500)
+
+    return () => {
+      clearInterval(phaseInterval)
+      clearInterval(fileInterval)
+    }
+  }, [isActive])
+
+  return (
+    <div className="space-y-4 font-mono text-xs h-full overflow-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-red-400">
+          <Skull className="w-4 h-4" />
+          <span className="font-bold">SYSTEM TAKEOVER</span>
+        </div>
+        <div className={cn(
+          "px-2 py-1 rounded text-[10px] font-bold",
+          accessLevel === 'guest' && "bg-gray-500/20 text-gray-400",
+          accessLevel === 'user' && "bg-yellow-500/20 text-yellow-400",
+          accessLevel === 'root' && "bg-red-500/20 text-red-400",
+        )}>
+          {accessLevel.toUpperCase()}
+        </div>
+      </div>
+
+      {/* Phase Progress */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-[10px]">
+          <span className="text-muted-foreground">Attack Phase</span>
+          <span className="text-red-400">{phases[phase]}</span>
+        </div>
+        <div className="flex gap-1">
+          {phases.map((_, i) => (
+            <div
+              key={i}
+              className={cn(
+                "h-2 flex-1 rounded-full transition-colors",
+                i <= phase ? "bg-red-500" : "bg-zinc-800"
+              )}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* System Info */}
+      <div className="p-3 bg-zinc-900/50 rounded-lg border border-red-500/20">
+        <div className="grid grid-cols-3 gap-2 text-[10px]">
+          <div>
+            <div className="text-muted-foreground">OS</div>
+            <div className="text-cyan-400">{systemInfo.os}</div>
+          </div>
+          <div>
+            <div className="text-muted-foreground">Kernel</div>
+            <div className="text-cyan-400">{systemInfo.kernel}</div>
+          </div>
+          <div>
+            <div className="text-muted-foreground">Host</div>
+            <div className="text-cyan-400">{systemInfo.hostname}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* File System Tree */}
+      <div className="p-3 bg-zinc-900/50 rounded-lg border border-zinc-800">
+        <div className="text-[10px] text-muted-foreground mb-2">File System Access:</div>
+        <div className="space-y-0.5">
+          {fileTree.map((file, i) => (
+            <motion.div
+              key={i}
+              className="flex items-center gap-1"
+              animate={file.accessed ? { x: [0, 5, 0] } : {}}
+            >
+              <ChevronRight className="w-3 h-3 text-muted-foreground" />
+              {file.type === 'folder' ? (
+                <Folder className={cn("w-3 h-3", file.accessed ? "text-yellow-400" : "text-blue-400")} />
+              ) : (
+                <File className={cn("w-3 h-3", file.accessed ? "text-red-400" : "text-gray-400")} />
+              )}
+              <span className={cn(
+                "text-[10px]",
+                file.accessed ? "text-green-400" : "text-muted-foreground"
+              )}>
+                {file.name}
+                {file.accessed && <span className="text-red-400 ml-1">*</span>}
+              </span>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+
+      {/* Live Logs */}
+      <div className="p-2 bg-black rounded border border-zinc-800 h-24 overflow-auto">
+        {logs.map((log, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className={cn(
+              "text-[10px]",
+              log.includes('[+]') && "text-green-400",
+              log.includes('[*]') && "text-cyan-400",
+              log.includes('[!]') && "text-yellow-400",
+            )}
+          >
+            {log}
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// CTF MINI CHALLENGE
+// ============================================
+
+function CTFChallenge({ isActive }: { isActive: boolean }) {
+  const [currentChallenge, setCurrentChallenge] = useState(0)
+  const [input, setInput] = useState('')
+  const [solved, setSolved] = useState<number[]>([])
+  const [hint, setHint] = useState('')
+  const [showFlag, setShowFlag] = useState(false)
+  const [points, setPoints] = useState(0)
+
+  const challenges = [
+    {
+      title: 'Base64 Decode',
+      category: 'Crypto',
+      difficulty: 'Easy',
+      points: 100,
+      description: 'Decode this Base64 string to find the flag:',
+      cipher: 'ZmxhZ3tiYXNlNjRfaXNfbm90X2VuY3J5cHRpb259',
+      answer: 'flag{base64_is_not_encryption}',
+      hint: 'Use a Base64 decoder. The result is the flag!',
+    },
+    {
+      title: 'Caesar Cipher',
+      category: 'Crypto',
+      difficulty: 'Easy',
+      points: 150,
+      description: 'Decrypt this Caesar cipher (shift of 13):',
+      cipher: 'synt{ebg13_vf_abg_frpher}',
+      answer: 'flag{rot13_is_not_secure}',
+      hint: 'ROT13 is a Caesar cipher with a shift of 13.',
+    },
+    {
+      title: 'Hex Decode',
+      category: 'Crypto',
+      difficulty: 'Easy',
+      points: 100,
+      description: 'Convert this hex to ASCII:',
+      cipher: '666c61677b6865785f656e636f64696e677d',
+      answer: 'flag{hex_encoding}',
+      hint: 'Each pair of hex digits represents one character.',
+    },
+    {
+      title: 'Binary Decode',
+      category: 'Crypto',
+      difficulty: 'Medium',
+      points: 200,
+      description: 'Decode this binary:',
+      cipher: '01100110 01101100 01100001 01100111',
+      answer: 'flag',
+      hint: 'Each 8 bits represents one ASCII character.',
+    },
+  ]
+
+  const handleSubmit = () => {
+    const challenge = challenges[currentChallenge]
+    if (input.toLowerCase().trim() === challenge.answer.toLowerCase()) {
+      if (!solved.includes(currentChallenge)) {
+        setSolved(prev => [...prev, currentChallenge])
+        setPoints(prev => prev + challenge.points)
+      }
+      setShowFlag(true)
+      setTimeout(() => {
+        setShowFlag(false)
+        setInput('')
+        setHint('')
+        setCurrentChallenge((currentChallenge + 1) % challenges.length)
+      }, 2000)
+    } else {
+      setHint('Incorrect! Try again.')
+    }
+  }
+
+  const challenge = challenges[currentChallenge]
+
+  return (
+    <div className="space-y-4 font-mono text-xs h-full overflow-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-yellow-400">
+          <Flag className="w-4 h-4" />
+          <span className="font-bold">CTF CHALLENGE</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Trophy className="w-4 h-4 text-yellow-500" />
+          <span className="text-yellow-400 font-bold">{points} pts</span>
+        </div>
+      </div>
+
+      {/* Challenge Progress */}
+      <div className="flex gap-1">
+        {challenges.map((_, i) => (
+          <div
+            key={i}
+            className={cn(
+              "h-2 flex-1 rounded-full",
+              solved.includes(i) ? "bg-green-500" :
+              i === currentChallenge ? "bg-yellow-500" : "bg-zinc-800"
+            )}
+          />
+        ))}
+      </div>
+
+      {/* Challenge Card */}
+      <div className="p-4 bg-zinc-900/50 rounded-lg border border-yellow-500/20">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h4 className="font-bold text-white">{challenge.title}</h4>
+            <div className="flex items-center gap-2 mt-1">
+              <span className="px-1.5 py-0.5 bg-purple-500/20 text-purple-400 rounded text-[10px]">
+                {challenge.category}
+              </span>
+              <span className={cn(
+                "px-1.5 py-0.5 rounded text-[10px]",
+                challenge.difficulty === 'Easy' && "bg-green-500/20 text-green-400",
+                challenge.difficulty === 'Medium' && "bg-yellow-500/20 text-yellow-400",
+                challenge.difficulty === 'Hard' && "bg-red-500/20 text-red-400",
+              )}>
+                {challenge.difficulty}
+              </span>
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-yellow-400 font-bold">{challenge.points}</div>
+            <div className="text-[10px] text-muted-foreground">points</div>
+          </div>
+        </div>
+
+        <p className="text-muted-foreground mb-3">{challenge.description}</p>
+
+        <div className="p-3 bg-black rounded border border-zinc-800 mb-3">
+          <code className="text-green-400 break-all">{challenge.cipher}</code>
+        </div>
+
+        {/* Input */}
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Enter flag..."
+            className="flex-1 px-3 py-2 bg-black border border-zinc-700 rounded focus:border-yellow-500 focus:outline-none text-white"
+            onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+          />
+          <button
+            onClick={handleSubmit}
+            className="px-4 py-2 bg-yellow-500 text-black font-bold rounded hover:bg-yellow-400 transition-colors"
+          >
+            Submit
+          </button>
+        </div>
+
+        {/* Hint Button */}
+        <button
+          onClick={() => setHint(challenge.hint)}
+          className="mt-2 text-[10px] text-muted-foreground hover:text-yellow-400"
+        >
+          Need a hint?
+        </button>
+
+        {hint && (
+          <div className="mt-2 p-2 bg-yellow-500/10 border border-yellow-500/30 rounded text-yellow-400 text-[10px]">
+            {hint}
+          </div>
+        )}
+      </div>
+
+      {/* Success Animation */}
+      <AnimatePresence>
+        {showFlag && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
+          >
+            <div className="p-8 bg-zinc-900 rounded-xl border border-green-500 text-center">
+              <Sparkles className="w-12 h-12 text-green-400 mx-auto mb-4" />
+              <div className="text-2xl font-bold text-green-400">FLAG CAPTURED!</div>
+              <div className="text-yellow-400 mt-2">+{challenge.points} points</div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
+
+// ============================================
+// FIREWALL BYPASS VISUALIZATION
+// ============================================
+
+function FirewallBypassVisualization({ isActive }: { isActive: boolean }) {
+  const [packets, setPackets] = useState<{ id: number; blocked: boolean; technique: string }[]>([])
+  const [bypassAttempts, setBypassAttempts] = useState(0)
+  const [successRate, setSuccessRate] = useState(0)
+  const [currentTechnique, setCurrentTechnique] = useState('')
+  const [firewallRules, setFirewallRules] = useState<{ port: number; action: 'ALLOW' | 'DENY' }[]>([])
+
+  const techniques = [
+    'Port Hopping',
+    'Protocol Tunneling',
+    'IP Fragmentation',
+    'SSL/TLS Encryption',
+    'DNS Tunneling',
+    'HTTP Header Manipulation',
+    'Steganography',
+    'Timing-based Evasion',
+  ]
+
+  useEffect(() => {
+    if (!isActive) return
+
+    // Initialize firewall rules
+    setFirewallRules([
+      { port: 22, action: 'DENY' },
+      { port: 23, action: 'DENY' },
+      { port: 80, action: 'ALLOW' },
+      { port: 443, action: 'ALLOW' },
+      { port: 3389, action: 'DENY' },
+      { port: 8080, action: 'DENY' },
+    ])
+
+    let attempts = 0
+    let successes = 0
+
+    const interval = setInterval(() => {
+      const technique = techniques[Math.floor(Math.random() * techniques.length)]
+      const blocked = Math.random() > 0.6 // 40% success rate
+
+      attempts++
+      if (!blocked) successes++
+
+      setBypassAttempts(attempts)
+      setSuccessRate(Math.round((successes / attempts) * 100))
+      setCurrentTechnique(technique)
+
+      setPackets(prev => [{
+        id: Date.now(),
+        blocked,
+        technique,
+      }, ...prev.slice(0, 6)])
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [isActive])
+
+  return (
+    <div className="space-y-4 font-mono text-xs h-full overflow-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-orange-400">
+          <ShieldOff className="w-4 h-4" />
+          <span className="font-bold">FIREWALL EVASION</span>
+        </div>
+        <div className="text-[10px] text-muted-foreground">
+          Success Rate: <span className="text-green-400">{successRate}%</span>
+        </div>
+      </div>
+
+      {/* Firewall Visualization */}
+      <div className="relative p-4 bg-zinc-900/50 rounded-lg border border-orange-500/20">
+        <div className="flex items-center justify-between">
+          {/* Source */}
+          <div className="text-center">
+            <Cpu className="w-8 h-8 text-cyan-400 mx-auto" />
+            <div className="text-[10px] text-muted-foreground mt-1">Attacker</div>
+          </div>
+
+          {/* Firewall */}
+          <div className="flex-1 mx-4 relative">
+            <div className="h-16 bg-gradient-to-r from-red-500/20 via-orange-500/30 to-red-500/20 rounded border-2 border-orange-500 flex items-center justify-center">
+              <Flame className="w-6 h-6 text-orange-500" />
+              <span className="ml-2 text-orange-400 font-bold">FIREWALL</span>
+            </div>
+
+            {/* Packet Animation */}
+            <AnimatePresence>
+              {packets.slice(0, 3).map((packet, i) => (
+                <motion.div
+                  key={packet.id}
+                  initial={{ x: -50, opacity: 0 }}
+                  animate={{
+                    x: packet.blocked ? 0 : 200,
+                    opacity: packet.blocked ? 0 : 1,
+                  }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                  className="absolute top-1/2 -translate-y-1/2"
+                  style={{ top: `${30 + i * 15}%` }}
+                >
+                  <div className={cn(
+                    "w-3 h-3 rounded-full",
+                    packet.blocked ? "bg-red-500" : "bg-green-500"
+                  )} />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+
+          {/* Target */}
+          <div className="text-center">
+            <Server className="w-8 h-8 text-green-400 mx-auto" />
+            <div className="text-[10px] text-muted-foreground mt-1">Target</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Current Technique */}
+      <div className="p-3 bg-zinc-900/50 rounded border border-zinc-800">
+        <div className="text-[10px] text-muted-foreground mb-1">Current Technique:</div>
+        <div className="text-cyan-400 font-bold flex items-center gap-2">
+          <Layers className="w-4 h-4" />
+          {currentTechnique}
+        </div>
+      </div>
+
+      {/* Firewall Rules */}
+      <div className="p-3 bg-zinc-900/50 rounded border border-zinc-800">
+        <div className="text-[10px] text-muted-foreground mb-2">Detected Rules:</div>
+        <div className="grid grid-cols-2 gap-1">
+          {firewallRules.map((rule, i) => (
+            <div
+              key={i}
+              className={cn(
+                "flex items-center justify-between p-1.5 rounded text-[10px]",
+                rule.action === 'ALLOW' ? "bg-green-500/10" : "bg-red-500/10"
+              )}
+            >
+              <span className="text-muted-foreground">Port {rule.port}</span>
+              <span className={rule.action === 'ALLOW' ? "text-green-400" : "text-red-400"}>
+                {rule.action}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Attempt Log */}
+      <div className="space-y-1">
+        <AnimatePresence>
+          {packets.map((packet) => (
+            <motion.div
+              key={packet.id}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0 }}
+              className={cn(
+                "flex items-center justify-between p-2 rounded text-[10px]",
+                packet.blocked ? "bg-red-500/10 border border-red-500/30" : "bg-green-500/10 border border-green-500/30"
+              )}
+            >
+              <span className="text-muted-foreground">{packet.technique}</span>
+              <span className={packet.blocked ? "text-red-400" : "text-green-400"}>
+                {packet.blocked ? "BLOCKED" : "BYPASSED"}
+              </span>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
 // MAIN HACKER PLAYGROUND COMPONENT
 // ============================================
 
-type PlaygroundMode = 'code' | 'scan' | 'terminal' | 'threats'
+type PlaygroundMode = 'code' | 'scan' | 'terminal' | 'threats' | 'crack' | 'binary' | 'takeover' | 'ctf' | 'firewall'
 
 export function HackerPlayground() {
   const [isPlaying, setIsPlaying] = useState(true)
@@ -834,6 +1695,11 @@ export function HackerPlayground() {
     { id: 'scan', label: 'Network Scan', icon: Network },
     { id: 'terminal', label: 'Exploit Run', icon: Terminal },
     { id: 'threats', label: 'Threat Feed', icon: Shield },
+    { id: 'crack', label: 'Hash Crack', icon: Key },
+    { id: 'binary', label: 'Packet Capture', icon: Binary },
+    { id: 'takeover', label: 'System Pwn', icon: Skull },
+    { id: 'ctf', label: 'CTF Challenge', icon: Flag },
+    { id: 'firewall', label: 'Firewall Bypass', icon: ShieldOff },
   ]
 
   return (
@@ -915,6 +1781,11 @@ export function HackerPlayground() {
             {mode === 'scan' && 'Network Scanner v2.1'}
             {mode === 'terminal' && 'Metasploit Framework'}
             {mode === 'threats' && 'Security Operations Center'}
+            {mode === 'crack' && 'Hashcat / John the Ripper'}
+            {mode === 'binary' && 'Wireshark Packet Analyzer'}
+            {mode === 'takeover' && 'Cobalt Strike Beacon'}
+            {mode === 'ctf' && 'CTF Platform - Capture The Flag'}
+            {mode === 'firewall' && 'Firewall Evasion Framework'}
           </div>
           <div className="text-xs text-muted-foreground font-mono">
             {mode === 'code' && `${currentScriptIndex + 1}/${hackingScripts.length}`}
@@ -934,6 +1805,11 @@ export function HackerPlayground() {
           {mode === 'scan' && <NetworkScanSimulation isActive={isPlaying} />}
           {mode === 'terminal' && <TerminalOutput isActive={isPlaying} />}
           {mode === 'threats' && <ThreatMonitor isActive={isPlaying} />}
+          {mode === 'crack' && <PasswordCrackSimulation isActive={isPlaying} />}
+          {mode === 'binary' && <BinaryStreamVisualization isActive={isPlaying} />}
+          {mode === 'takeover' && <SystemTakeoverSimulation isActive={isPlaying} />}
+          {mode === 'ctf' && <CTFChallenge isActive={isPlaying} />}
+          {mode === 'firewall' && <FirewallBypassVisualization isActive={isPlaying} />}
         </div>
 
         {/* Status Bar */}
@@ -948,6 +1824,11 @@ export function HackerPlayground() {
               {mode === 'scan' && 'Nmap-style Scanner'}
               {mode === 'terminal' && 'msf6 >'}
               {mode === 'threats' && 'Real-time Monitoring'}
+              {mode === 'crack' && 'Rainbow Tables + Brute Force'}
+              {mode === 'binary' && 'libpcap / tcpdump'}
+              {mode === 'takeover' && 'Post-Exploitation Framework'}
+              {mode === 'ctf' && 'Crypto / Web / Forensics'}
+              {mode === 'firewall' && 'IDS/IPS Evasion'}
             </span>
           </div>
           <div className="flex items-center gap-4 text-muted-foreground">
