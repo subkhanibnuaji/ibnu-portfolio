@@ -940,6 +940,168 @@ const TOOLS = [
     bgColor: 'bg-green-500/10',
     textColor: 'text-green-500',
     category: 'Utility'
+  },
+  // 3D & Interactive
+  {
+    slug: '3d-model-viewer',
+    name: '3D Model Viewer',
+    description: 'Interactive 3D model viewer with rotation, zoom, and preset shapes.',
+    icon: Blocks,
+    bgColor: 'bg-violet-500/10',
+    textColor: 'text-violet-500',
+    category: '3D'
+  },
+  // Advanced Games
+  {
+    slug: 'chess-game',
+    name: 'Chess Game',
+    description: 'Play chess against AI or with a friend in 2-player mode.',
+    icon: Grid3X3,
+    bgColor: 'bg-amber-500/10',
+    textColor: 'text-amber-500',
+    category: 'Game'
+  },
+  {
+    slug: 'flappy-bird',
+    name: 'Flappy Bird',
+    description: 'Classic flappy bird game - tap to fly and avoid the pipes!',
+    icon: Zap,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Game'
+  },
+  {
+    slug: 'typing-race',
+    name: 'Typing Race',
+    description: 'Test your typing speed and accuracy with timed challenges.',
+    icon: Keyboard,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Game'
+  },
+  {
+    slug: 'rock-paper-scissors',
+    name: 'Rock Paper Scissors',
+    description: 'Classic game against the computer with stats tracking.',
+    icon: Dices,
+    bgColor: 'bg-pink-500/10',
+    textColor: 'text-pink-500',
+    category: 'Game'
+  },
+  // Music Production
+  {
+    slug: 'piano',
+    name: 'Virtual Piano',
+    description: 'Play piano with keyboard or mouse, change waveforms, and record.',
+    icon: Music,
+    bgColor: 'bg-indigo-500/10',
+    textColor: 'text-indigo-500',
+    category: 'Music'
+  },
+  {
+    slug: 'beat-maker',
+    name: 'Beat Maker',
+    description: 'Create beats with a step sequencer and preset patterns.',
+    icon: Music,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Music'
+  },
+  // Video/Audio Tools
+  {
+    slug: 'voice-recorder',
+    name: 'Voice Recorder',
+    description: 'Record audio from your microphone with visualization.',
+    icon: Radio,
+    bgColor: 'bg-red-500/10',
+    textColor: 'text-red-500',
+    category: 'Media'
+  },
+  {
+    slug: 'screen-recorder',
+    name: 'Screen Recorder',
+    description: 'Record your screen or camera with audio support.',
+    icon: Monitor,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Media'
+  },
+  // Data Visualization
+  {
+    slug: 'mind-map',
+    name: 'Mind Map',
+    description: 'Create and visualize ideas with an interactive mind map.',
+    icon: Brain,
+    bgColor: 'bg-cyan-500/10',
+    textColor: 'text-cyan-500',
+    category: 'Productivity'
+  },
+  {
+    slug: 'chart-builder',
+    name: 'Chart Builder',
+    description: 'Create bar, line, pie, and doughnut charts from your data.',
+    icon: Target,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Data'
+  },
+  // Social/Communication
+  {
+    slug: 'poll-creator',
+    name: 'Poll Creator',
+    description: 'Create polls, vote, and see results in real-time.',
+    icon: ListChecks,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Social'
+  },
+  // Education
+  {
+    slug: 'quiz-maker',
+    name: 'Quiz Maker',
+    description: 'Create quizzes with multiple choice questions.',
+    icon: BookOpen,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Education'
+  },
+  // Lifestyle
+  {
+    slug: 'recipe-manager',
+    name: 'Recipe Manager',
+    description: 'Save, organize, and manage your favorite recipes.',
+    icon: Sparkles,
+    bgColor: 'bg-orange-500/10',
+    textColor: 'text-orange-500',
+    category: 'Lifestyle'
+  },
+  {
+    slug: 'workout-planner',
+    name: 'Workout Planner',
+    description: 'Plan, track, and execute your workout routines.',
+    icon: Flame,
+    bgColor: 'bg-red-500/10',
+    textColor: 'text-red-500',
+    category: 'Fitness'
+  },
+  {
+    slug: 'budget-tracker',
+    name: 'Budget Tracker',
+    description: 'Track income, expenses, and set budget limits.',
+    icon: Wallet,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Finance'
+  },
+  // Developer Tools
+  {
+    slug: 'code-diff-viewer',
+    name: 'Code Diff Viewer',
+    description: 'Compare code changes with split or unified view.',
+    icon: Code,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Developer'
   }
 ]
 
