@@ -1,0 +1,24 @@
+'use client'
+
+import Link from 'next/link'
+import { ArrowLeft } from 'lucide-react'
+import { ImageCompressor } from '@/components/tools/image-compressor'
+
+export default function ImageCompressorPage() {
+  return (
+    <main className="min-h-screen py-24">
+      <div className="container max-w-4xl">
+        <Link
+          href="/tools"
+          className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Tools
+        </Link>
+        <h1 className="text-3xl font-bold mb-2">Image Compressor</h1>
+        <p className="text-muted-foreground mb-8">Compress images while maintaining quality</p>
+        <ImageCompressor />
+      </div>
+    </main>
+  )
+}
