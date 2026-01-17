@@ -10,6 +10,7 @@ import {
 import { NewsFeed } from '@/components/pillars/news-feed'
 import { SecurityStatsWidget, ThreatIndicator } from '@/components/pillars/security-stats'
 import { SecurityToolsGrid } from '@/components/security/security-tools'
+import { HackerPlaygroundGrid } from '@/components/security/hacker-playground'
 
 const securityDomains = [
   {
@@ -141,6 +142,28 @@ export default function CyberSecurityPage() {
         </motion.div>
 
         <SecurityToolsGrid />
+      </section>
+
+      {/* Ethical Hacker Playground - NEW */}
+      <section className="container mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mb-8"
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+              <Terminal className="w-5 h-5 text-green-500" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold">Ethical Hacker Playground</h2>
+              <p className="text-sm text-muted-foreground">Interactive hacking simulations for educational purposes</p>
+            </div>
+          </div>
+        </motion.div>
+
+        <HackerPlaygroundGrid />
       </section>
 
       {/* Security Stats */}
