@@ -31,6 +31,7 @@ interface ToolExecution {
 }
 
 interface AgentMessage {
+  id: string;
   role: 'user' | 'assistant';
   content: string;
   toolExecutions?: ToolExecution[];
@@ -38,6 +39,7 @@ interface AgentMessage {
 
 export default function AgentPage() {
   const [messages, setMessages] = useState<AgentMessage[]>([]);
+  const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [model, setModel] = useState<GroqModelId>(AI_DEFAULTS.model);
   const [error, setError] = useState<string | null>(null);
@@ -61,13 +63,19 @@ export default function AgentPage() {
     }
   }, []);
 
-  const handleSend = useCallback(
-    async (message: string) => {
+  const handleSubmit = useCallback(
+    async (messageOrEvent?: string | React.FormEvent) => {
+      // Handle both string message and form event
+      const message = typeof messageOrEvent === 'string' ? messageOrEvent : input;
+      if (typeof messageOrEvent !== 'string') {
+        messageOrEvent?.preventDefault?.();
+      }
       if (!message.trim() || isLoading) return;
 
-      const userMessage: AgentMessage = { role: 'user', content: message.trim() };
+      const userMessage: AgentMessage = { id: `user-${Date.now()}`, role: 'user', content: message.trim() };
       const newMessages = [...messages, userMessage];
       setMessages(newMessages);
+      setInput('');
       setError(null);
       setIsLoading(true);
       setCurrentToolExecutions([]);
@@ -133,6 +141,7 @@ export default function AgentPage() {
                   setMessages([
                     ...newMessages,
                     {
+                      id: `assistant-${Date.now()}`,
                       role: 'assistant',
                       content: assistantContent,
                       toolExecutions: [...toolExecutions],
@@ -153,6 +162,7 @@ export default function AgentPage() {
           setMessages([
             ...newMessages,
             {
+              id: `assistant-final-${Date.now()}`,
               role: 'assistant',
               content: assistantContent,
               toolExecutions,
@@ -171,7 +181,7 @@ export default function AgentPage() {
         abortControllerRef.current = null;
       }
     },
-    [isLoading, messages, model]
+    [input, isLoading, messages, model]
   );
 
   const handleClear = useCallback(() => {
@@ -251,7 +261,7 @@ export default function AgentPage() {
                 ].map((suggestion) => (
                   <button
                     key={suggestion}
-                    onClick={() => handleSend(suggestion)}
+                    onClick={() => setInput(suggestion)}
                     className="rounded-full bg-gray-700/50 px-4 py-2 text-sm text-gray-300 transition-colors hover:bg-gray-700"
                   >
                     {suggestion}
@@ -284,10 +294,9 @@ export default function AgentPage() {
                       </div>
                     )}
                     <ChatMessage
-                      id={`msg-${index}`}
+                      id={message.id}
                       role={message.role}
                       content={message.content}
-                      isStreaming={false}
                     />
                   </motion.div>
                 ))}
@@ -348,7 +357,7 @@ export default function AgentPage() {
             </div>
           ) : (
             <ChatInput
-              onSend={handleSend}
+              onSend={handleSubmit}
               placeholder="Ask the agent to do something..."
               disabled={isLoading}
             />
