@@ -18,9 +18,11 @@ import { cn } from '@/lib/utils';
 
 export interface ChatInputProps {
   onSend?: (message: string) => void;
-  onSubmit?: (e?: React.FormEvent) => void; // Alternative to onSend
+  // Controlled mode props
   value?: string;
   onChange?: (value: string) => void;
+  onSubmit?: (e?: FormEvent) => void;
+  // Common props
   isLoading?: boolean;
   disabled?: boolean;
   placeholder?: string;
@@ -35,9 +37,9 @@ export interface ChatInputProps {
 
 export function ChatInput({
   onSend,
-  onSubmit,
   value: controlledValue,
   onChange: controlledOnChange,
+  onSubmit,
   isLoading = false,
   disabled = false,
   placeholder = 'Type your message...',
@@ -48,7 +50,7 @@ export function ChatInput({
   const [internalInput, setInternalInput] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Use controlled value if provided, otherwise internal state
+  // Support both controlled and uncontrolled modes
   const isControlled = controlledValue !== undefined;
   const input = isControlled ? controlledValue : internalInput;
   const setInput = isControlled

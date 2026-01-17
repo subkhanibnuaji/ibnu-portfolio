@@ -9,11 +9,34 @@
 // Configuration
 export * from './config';
 
-// LangChain utilities
-export * from './langchain';
+// LangChain utilities (excluding AIMessage to avoid collision with config.ts)
+export {
+  initializeGroqLLM,
+  convertToLangChainMessages,
+  createChatChain,
+  createRAGChain,
+  createCodeAssistantChain,
+  streamChatResponse,
+  streamRAGResponse,
+  getAvailableModels,
+  isValidModel,
+  estimateTokens,
+  truncateMessages,
+  HumanMessage,
+  SystemMessage,
+  ChatPromptTemplate,
+  MessagesPlaceholder,
+  StringOutputParser,
+} from './langchain';
+
+// LangChain AIMessage (separate export to avoid collision)
+export { AIMessage as LangChainAIMessage } from './langchain';
 
 // RAG utilities
 export * from './rag';
 
 // Agent utilities
 export * from './agent';
+
+// Telegram bot utilities
+export * from './telegram';

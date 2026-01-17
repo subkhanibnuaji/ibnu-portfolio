@@ -118,6 +118,7 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               {children}
+              <SiteNavigator />
               <Toaster richColors position="bottom-right" />
               <AchievementSystem />
               <QuickActionsFAB />
