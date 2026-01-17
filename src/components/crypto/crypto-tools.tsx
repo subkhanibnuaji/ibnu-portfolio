@@ -3268,17 +3268,789 @@ export function AirdropChecker() {
 }
 
 // ============================================
+// POSITION SIZE CALCULATOR
+// ============================================
+
+export function PositionSizeCalculator() {
+  const [accountSize, setAccountSize] = useState('10000')
+  const [riskPercent, setRiskPercent] = useState('2')
+  const [entryPrice, setEntryPrice] = useState('50000')
+  const [stopLoss, setStopLoss] = useState('48000')
+  const [result, setResult] = useState<{
+    riskAmount: number
+    positionSize: number
+    stopLossPercent: number
+    leverage: number
+  } | null>(null)
+
+  const calculate = useCallback(() => {
+    const account = parseFloat(accountSize)
+    const risk = parseFloat(riskPercent) / 100
+    const entry = parseFloat(entryPrice)
+    const stop = parseFloat(stopLoss)
+
+    if (isNaN(account) || isNaN(risk) || isNaN(entry) || isNaN(stop) || entry === stop) {
+      setResult(null)
+      return
+    }
+
+    const riskAmount = account * risk
+    const stopLossPercent = Math.abs((entry - stop) / entry) * 100
+    const positionSize = riskAmount / (stopLossPercent / 100)
+    const leverage = positionSize / account
+
+    setResult({ riskAmount, positionSize, stopLossPercent, leverage })
+  }, [accountSize, riskPercent, entryPrice, stopLoss])
+
+  useEffect(() => {
+    calculate()
+  }, [calculate])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+          <Target className="w-5 h-5 text-blue-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Position Size Calculator</h3>
+          <p className="text-xs text-muted-foreground">Risk-based position sizing</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Account Size ($)</label>
+            <input
+              type="number"
+              value={accountSize}
+              onChange={(e) => setAccountSize(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-blue-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Risk (%)</label>
+            <input
+              type="number"
+              value={riskPercent}
+              onChange={(e) => setRiskPercent(e.target.value)}
+              step="0.5"
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-blue-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Entry Price ($)</label>
+            <input
+              type="number"
+              value={entryPrice}
+              onChange={(e) => setEntryPrice(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-blue-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Stop Loss ($)</label>
+            <input
+              type="number"
+              value={stopLoss}
+              onChange={(e) => setStopLoss(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-blue-500 focus:outline-none text-sm"
+            />
+          </div>
+        </div>
+
+        {result && (
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 bg-red-500/10 rounded-lg text-center">
+                <p className="text-lg font-bold text-red-500">${result.riskAmount.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground">Risk Amount</p>
+              </div>
+              <div className="p-3 bg-blue-500/10 rounded-lg text-center">
+                <p className="text-lg font-bold text-blue-500">${result.positionSize.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground">Position Size</p>
+              </div>
+            </div>
+            <div className="p-3 bg-muted/50 rounded-lg space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Stop Loss Distance:</span>
+                <span className="font-medium text-red-500">{result.stopLossPercent.toFixed(2)}%</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Effective Leverage:</span>
+                <span className="font-medium">{result.leverage.toFixed(2)}x</span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// RISK/REWARD CALCULATOR
+// ============================================
+
+export function RiskRewardCalculator() {
+  const [entryPrice, setEntryPrice] = useState('50000')
+  const [stopLoss, setStopLoss] = useState('48000')
+  const [takeProfit, setTakeProfit] = useState('55000')
+  const [winRate, setWinRate] = useState('50')
+  const [result, setResult] = useState<{
+    riskPercent: number
+    rewardPercent: number
+    rrRatio: number
+    breakeven: number
+    expectedValue: number
+  } | null>(null)
+
+  const calculate = useCallback(() => {
+    const entry = parseFloat(entryPrice)
+    const stop = parseFloat(stopLoss)
+    const target = parseFloat(takeProfit)
+    const wr = parseFloat(winRate) / 100
+
+    if (isNaN(entry) || isNaN(stop) || isNaN(target) || isNaN(wr)) {
+      setResult(null)
+      return
+    }
+
+    const riskPercent = Math.abs((entry - stop) / entry) * 100
+    const rewardPercent = Math.abs((target - entry) / entry) * 100
+    const rrRatio = rewardPercent / riskPercent
+    const breakeven = (1 / (1 + rrRatio)) * 100
+    const expectedValue = (wr * rewardPercent) - ((1 - wr) * riskPercent)
+
+    setResult({ riskPercent, rewardPercent, rrRatio, breakeven, expectedValue })
+  }, [entryPrice, stopLoss, takeProfit, winRate])
+
+  useEffect(() => {
+    calculate()
+  }, [calculate])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+          <Scale className="w-5 h-5 text-green-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Risk/Reward Calculator</h3>
+          <p className="text-xs text-muted-foreground">Analyze trade R:R ratio</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Entry Price</label>
+            <input
+              type="number"
+              value={entryPrice}
+              onChange={(e) => setEntryPrice(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-green-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Win Rate (%)</label>
+            <input
+              type="number"
+              value={winRate}
+              onChange={(e) => setWinRate(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-green-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Stop Loss</label>
+            <input
+              type="number"
+              value={stopLoss}
+              onChange={(e) => setStopLoss(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-green-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Take Profit</label>
+            <input
+              type="number"
+              value={takeProfit}
+              onChange={(e) => setTakeProfit(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-green-500 focus:outline-none text-sm"
+            />
+          </div>
+        </div>
+
+        {result && (
+          <div className="space-y-3">
+            <div className="grid grid-cols-3 gap-2">
+              <div className="p-3 bg-red-500/10 rounded-lg text-center">
+                <p className="text-lg font-bold text-red-500">{result.riskPercent.toFixed(2)}%</p>
+                <p className="text-xs text-muted-foreground">Risk</p>
+              </div>
+              <div className="p-3 bg-green-500/10 rounded-lg text-center">
+                <p className="text-lg font-bold text-green-500">{result.rewardPercent.toFixed(2)}%</p>
+                <p className="text-xs text-muted-foreground">Reward</p>
+              </div>
+              <div className="p-3 bg-blue-500/10 rounded-lg text-center">
+                <p className="text-lg font-bold text-blue-500">1:{result.rrRatio.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground">R:R Ratio</p>
+              </div>
+            </div>
+            <div className="p-3 bg-muted/50 rounded-lg space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Breakeven Win Rate:</span>
+                <span className="font-medium">{result.breakeven.toFixed(1)}%</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-muted-foreground">Expected Value:</span>
+                <span className={cn('font-medium', result.expectedValue >= 0 ? 'text-green-500' : 'text-red-500')}>
+                  {result.expectedValue >= 0 ? '+' : ''}{result.expectedValue.toFixed(2)}%
+                </span>
+              </div>
+            </div>
+            {result.expectedValue >= 0 && (
+              <div className="p-2 bg-green-500/10 rounded text-xs text-green-500 text-center">
+                Positive expectancy trade setup
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// FIBONACCI RETRACEMENT CALCULATOR
+// ============================================
+
+const FIB_LEVELS = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1, 1.272, 1.618]
+
+export function FibonacciCalculator() {
+  const [highPrice, setHighPrice] = useState('69000')
+  const [lowPrice, setLowPrice] = useState('49000')
+  const [trend, setTrend] = useState<'up' | 'down'>('up')
+  const [levels, setLevels] = useState<{ level: number; price: number }[]>([])
+
+  const calculate = useCallback(() => {
+    const high = parseFloat(highPrice)
+    const low = parseFloat(lowPrice)
+
+    if (isNaN(high) || isNaN(low)) {
+      setLevels([])
+      return
+    }
+
+    const range = high - low
+    const fibLevels = FIB_LEVELS.map(level => {
+      const price = trend === 'up'
+        ? high - (range * level)
+        : low + (range * level)
+      return { level, price }
+    })
+
+    setLevels(fibLevels)
+  }, [highPrice, lowPrice, trend])
+
+  useEffect(() => {
+    calculate()
+  }, [calculate])
+
+  const getLevelColor = (level: number) => {
+    if (level === 0 || level === 1) return 'text-foreground'
+    if (level === 0.618) return 'text-yellow-500'
+    if (level === 0.5) return 'text-cyan-500'
+    if (level === 0.382) return 'text-green-500'
+    if (level > 1) return 'text-purple-500'
+    return 'text-muted-foreground'
+  }
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center">
+          <LineChart className="w-5 h-5 text-yellow-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Fibonacci Retracement</h3>
+          <p className="text-xs text-muted-foreground">Calculate key fib levels</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex gap-2">
+          <button
+            onClick={() => setTrend('up')}
+            className={cn(
+              'flex-1 py-2 rounded-lg text-sm font-medium transition-colors',
+              trend === 'up' ? 'bg-green-500 text-white' : 'bg-muted/50 hover:bg-muted'
+            )}
+          >
+            Uptrend
+          </button>
+          <button
+            onClick={() => setTrend('down')}
+            className={cn(
+              'flex-1 py-2 rounded-lg text-sm font-medium transition-colors',
+              trend === 'down' ? 'bg-red-500 text-white' : 'bg-muted/50 hover:bg-muted'
+            )}
+          >
+            Downtrend
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">High Price</label>
+            <input
+              type="number"
+              value={highPrice}
+              onChange={(e) => setHighPrice(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-yellow-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Low Price</label>
+            <input
+              type="number"
+              value={lowPrice}
+              onChange={(e) => setLowPrice(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-yellow-500 focus:outline-none text-sm"
+            />
+          </div>
+        </div>
+
+        {levels.length > 0 && (
+          <div className="space-y-1">
+            {levels.map(({ level, price }) => (
+              <div
+                key={level}
+                className={cn(
+                  'flex justify-between items-center p-2 rounded text-sm',
+                  level === 0.618 && 'bg-yellow-500/10',
+                  level === 0.5 && 'bg-cyan-500/10',
+                  level === 0.382 && 'bg-green-500/10',
+                )}
+              >
+                <span className={cn('font-mono', getLevelColor(level))}>
+                  {(level * 100).toFixed(1)}%
+                </span>
+                <span className={cn('font-mono font-medium', getLevelColor(level))}>
+                  ${price.toFixed(2)}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <p className="text-xs text-muted-foreground">
+          Key levels: 38.2%, 50%, 61.8% (Golden Ratio)
+        </p>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// PORTFOLIO TRACKER
+// ============================================
+
+export function PortfolioTracker() {
+  const [holdings, setHoldings] = useState([
+    { symbol: 'BTC', amount: 0.5, avgPrice: 45000, currentPrice: 60000 },
+    { symbol: 'ETH', amount: 5, avgPrice: 2500, currentPrice: 3200 },
+    { symbol: 'SOL', amount: 50, avgPrice: 80, currentPrice: 120 },
+  ])
+
+  const addHolding = () => {
+    setHoldings([...holdings, { symbol: 'NEW', amount: 0, avgPrice: 0, currentPrice: 0 }])
+  }
+
+  const updateHolding = (index: number, field: keyof typeof holdings[0], value: string | number) => {
+    setHoldings(prev => {
+      const updated = [...prev]
+      updated[index] = { ...updated[index], [field]: field === 'symbol' ? value : parseFloat(value as string) || 0 }
+      return updated
+    })
+  }
+
+  const removeHolding = (index: number) => {
+    setHoldings(prev => prev.filter((_, i) => i !== index))
+  }
+
+  const totalInvested = holdings.reduce((acc, h) => acc + (h.amount * h.avgPrice), 0)
+  const totalValue = holdings.reduce((acc, h) => acc + (h.amount * h.currentPrice), 0)
+  const totalPnL = totalValue - totalInvested
+  const totalPnLPercent = totalInvested > 0 ? (totalPnL / totalInvested) * 100 : 0
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+          <PiggyBank className="w-5 h-5 text-purple-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Portfolio Tracker</h3>
+          <p className="text-xs text-muted-foreground">Track your crypto holdings</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {/* Summary */}
+        <div className="grid grid-cols-3 gap-2">
+          <div className="p-3 bg-muted/50 rounded-lg text-center">
+            <p className="text-lg font-bold">${totalInvested.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+            <p className="text-xs text-muted-foreground">Invested</p>
+          </div>
+          <div className="p-3 bg-purple-500/10 rounded-lg text-center">
+            <p className="text-lg font-bold text-purple-500">${totalValue.toLocaleString(undefined, { maximumFractionDigits: 0 })}</p>
+            <p className="text-xs text-muted-foreground">Value</p>
+          </div>
+          <div className={cn('p-3 rounded-lg text-center', totalPnL >= 0 ? 'bg-green-500/10' : 'bg-red-500/10')}>
+            <p className={cn('text-lg font-bold', totalPnL >= 0 ? 'text-green-500' : 'text-red-500')}>
+              {totalPnL >= 0 ? '+' : ''}{totalPnLPercent.toFixed(1)}%
+            </p>
+            <p className="text-xs text-muted-foreground">P/L</p>
+          </div>
+        </div>
+
+        {/* Holdings */}
+        <div className="space-y-2 max-h-60 overflow-y-auto">
+          {holdings.map((holding, index) => {
+            const value = holding.amount * holding.currentPrice
+            const cost = holding.amount * holding.avgPrice
+            const pnl = value - cost
+            const pnlPercent = cost > 0 ? (pnl / cost) * 100 : 0
+
+            return (
+              <div key={index} className="p-3 bg-muted/30 rounded-lg">
+                <div className="grid grid-cols-4 gap-2 mb-2">
+                  <input
+                    type="text"
+                    value={holding.symbol}
+                    onChange={(e) => updateHolding(index, 'symbol', e.target.value.toUpperCase())}
+                    className="px-2 py-1 bg-muted/50 border border-border rounded text-xs font-bold"
+                    placeholder="BTC"
+                  />
+                  <input
+                    type="number"
+                    value={holding.amount || ''}
+                    onChange={(e) => updateHolding(index, 'amount', e.target.value)}
+                    className="px-2 py-1 bg-muted/50 border border-border rounded text-xs"
+                    placeholder="Amount"
+                  />
+                  <input
+                    type="number"
+                    value={holding.avgPrice || ''}
+                    onChange={(e) => updateHolding(index, 'avgPrice', e.target.value)}
+                    className="px-2 py-1 bg-muted/50 border border-border rounded text-xs"
+                    placeholder="Avg Price"
+                  />
+                  <input
+                    type="number"
+                    value={holding.currentPrice || ''}
+                    onChange={(e) => updateHolding(index, 'currentPrice', e.target.value)}
+                    className="px-2 py-1 bg-muted/50 border border-border rounded text-xs"
+                    placeholder="Current"
+                  />
+                </div>
+                <div className="flex justify-between items-center text-xs">
+                  <span className="text-muted-foreground">
+                    Value: ${value.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className={cn(pnl >= 0 ? 'text-green-500' : 'text-red-500')}>
+                      {pnl >= 0 ? '+' : ''}{pnlPercent.toFixed(1)}%
+                    </span>
+                    <button
+                      onClick={() => removeHolding(index)}
+                      className="text-red-500 hover:bg-red-500/10 p-1 rounded"
+                    >
+                      <XCircle className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        <button
+          onClick={addHolding}
+          className="w-full py-2 border border-dashed border-border rounded-lg text-sm text-muted-foreground hover:text-foreground hover:border-purple-500 transition-colors"
+        >
+          + Add Holding
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// WHALE ALERT SIMULATOR
+// ============================================
+
+const WHALE_TRANSACTIONS = [
+  { type: 'transfer', amount: 5000, coin: 'BTC', from: 'Unknown', to: 'Binance', time: '2 min ago', signal: 'bearish' },
+  { type: 'transfer', amount: 50000, coin: 'ETH', from: 'Coinbase', to: 'Unknown', time: '15 min ago', signal: 'bullish' },
+  { type: 'transfer', amount: 2500, coin: 'BTC', from: 'Unknown', to: 'Unknown', time: '1 hour ago', signal: 'neutral' },
+  { type: 'transfer', amount: 100000000, coin: 'USDT', from: 'Tether Treasury', to: 'Bitfinex', time: '3 hours ago', signal: 'bullish' },
+  { type: 'transfer', amount: 1000, coin: 'BTC', from: 'Kraken', to: 'Unknown', time: '5 hours ago', signal: 'bullish' },
+]
+
+export function WhaleAlertSimulator() {
+  const [transactions] = useState(WHALE_TRANSACTIONS)
+  const [filter, setFilter] = useState<'all' | 'bullish' | 'bearish'>('all')
+
+  const filteredTxs = filter === 'all'
+    ? transactions
+    : transactions.filter(tx => tx.signal === filter)
+
+  const formatAmount = (amount: number, coin: string) => {
+    if (coin === 'USDT' || coin === 'USDC') {
+      if (amount >= 1e9) return `$${(amount / 1e9).toFixed(1)}B`
+      if (amount >= 1e6) return `$${(amount / 1e6).toFixed(1)}M`
+      return `$${amount.toLocaleString()}`
+    }
+    return `${amount.toLocaleString()} ${coin}`
+  }
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+          <Eye className="w-5 h-5 text-cyan-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Whale Alert</h3>
+          <p className="text-xs text-muted-foreground">Large transaction monitor</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex gap-2">
+          {(['all', 'bullish', 'bearish'] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => setFilter(f)}
+              className={cn(
+                'flex-1 py-1.5 rounded-lg text-xs font-medium capitalize transition-colors',
+                filter === f ? 'bg-cyan-500 text-white' : 'bg-muted/50 hover:bg-muted'
+              )}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+
+        <div className="space-y-2 max-h-64 overflow-y-auto">
+          {filteredTxs.map((tx, index) => (
+            <div
+              key={index}
+              className={cn(
+                'p-3 rounded-lg border-l-4',
+                tx.signal === 'bullish' && 'bg-green-500/10 border-green-500',
+                tx.signal === 'bearish' && 'bg-red-500/10 border-red-500',
+                tx.signal === 'neutral' && 'bg-muted/50 border-muted-foreground',
+              )}
+            >
+              <div className="flex justify-between items-start mb-1">
+                <span className="font-bold text-sm">{formatAmount(tx.amount, tx.coin)}</span>
+                <span className="text-xs text-muted-foreground">{tx.time}</span>
+              </div>
+              <div className="text-xs text-muted-foreground">
+                <span className="font-mono">{tx.from}</span>
+                <span className="mx-2">→</span>
+                <span className="font-mono">{tx.to}</span>
+              </div>
+              <div className="mt-1">
+                <span className={cn(
+                  'text-xs px-2 py-0.5 rounded',
+                  tx.signal === 'bullish' && 'bg-green-500/20 text-green-500',
+                  tx.signal === 'bearish' && 'bg-red-500/20 text-red-500',
+                  tx.signal === 'neutral' && 'bg-muted text-muted-foreground',
+                )}>
+                  {tx.to.includes('Unknown') ? 'Withdrawal' : 'Deposit'} - {tx.signal}
+                </span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <p className="text-xs text-muted-foreground text-center">
+          Exchange deposits often signal selling pressure. Withdrawals may indicate accumulation.
+        </p>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// PROFIT/LOSS CALCULATOR WITH TAX
+// ============================================
+
+export function ProfitLossCalculator() {
+  const [buyPrice, setBuyPrice] = useState('45000')
+  const [sellPrice, setSellPrice] = useState('60000')
+  const [amount, setAmount] = useState('1')
+  const [fees, setFees] = useState('0.1')
+  const [taxRate, setTaxRate] = useState('30')
+  const [result, setResult] = useState<{
+    grossProfit: number
+    totalFees: number
+    netProfit: number
+    taxAmount: number
+    afterTax: number
+    roi: number
+  } | null>(null)
+
+  const calculate = useCallback(() => {
+    const buy = parseFloat(buyPrice)
+    const sell = parseFloat(sellPrice)
+    const qty = parseFloat(amount)
+    const feePercent = parseFloat(fees) / 100
+    const tax = parseFloat(taxRate) / 100
+
+    if (isNaN(buy) || isNaN(sell) || isNaN(qty)) {
+      setResult(null)
+      return
+    }
+
+    const buyTotal = buy * qty
+    const sellTotal = sell * qty
+    const buyFee = buyTotal * feePercent
+    const sellFee = sellTotal * feePercent
+    const totalFees = buyFee + sellFee
+
+    const grossProfit = sellTotal - buyTotal
+    const netProfit = grossProfit - totalFees
+    const taxAmount = netProfit > 0 ? netProfit * tax : 0
+    const afterTax = netProfit - taxAmount
+    const roi = (netProfit / buyTotal) * 100
+
+    setResult({ grossProfit, totalFees, netProfit, taxAmount, afterTax, roi })
+  }, [buyPrice, sellPrice, amount, fees, taxRate])
+
+  useEffect(() => {
+    calculate()
+  }, [calculate])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
+          <DollarSign className="w-5 h-5 text-emerald-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Profit/Loss Calculator</h3>
+          <p className="text-xs text-muted-foreground">With fees and tax calculation</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Buy Price</label>
+            <input
+              type="number"
+              value={buyPrice}
+              onChange={(e) => setBuyPrice(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-emerald-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Sell Price</label>
+            <input
+              type="number"
+              value={sellPrice}
+              onChange={(e) => setSellPrice(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-emerald-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Amount</label>
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              step="0.01"
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-emerald-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Fees (%)</label>
+            <input
+              type="number"
+              value={fees}
+              onChange={(e) => setFees(e.target.value)}
+              step="0.01"
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-emerald-500 focus:outline-none text-sm"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="text-xs text-muted-foreground mb-1 block">Tax Rate (%)</label>
+          <input
+            type="number"
+            value={taxRate}
+            onChange={(e) => setTaxRate(e.target.value)}
+            className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-emerald-500 focus:outline-none text-sm"
+          />
+        </div>
+
+        {result && (
+          <div className="space-y-2">
+            <div className="p-3 bg-muted/50 rounded-lg space-y-1 text-sm">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Gross Profit:</span>
+                <span className={cn(result.grossProfit >= 0 ? 'text-green-500' : 'text-red-500')}>
+                  ${result.grossProfit.toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Trading Fees:</span>
+                <span className="text-red-500">-${result.totalFees.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Net Profit:</span>
+                <span className={cn(result.netProfit >= 0 ? 'text-green-500' : 'text-red-500')}>
+                  ${result.netProfit.toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Tax ({taxRate}%):</span>
+                <span className="text-red-500">-${result.taxAmount.toFixed(2)}</span>
+              </div>
+            </div>
+            <div className={cn(
+              'p-4 rounded-lg text-center',
+              result.afterTax >= 0 ? 'bg-green-500/10' : 'bg-red-500/10'
+            )}>
+              <p className={cn('text-2xl font-bold', result.afterTax >= 0 ? 'text-green-500' : 'text-red-500')}>
+                ${result.afterTax.toFixed(2)}
+              </p>
+              <p className="text-sm text-muted-foreground">After-Tax Profit ({result.roi.toFixed(1)}% ROI)</p>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
 // CRYPTO TOOLS GRID
 // ============================================
 
 const TOOL_CATEGORIES = [
   { id: 'btc-indicators', label: 'BTC Indicators', icon: Bitcoin },
-  { id: 'calculator', label: 'Calculator', icon: Calculator },
+  { id: 'trading', label: 'Trading', icon: LineChart },
+  { id: 'portfolio', label: 'Portfolio', icon: PiggyBank },
   { id: 'defi', label: 'DeFi', icon: TrendingUp },
   { id: 'web3', label: 'Web3', icon: Globe },
-  { id: 'converter', label: 'Converter', icon: ArrowRightLeft },
-  { id: 'validator', label: 'Validator', icon: Wallet },
-  { id: 'mining', label: 'Mining', icon: BarChart3 },
+  { id: 'calculator', label: 'Calculator', icon: Calculator },
 ]
 
 export function CryptoToolsGrid() {
@@ -3299,14 +4071,23 @@ export function CryptoToolsGrid() {
             <BitcoinHalvingCountdown />
           </div>
         )
-      case 'calculator':
+      case 'trading':
         return (
           <div className="grid md:grid-cols-2 gap-6">
+            <PositionSizeCalculator />
+            <RiskRewardCalculator />
+            <FibonacciCalculator />
+            <LiquidationCalculator />
+            <ProfitLossCalculator />
+          </div>
+        )
+      case 'portfolio':
+        return (
+          <div className="grid md:grid-cols-2 gap-6">
+            <PortfolioTracker />
+            <WhaleAlertSimulator />
             <CryptoROICalculator />
             <DCACalculator />
-            <MarketCapCalculator />
-            <MiningCalculator />
-            <LiquidationCalculator />
           </div>
         )
       case 'defi':
@@ -3327,24 +4108,14 @@ export function CryptoToolsGrid() {
             <NFTRarityCalculator />
             <TokenApprovalChecker />
             <WalletAddressValidator />
-          </div>
-        )
-      case 'converter':
-        return (
-          <div className="grid md:grid-cols-1 gap-6">
-            <CryptoUnitConverter />
-          </div>
-        )
-      case 'validator':
-        return (
-          <div className="grid md:grid-cols-2 gap-6">
-            <WalletAddressValidator />
             <GasFeeEstimator />
           </div>
         )
-      case 'mining':
+      case 'calculator':
         return (
-          <div className="grid md:grid-cols-1 gap-6">
+          <div className="grid md:grid-cols-2 gap-6">
+            <CryptoUnitConverter />
+            <MarketCapCalculator />
             <MiningCalculator />
           </div>
         )
