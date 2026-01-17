@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect, useCallback } from 'react'
+import { useState, useRef, useEffect, useCallback, useMemo, useTransition, memo } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
@@ -17,6 +17,68 @@ import {
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { generatePDF, generatePPT, type PDFData, type PPTData } from '@/lib/ai/file-generators'
+
+// ============================================
+// PERFORMANCE UTILITIES
+// ============================================
+
+// Batched state updater using requestAnimationFrame to prevent INP issues
+class StreamingBuffer {
+  private buffer: string = ''
+  private rafId: number | null = null
+  private callback: ((content: string) => void) | null = null
+
+  setCallback(cb: (content: string) => void) {
+    this.callback = cb
+  }
+
+  append(chunk: string) {
+    this.buffer += chunk
+    if (!this.rafId) {
+      this.rafId = requestAnimationFrame(() => {
+        if (this.callback && this.buffer) {
+          this.callback(this.buffer)
+          this.buffer = ''
+        }
+        this.rafId = null
+      })
+    }
+  }
+
+  flush() {
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId)
+      this.rafId = null
+    }
+    if (this.callback && this.buffer) {
+      this.callback(this.buffer)
+      this.buffer = ''
+    }
+  }
+
+  clear() {
+    this.buffer = ''
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId)
+      this.rafId = null
+    }
+  }
+}
+
+// Throttle utility for scroll handlers
+function throttle<T extends (...args: Parameters<T>) => void>(
+  func: T,
+  limit: number
+): T {
+  let inThrottle = false
+  return ((...args: Parameters<T>) => {
+    if (!inThrottle) {
+      func(...args)
+      inThrottle = true
+      setTimeout(() => (inThrottle = false), limit)
+    }
+  }) as T
+}
 
 type ChatMode = 'quick' | 'ai' | 'agent'
 
@@ -85,7 +147,7 @@ function parseSpecialResult(result: string): ParsedResult {
   return { type: 'text', content: result }
 }
 
-// Handle file generation (async for dynamic imports)
+// Handle file generation (async for PPT which uses API)
 async function handleFileGeneration(result: string): Promise<boolean> {
   const parsed = parseSpecialResult(result)
   if (parsed.type === 'pdf' && parsed.data) {
@@ -93,8 +155,13 @@ async function handleFileGeneration(result: string): Promise<boolean> {
     return true
   }
   if (parsed.type === 'ppt' && parsed.data) {
-    await generatePPT(parsed.data as PPTData)
-    return true
+    try {
+      await generatePPT(parsed.data as PPTData)
+      return true
+    } catch (error) {
+      console.error('PPT generation failed:', error)
+      return false
+    }
   }
   return false
 }
@@ -379,6 +446,236 @@ Visit the **Contact** page to send a message directly!`,
     quickReplies: [
       { label: 'Go to Contact', value: 'Navigate to contact page' },
       { label: 'Download Resume', value: 'How can I download your resume?' }
+    ]
+  },
+  resume: {
+    patterns: ['resume', 'cv', 'curriculum vitae', 'download cv', 'download resume'],
+    response: `**Resume / CV**
+
+You can download Ibnu's resume from the **About** page!
+
+**What's Included:**
+- Complete work experience
+- Education details
+- Technical skills
+- Certifications summary
+- Contact information
+
+**Quick Stats:**
+- 5+ Years Experience
+- 50+ Projects
+- 2 Degrees (MBA + S.Kom)
+- 50+ Certifications
+
+Visit **/about** and scroll to the Resume section to download!`,
+    quickReplies: [
+      { label: 'Go to About', value: 'Navigate to about page' },
+      { label: 'Experience', value: 'Tell me about your experience' }
+    ]
+  },
+  newsletter: {
+    patterns: ['newsletter', 'subscribe', 'update', 'langganan', 'berlangganan'],
+    response: `**Newsletter Subscription**
+
+Stay updated with Ibnu's latest:
+- Tech articles and insights
+- Project updates
+- AI/Blockchain/Cybersecurity content
+- Career tips
+
+**How to Subscribe:**
+Look for the newsletter form in the website footer, or visit the blog page!
+
+**Topics Covered:**
+Tech, AI/ML, Web3, Career, Projects
+
+No spam, unsubscribe anytime.`,
+    quickReplies: [
+      { label: 'Blog', value: 'Where is the blog?' },
+      { label: 'Contact', value: 'How can I contact you?' }
+    ]
+  },
+  languages: {
+    patterns: ['language', 'bahasa', 'english', 'indonesian', 'mandarin', 'arabic', 'toefl'],
+    response: `**Language Proficiency:**
+
+1. **Indonesian** - Native Speaker
+   - First language
+
+2. **English** - Advanced (C1)
+   - TOEFL ITP: 593
+   - Professional working proficiency
+
+3. **Arabic** - Beginner
+   - Basic reading (Quran)
+
+4. **Mandarin** - Beginner
+   - HSK Level 1 certified
+
+Currently focused on improving English for international opportunities and Mandarin for business in Asia.`,
+    quickReplies: [
+      { label: 'Education', value: 'Tell me about your education' },
+      { label: 'Certifications', value: 'What certifications?' }
+    ]
+  },
+  navigation: {
+    patterns: ['page', 'navigate', 'go to', 'where', 'find', 'see all', 'halaman'],
+    response: `**Website Navigation:**
+
+- **/about** - Timeline, education, experience, resume
+- **/projects** - All projects showcase
+- **/interests** - AI, Blockchain, Cybersecurity deep-dive
+- **/certifications** - 50+ credentials
+- **/contact** - Send me a message
+- **/blog** - Articles and insights
+- **/simple-llm** - Chat with AI (LangChain)
+
+**Keyboard Shortcuts:**
+- Press **Cmd+K** (or Ctrl+K) to open command palette
+- Press **T** to open terminal emulator
+- Press **Esc** to close modals`,
+    quickReplies: [
+      { label: 'About Page', value: 'What can I find on the About page?' },
+      { label: 'Terminal', value: 'How do I use the terminal?' }
+    ]
+  },
+  terminal: {
+    patterns: ['terminal', 'command', 'cli', 'shell', 'console'],
+    response: `**Interactive Terminal**
+
+Press **T** or click the Terminal button to open an interactive terminal emulator!
+
+**Popular Commands:**
+- \`help\` - Show all commands
+- \`about\` - About Ibnu
+- \`skills\` - List all skills
+- \`projects\` - View projects
+- \`crypto\` - Crypto portfolio info
+- \`contact\` - Contact info
+- \`neofetch\` - System info ASCII art
+- \`matrix\` - Fun easter egg!
+- \`clear\` - Clear screen
+
+Try typing \`help\` in the terminal for a full list of 40+ commands.`,
+    quickReplies: [
+      { label: 'Open Terminal', value: 'How do I open the terminal?' }
+    ]
+  },
+  website: {
+    patterns: ['website', 'portfolio', 'built with', 'stack', 'next.js', 'this site', 'web ini'],
+    response: `**This Portfolio Website**
+
+Built with modern technologies:
+
+**Frontend:**
+- Next.js 15 (App Router)
+- React 18
+- TypeScript
+- Tailwind CSS
+- Framer Motion (animations)
+
+**Features:**
+- AI Chatbot (you're using it now!)
+- Interactive Terminal Emulator
+- Command Palette (Cmd+K)
+- Dark Theme
+- Responsive Design
+- Newsletter Subscription
+- Contact Form with Email
+
+**Backend:**
+- Prisma ORM
+- PostgreSQL (Neon)
+- NextAuth.js
+- Resend (emails)
+
+Built with modern best practices!`,
+    quickReplies: [
+      { label: 'Skills', value: 'What are your skills?' },
+      { label: 'Projects', value: 'What projects have you built?' }
+    ]
+  },
+  funfacts: {
+    patterns: ['fun fact', 'interesting', 'hobi', 'hobby', 'free time', 'waktu luang', 'menarik'],
+    response: `**Fun Facts About Ibnu:**
+
+- Started coding at 16, built first website in high school
+- Founded a startup while still in university
+- Can read Arabic (basic) and learning Mandarin
+- Crypto enthusiast since 2021 bull run
+- Love exploring new AI tools and frameworks
+- Terminal and CLI enthusiast (hence the terminal feature!)
+- Believe in "learn by building" philosophy
+- Coffee > Tea (definitely)
+- Based in Jakarta, Indonesia
+
+**Motto:** "Technology should serve humanity, not the other way around."`,
+    quickReplies: [
+      { label: 'About', value: 'Tell me more about Ibnu' },
+      { label: 'Interests', value: 'What are your interests?' }
+    ]
+  },
+  thanks: {
+    patterns: ['thank', 'thanks', 'terima kasih', 'makasih', 'appreciate', 'helpful'],
+    response: `You're welcome! I'm glad I could help.
+
+Feel free to ask more questions about:
+- Ibnu's background and experience
+- Projects and technical work
+- Skills and certifications
+- Contact information
+
+Or explore the website:
+- Use **Cmd+K** for quick navigation
+- Press **T** for the terminal
+- Check out the **Projects** page
+
+Is there anything else you'd like to know?`,
+    quickReplies: [
+      { label: 'Contact', value: 'How can I contact you?' },
+      { label: 'Projects', value: 'Show me the projects' }
+    ]
+  },
+  bye: {
+    patterns: ['bye', 'goodbye', 'see you', 'sampai jumpa', 'dadah', 'later'],
+    response: `Goodbye! Thanks for chatting with me.
+
+**Before you go:**
+- Subscribe to the newsletter for updates
+- Connect on LinkedIn: /in/subkhanibnuaji
+- Check out the Projects page
+- Download the resume from About page
+
+Feel free to come back anytime! The chat will be here.
+
+Have a great day!`,
+    quickReplies: [
+      { label: 'Stay', value: 'Actually, I have more questions' },
+      { label: 'Newsletter', value: 'How do I subscribe?' }
+    ]
+  },
+  currentrole: {
+    patterns: ['current', 'now', 'sekarang', 'saat ini', 'hari ini', 'present'],
+    response: `**Current Role (Aug 2024 - Present)**
+
+**Civil Servant (ASN)** at Ministry of Housing & Settlement Areas (Kementerian PKP)
+
+**Responsibilities:**
+- Managing end-to-end delivery of enterprise IT applications
+- Lead development of HUB PKP digital housing ecosystem
+- Coordinate vendor delivery and user adoption
+- Support ministerial policy drafting
+- Evaluate procurement proposals >IDR 10B
+
+**Key Projects:**
+- HUB PKP (Klinik Rumah) - Digital housing platform
+- SIBARU - Enterprise information system
+- SIMONI - Monitoring & evaluation system
+
+Located in Jakarta, Indonesia.`,
+    quickReplies: [
+      { label: 'HUB PKP', value: 'Tell me about HUB PKP' },
+      { label: 'Previous Jobs', value: 'What did you do before?' }
     ]
   },
   default: {
@@ -700,6 +997,140 @@ function ChatHistoryPanel({
   )
 }
 
+// ============================================
+// MEMOIZED CHAT MESSAGE ITEM COMPONENT
+// ============================================
+
+interface ChatMessageItemProps {
+  message: Message
+  mode: ChatMode
+}
+
+const ChatMessageItem = memo(function ChatMessageItem({ message, mode }: ChatMessageItemProps) {
+  return (
+    <div
+      className={cn(
+        'flex gap-3',
+        message.role === 'user' ? 'flex-row-reverse' : 'flex-row'
+      )}
+      style={{ contain: 'content' }} // CSS containment for performance
+    >
+      <div
+        className={cn(
+          'w-8 h-8 rounded-full flex items-center justify-center shrink-0',
+          message.role === 'user'
+            ? 'bg-primary'
+            : mode === 'agent' ? 'bg-gradient-to-r from-pink-500 to-orange-500' : mode === 'ai' ? 'bg-cyber-purple' : 'bg-cyber-gradient'
+        )}
+      >
+        {message.role === 'user' ? (
+          <User className="h-4 w-4 text-white" />
+        ) : mode === 'agent' ? (
+          <Wand2 className="h-4 w-4 text-white" />
+        ) : mode === 'ai' ? (
+          <Brain className="h-4 w-4 text-white" />
+        ) : (
+          <Bot className="h-4 w-4 text-white" />
+        )}
+      </div>
+      <div
+        className={cn(
+          'max-w-[80%] rounded-2xl px-4 py-2.5',
+          message.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
+        )}
+        style={{ contain: 'layout style' }} // CSS containment
+      >
+        {message.role === 'assistant' ? (
+          <div className="text-sm space-y-2">
+            {/* Tool Executions */}
+            {message.toolExecutions && message.toolExecutions.length > 0 && (
+              <div className="space-y-1.5 mb-2">
+                {message.toolExecutions.map((exec, idx) => (
+                  <div key={idx} className="flex items-center gap-2 text-xs bg-black/10 rounded-lg px-2 py-1.5">
+                    {exec.isLoading ? (
+                      <Loader2 className="h-3 w-3 animate-spin text-orange-400" />
+                    ) : (
+                      <span className="text-green-400">✓</span>
+                    )}
+                    <span className="capitalize text-muted-foreground">{exec.tool.replace(/_/g, ' ')}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Generated Images */}
+            {message.images && message.images.length > 0 && (
+              <div className="space-y-2 mb-2">
+                {message.images.map((imgUrl, idx) => (
+                  <div key={idx} className="relative rounded-lg overflow-hidden">
+                    <Image
+                      src={imgUrl}
+                      alt="Generated image"
+                      width={280}
+                      height={280}
+                      className="rounded-lg"
+                      unoptimized
+                      loading="lazy"
+                    />
+                    <a
+                      href={imgUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="absolute bottom-2 right-2 text-xs bg-black/50 text-white px-2 py-1 rounded hover:bg-black/70"
+                    >
+                      Open Full
+                    </a>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Text Content */}
+            <div className="whitespace-pre-line">
+              {message.content ? message.content.split('\n').map((line, i) => {
+                // Handle bold text
+                const parts = line.split(/(\*\*[^*]+\*\*)/g)
+                return (
+                  <p key={i} className={line.startsWith('-') || line.startsWith('•') ? 'ml-2' : ''}>
+                    {parts.map((part, j) => {
+                      if (part.startsWith('**') && part.endsWith('**')) {
+                        return <strong key={j}>{part.slice(2, -2)}</strong>
+                      }
+                      return part
+                    })}
+                  </p>
+                )
+              }) : (
+                !message.toolExecutions?.length && !message.images?.length && (
+                  <span className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Thinking...
+                  </span>
+                )
+              )}
+            </div>
+          </div>
+        ) : (
+          <p className="text-sm">{message.content}</p>
+        )}
+      </div>
+    </div>
+  )
+}, (prevProps, nextProps) => {
+  // Custom comparison for memo - only re-render if these change
+  return (
+    prevProps.message.id === nextProps.message.id &&
+    prevProps.message.content === nextProps.message.content &&
+    prevProps.message.toolExecutions?.length === nextProps.message.toolExecutions?.length &&
+    prevProps.message.images?.length === nextProps.message.images?.length &&
+    prevProps.mode === nextProps.mode
+  )
+})
+
+// ============================================
+// MAIN CHATBOT COMPONENT
+// ============================================
+
 export function AIChatbot() {
   const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
@@ -710,6 +1141,7 @@ export function AIChatbot() {
   const [showSuggestions, setShowSuggestions] = useState(true)
   const [sessions, setSessions] = useState<ChatSession[]>([])
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null)
+  const [isMounted, setIsMounted] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -728,6 +1160,13 @@ export function AIChatbot() {
   const inputRef = useRef<HTMLInputElement>(null)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const recognitionRef = useRef<any>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
+
+  // Performance: useTransition for non-blocking updates
+  const [, startTransition] = useTransition()
+
+  // Performance: Streaming buffer for batched updates
+  const streamingBufferRef = useRef(new StreamingBuffer())
 
   // Initialize speech recognition
   useEffect(() => {
@@ -821,12 +1260,22 @@ export function AIChatbot() {
     ])
   }, [])
 
-  const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [])
+  // Performance: Throttled scroll to bottom
+  const scrollToBottom = useMemo(
+    () =>
+      throttle(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' })
+        }
+      }, 100),
+    []
+  )
 
+  // Scroll on new messages (with transition for non-blocking)
   useEffect(() => {
-    scrollToBottom()
+    startTransition(() => {
+      scrollToBottom()
+    })
   }, [messages, scrollToBottom, isTyping])
 
   useEffect(() => {
@@ -924,8 +1373,15 @@ export function AIChatbot() {
     }
   }, [])
 
-  // Send message with AI mode (using Groq API)
-  const sendAIMessage = async (content: string) => {
+  // Cleanup streaming buffer on unmount
+  useEffect(() => {
+    return () => {
+      streamingBufferRef.current.clear()
+    }
+  }, [])
+
+  // Send message with AI mode (using Groq API) - OPTIMIZED with batched updates
+  const sendAIMessage = useCallback(async (content: string) => {
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
@@ -933,8 +1389,9 @@ export function AIChatbot() {
       timestamp: new Date()
     }
 
+    const assistantMessageId = (Date.now() + 1).toString()
     const assistantMessage: Message = {
-      id: (Date.now() + 1).toString(),
+      id: assistantMessageId,
       role: 'assistant',
       content: '',
       timestamp: new Date()
@@ -945,6 +1402,26 @@ export function AIChatbot() {
     setIsLoading(true)
     setIsTyping(true)
     setShowSuggestions(false)
+
+    // Accumulated content for batched updates
+    let accumulatedContent = ''
+
+    // Setup streaming buffer callback for batched updates
+    streamingBufferRef.current.setCallback((batchedContent) => {
+      accumulatedContent += batchedContent
+      // Use startTransition for non-blocking UI update
+      startTransition(() => {
+        setMessages(prev => {
+          const updated = [...prev]
+          const lastMessage = updated[updated.length - 1]
+          if (lastMessage.role === 'assistant' && lastMessage.id === assistantMessageId) {
+            // Create new object to trigger re-render
+            updated[updated.length - 1] = { ...lastMessage, content: accumulatedContent }
+          }
+          return updated
+        })
+      })
+    })
 
     try {
       const response = await fetch('/api/simple-llm', {
@@ -986,14 +1463,8 @@ export function AIChatbot() {
             try {
               const parsed = JSON.parse(data)
               if (parsed.content) {
-                setMessages(prev => {
-                  const updated = [...prev]
-                  const lastMessage = updated[updated.length - 1]
-                  if (lastMessage.role === 'assistant') {
-                    lastMessage.content += parsed.content
-                  }
-                  return updated
-                })
+                // Use streaming buffer for batched updates (prevents INP issues)
+                streamingBufferRef.current.append(parsed.content)
               }
               if (parsed.error) {
                 throw new Error(parsed.error)
@@ -1005,6 +1476,8 @@ export function AIChatbot() {
         }
       }
 
+      // Flush any remaining content in buffer
+      streamingBufferRef.current.flush()
       // Save to history after completion
       setMessages(prev => {
         saveToHistory(prev, mode)
@@ -1012,14 +1485,18 @@ export function AIChatbot() {
       })
     } catch (error) {
       console.error('AI Chat Error:', error)
+      streamingBufferRef.current.clear()
       setIsTyping(false)
       setMessages(prev => {
         const updated = [...prev]
         const lastMessage = updated[updated.length - 1]
         if (lastMessage.role === 'assistant') {
-          lastMessage.content = error instanceof Error
-            ? `Error: ${error.message}\n\nTip: Make sure GROQ_API_KEY is set.`
-            : 'Sorry, an error occurred. Please try again.'
+          updated[updated.length - 1] = {
+            ...lastMessage,
+            content: error instanceof Error
+              ? `Error: ${error.message}\n\nTip: Make sure GROQ_API_KEY is set. Get free key at console.groq.com`
+              : 'Sorry, an error occurred. Please try again.'
+          }
         }
         return updated
       })
@@ -1027,10 +1504,10 @@ export function AIChatbot() {
       setIsLoading(false)
       setIsTyping(false)
     }
-  }
+  }, [messages, startTransition])
 
-  // Send message with Agent mode
-  const sendAgentMessage = async (content: string) => {
+  // Send message with Agent mode (using tools including image generation) - OPTIMIZED
+  const sendAgentMessage = useCallback(async (content: string) => {
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
@@ -1038,8 +1515,9 @@ export function AIChatbot() {
       timestamp: new Date()
     }
 
+    const assistantMessageId = (Date.now() + 1).toString()
     const assistantMessage: Message = {
-      id: (Date.now() + 1).toString(),
+      id: assistantMessageId,
       role: 'assistant',
       content: '',
       timestamp: new Date(),
@@ -1103,13 +1581,16 @@ export function AIChatbot() {
                   isLoading: true
                 }
                 toolExecutions.push(execution)
-                setMessages(prev => {
-                  const updated = [...prev]
-                  const lastMessage = updated[updated.length - 1]
-                  if (lastMessage.role === 'assistant') {
-                    lastMessage.toolExecutions = [...toolExecutions]
-                  }
-                  return [...updated]
+                // Use startTransition for non-blocking update
+                startTransition(() => {
+                  setMessages(prev => {
+                    const updated = [...prev]
+                    const lastMessage = updated[updated.length - 1]
+                    if (lastMessage.role === 'assistant' && lastMessage.id === assistantMessageId) {
+                      updated[updated.length - 1] = { ...lastMessage, toolExecutions: [...toolExecutions] }
+                    }
+                    return updated
+                  })
                 })
               } else if (parsed.type === 'tool_result') {
                 const lastExecution = toolExecutions[toolExecutions.length - 1]
@@ -1121,29 +1602,44 @@ export function AIChatbot() {
                   if (parsedResult.type === 'image' || parsedResult.type === 'qr') {
                     images.push(parsedResult.content)
                   } else if (parsedResult.type === 'pdf' || parsedResult.type === 'ppt') {
-                    handleFileGeneration(parsed.result || '').catch(console.error)
+                    // Trigger file download (async, don't block)
+                    handleFileGeneration(parsed.result || '').catch(err => {
+                      console.error('File generation error:', err)
+                    })
                   }
 
-                  setMessages(prev => {
-                    const updated = [...prev]
-                    const lastMessage = updated[updated.length - 1]
-                    if (lastMessage.role === 'assistant') {
-                      lastMessage.toolExecutions = [...toolExecutions]
-                      lastMessage.images = [...images]
-                    }
-                    return [...updated]
+                  // Use startTransition for non-blocking update
+                  startTransition(() => {
+                    setMessages(prev => {
+                      const updated = [...prev]
+                      const lastMessage = updated[updated.length - 1]
+                      if (lastMessage.role === 'assistant' && lastMessage.id === assistantMessageId) {
+                        updated[updated.length - 1] = {
+                          ...lastMessage,
+                          toolExecutions: [...toolExecutions],
+                          images: [...images]
+                        }
+                      }
+                      return updated
+                    })
                   })
                 }
               } else if (parsed.type === 'response' || parsed.type === 'text') {
-                setMessages(prev => {
-                  const updated = [...prev]
-                  const lastMessage = updated[updated.length - 1]
-                  if (lastMessage.role === 'assistant') {
-                    lastMessage.content = parsed.content || ''
-                    lastMessage.toolExecutions = toolExecutions
-                    lastMessage.images = images
-                  }
-                  return [...updated]
+                // Use startTransition for non-blocking update
+                startTransition(() => {
+                  setMessages(prev => {
+                    const updated = [...prev]
+                    const lastMessage = updated[updated.length - 1]
+                    if (lastMessage.role === 'assistant' && lastMessage.id === assistantMessageId) {
+                      updated[updated.length - 1] = {
+                        ...lastMessage,
+                        content: parsed.content || '',
+                        toolExecutions: [...toolExecutions],
+                        images: [...images]
+                      }
+                    }
+                    return updated
+                  })
                 })
               } else if (parsed.type === 'error') {
                 throw new Error(parsed.error)
@@ -1167,9 +1663,12 @@ export function AIChatbot() {
         const updated = [...prev]
         const lastMessage = updated[updated.length - 1]
         if (lastMessage.role === 'assistant') {
-          lastMessage.content = error instanceof Error
-            ? `Error: ${error.message}`
-            : 'Sorry, an error occurred. Please try again.'
+          updated[updated.length - 1] = {
+            ...lastMessage,
+            content: error instanceof Error
+              ? `Error: ${error.message}\n\nTip: Make sure GROQ_API_KEY is set. Get free key at console.groq.com`
+              : 'Sorry, an error occurred. Please try again.'
+          }
         }
         return updated
       })
@@ -1177,10 +1676,10 @@ export function AIChatbot() {
       setIsLoading(false)
       setIsTyping(false)
     }
-  }
+  }, [messages, startTransition])
 
-  // Send message with Quick mode
-  const sendQuickMessage = (content: string) => {
+  // Send message with Quick mode (pattern matching) - memoized
+  const sendQuickMessage = useCallback((content: string) => {
     if (content.toLowerCase().includes('quick menu') || content.toLowerCase().includes('show menu')) {
       setShowQuickPicker(true)
       return
@@ -1210,9 +1709,10 @@ export function AIChatbot() {
     })
     setInput('')
     setShowSuggestions(false)
-  }
+  }, [])
 
-  const sendMessage = (content: string) => {
+  // Memoized sendMessage handler
+  const sendMessage = useCallback((content: string) => {
     if (!content.trim() || isLoading) return
 
     if (mode === 'agent') {
@@ -1222,16 +1722,17 @@ export function AIChatbot() {
     } else {
       sendQuickMessage(content)
     }
-  }
+  }, [mode, isLoading, sendAgentMessage, sendAIMessage, sendQuickMessage])
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  // Memoized keyboard handler
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
       sendMessage(input)
     }
-  }
+  }, [sendMessage, input])
 
-  const getWelcomeMessage = (chatMode: ChatMode) => {
+  const getWelcomeMessage = useCallback((chatMode: ChatMode) => {
     switch (chatMode) {
       case 'agent':
         return "Hi! I'm IbnuGPT Agent with 25 superpowers!\n\n**Generate:** Images, QR codes, PDFs, Presentations\n**Knowledge:** Wikipedia, Dictionary, Crypto prices\n**Utility:** Calculator, Translator, URL shortener\n\nTry: \"Generate a motivational quote\" or \"Shorten this URL\""
@@ -1240,9 +1741,10 @@ export function AIChatbot() {
       default:
         return "Hi! I'm Ibnu's portfolio assistant. I can help you learn about his background, projects, skills, and interests. What would you like to know?"
     }
-  }
+  }, [])
 
-  const clearChat = () => {
+  // Memoized clear chat handler
+  const clearChat = useCallback(() => {
     setCurrentSessionId(null)
     setMessages([
       {
@@ -1254,9 +1756,10 @@ export function AIChatbot() {
       }
     ])
     setShowSuggestions(true)
-  }
+  }, [mode, getWelcomeMessage])
 
-  const switchMode = (newMode: ChatMode) => {
+  // Memoized switch mode handler
+  const switchMode = useCallback((newMode: ChatMode) => {
     setMode(newMode)
     setShowQuickPicker(false)
     setShowHistory(false)
@@ -1271,17 +1774,17 @@ export function AIChatbot() {
       }
     ])
     setShowSuggestions(true)
-  }
+  }, [getWelcomeMessage])
 
-  const loadSession = (session: ChatSession) => {
+  const loadSession = useCallback((session: ChatSession) => {
     setCurrentSessionId(session.id)
     setMode(session.mode)
     setMessages(session.messages)
     setShowHistory(false)
     setShowSuggestions(false)
-  }
+  }, [])
 
-  const deleteSession = (sessionId: string) => {
+  const deleteSession = useCallback((sessionId: string) => {
     setSessions(prev => {
       const updated = prev.filter(s => s.id !== sessionId)
       localStorage.setItem(STORAGE_KEYS.CHAT_HISTORY, JSON.stringify(updated))
@@ -1290,11 +1793,14 @@ export function AIChatbot() {
     if (currentSessionId === sessionId) {
       clearChat()
     }
-  }
+  }, [currentSessionId, clearChat])
 
-  // Get the last message's quick replies
-  const lastMessage = messages[messages.length - 1]
-  const showQuickReplies = mode === 'quick' && lastMessage?.role === 'assistant' && lastMessage?.quickReplies && !showQuickPicker && !showHistory
+  // Memoized derived state for quick replies
+  const lastMessage = useMemo(() => messages[messages.length - 1], [messages])
+  const showQuickReplies = useMemo(
+    () => mode === 'quick' && lastMessage?.role === 'assistant' && lastMessage?.quickReplies && !showQuickPicker && !showHistory,
+    [mode, lastMessage, showQuickPicker, showHistory]
+  )
 
   return (
     <>

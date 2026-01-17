@@ -75,6 +75,21 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
+  /* Ensure header/navbar is always clickable */
+  header {
+    pointer-events: auto !important;
+  }
+
+  header * {
+    pointer-events: auto;
+  }
+
+  header a,
+  header button {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+  }
+
   /* Custom Scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
