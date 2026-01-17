@@ -77,7 +77,7 @@ export function NavigationProgress() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed top-0 left-0 right-0 h-1 z-[100]"
+          className="fixed top-0 left-0 right-0 h-1 z-[45] pointer-events-none"
         >
           <motion.div
             className="h-full bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500"
