@@ -1,5 +1,5 @@
-import { ScrollView, StyleSheet, View, Pressable } from 'react-native';
-import { Link } from 'expo-router';
+import { ScrollView, StyleSheet, View, Pressable, TouchableOpacity } from 'react-native';
+import { Link, router } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
@@ -9,16 +9,23 @@ import { Loading } from '@/components/Loading';
 import { ErrorView } from '@/components/ErrorView';
 import { useSummary, useProjects } from '@/hooks/useApi';
 import { useThemeColor } from '@/hooks/useThemeColor';
+import { useAuth } from '@/contexts/AuthContext';
+import { useFavorites } from '@/contexts/FavoritesContext';
+import { useNotes } from '@/contexts/NotesContext';
 import { SOCIAL_LINKS } from '@/constants/config';
 import * as WebBrowser from 'expo-web-browser';
 
 export default function HomeScreen() {
   const { data: summary, isLoading: summaryLoading, error: summaryError, refetch } = useSummary();
   const { data: featuredProjects, isLoading: projectsLoading } = useProjects({ featured: true, limit: 2 });
+  const { isAuthenticated, user } = useAuth();
+  const { favorites } = useFavorites();
+  const { notes } = useNotes();
 
   const primaryColor = useThemeColor({}, 'primary');
   const secondaryColor = useThemeColor({}, 'secondary');
   const accentColor = useThemeColor({}, 'accent');
+  const mutedColor = useThemeColor({}, 'tabIconDefault');
 
   if (summaryLoading) {
     return <Loading fullScreen message="Loading portfolio..." />;
@@ -65,6 +72,72 @@ export default function HomeScreen() {
             </Pressable>
           </View>
         </View>
+
+        {/* User Quick Actions (if logged in) */}
+        {isAuthenticated && (
+          <Card style={styles.userCard}>
+            <View style={styles.userHeader}>
+              <View style={styles.userInfo}>
+                <View style={[styles.userAvatar, { backgroundColor: primaryColor + '20' }]}>
+                  <ThemedText style={[styles.userAvatarText, { color: primaryColor }]}>
+                    {(user?.email || 'U').charAt(0).toUpperCase()}
+                  </ThemedText>
+                </View>
+                <View>
+                  <ThemedText type="defaultSemiBold">
+                    Welcome, {user?.user_metadata?.full_name || 'User'}!
+                  </ThemedText>
+                  <ThemedText type="muted">{user?.email}</ThemedText>
+                </View>
+              </View>
+              <TouchableOpacity onPress={() => router.push('/profile')}>
+                <Ionicons name="chevron-forward" size={20} color={mutedColor} />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.userStats}>
+              <TouchableOpacity
+                style={styles.userStatItem}
+                onPress={() => router.push('/favorites')}
+              >
+                <Ionicons name="heart" size={20} color="#ef4444" />
+                <ThemedText type="small">{favorites.length} Favorites</ThemedText>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.userStatItem}
+                onPress={() => router.push('/notes')}
+              >
+                <Ionicons name="document-text" size={20} color="#3b82f6" />
+                <ThemedText type="small">{notes.length} Notes</ThemedText>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.userStatItem}
+                onPress={() => router.push('/settings')}
+              >
+                <Ionicons name="settings" size={20} color="#8b5cf6" />
+                <ThemedText type="small">Settings</ThemedText>
+              </TouchableOpacity>
+            </View>
+          </Card>
+        )}
+
+        {/* Quick Features Banner (if not logged in) */}
+        {!isAuthenticated && (
+          <Card
+            style={styles.loginBanner}
+            onPress={() => router.push('/(auth)/login')}
+          >
+            <View style={styles.loginBannerContent}>
+              <View style={[styles.loginIcon, { backgroundColor: primaryColor + '20' }]}>
+                <Ionicons name="person-add" size={24} color={primaryColor} />
+              </View>
+              <View style={styles.loginBannerText}>
+                <ThemedText type="defaultSemiBold">Sign in for more features</ThemedText>
+                <ThemedText type="muted">Save favorites, create notes & more</ThemedText>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={mutedColor} />
+            </View>
+          </Card>
+        )}
 
         {/* Stats Section */}
         <View style={styles.statsGrid}>
@@ -144,6 +217,48 @@ export default function HomeScreen() {
             ))}
           </View>
         </View>
+
+        {/* Features Grid */}
+        <View style={styles.section}>
+          <ThemedText type="subtitle" style={styles.sectionTitle}>
+            App Features
+          </ThemedText>
+          <View style={styles.featuresGrid}>
+            <TouchableOpacity
+              style={[styles.featureCard, { backgroundColor: '#fef3c7' }]}
+              onPress={() => router.push('/favorites')}
+            >
+              <Ionicons name="heart" size={28} color="#f59e0b" />
+              <ThemedText style={styles.featureLabel}>Favorites</ThemedText>
+              <ThemedText style={styles.featureCount}>{favorites.length}</ThemedText>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.featureCard, { backgroundColor: '#dbeafe' }]}
+              onPress={() => router.push('/notes')}
+            >
+              <Ionicons name="document-text" size={28} color="#3b82f6" />
+              <ThemedText style={styles.featureLabel}>Notes</ThemedText>
+              <ThemedText style={styles.featureCount}>{notes.length}</ThemedText>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.featureCard, { backgroundColor: '#dcfce7' }]}
+              onPress={() => router.push('/analytics')}
+            >
+              <Ionicons name="analytics" size={28} color="#10b981" />
+              <ThemedText style={styles.featureLabel}>Activity</ThemedText>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.featureCard, { backgroundColor: '#f3e8ff' }]}
+              onPress={() => router.push('/search')}
+            >
+              <Ionicons name="search" size={28} color="#8b5cf6" />
+              <ThemedText style={styles.featureLabel}>Search</ThemedText>
+            </TouchableOpacity>
+          </View>
+        </View>
       </ScrollView>
     </ThemedView>
   );
@@ -159,7 +274,7 @@ const styles = StyleSheet.create({
   },
   hero: {
     alignItems: 'center',
-    marginBottom: 32,
+    marginBottom: 24,
   },
   avatarContainer: {
     marginBottom: 16,
@@ -201,11 +316,67 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  userCard: {
+    padding: 16,
+    marginBottom: 24,
+  },
+  userHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  userInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  userAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  userAvatarText: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  userStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: 'rgba(0,0,0,0.1)',
+  },
+  userStatItem: {
+    alignItems: 'center',
+    gap: 4,
+  },
+  loginBanner: {
+    padding: 16,
+    marginBottom: 24,
+  },
+  loginBannerContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  loginIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  loginBannerText: {
+    flex: 1,
+  },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 12,
-    marginBottom: 32,
+    marginBottom: 24,
   },
   statCard: {
     width: '47%',
@@ -257,5 +428,26 @@ const styles = StyleSheet.create({
   },
   quickLinkLabel: {
     marginTop: 8,
+  },
+  featuresGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  featureCard: {
+    width: '47%',
+    padding: 16,
+    borderRadius: 16,
+    alignItems: 'center',
+    gap: 8,
+  },
+  featureLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#374151',
+  },
+  featureCount: {
+    fontSize: 12,
+    color: '#6b7280',
   },
 });

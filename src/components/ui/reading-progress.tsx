@@ -34,7 +34,7 @@ export function ReadingProgress({
   return (
     <>
       <motion.div
-        className={`fixed left-0 right-0 z-50 origin-left ${color} ${className}`}
+        className={`fixed left-0 right-0 z-[45] origin-left pointer-events-none ${color} ${className}`}
         style={{
           scaleX,
           height,
