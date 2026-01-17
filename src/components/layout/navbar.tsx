@@ -19,6 +19,10 @@ import {
   Sparkles,
   Bitcoin,
   Shield,
+  Wallet,
+  Cpu,
+  Layers,
+  Zap
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
@@ -51,6 +55,7 @@ const PILLARS_ITEMS = [
     bgColor: 'bg-ai-primary/10',
   },
 ]
+
 
 // Dropdown menu items for "Explore"
 const EXPLORE_ITEMS = [
@@ -130,7 +135,7 @@ interface DropdownProps {
 function NavDropdown({ label, items, isActive, icon: LabelIcon, showHeader, headerText }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handleMouseEnter = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
@@ -141,10 +146,26 @@ function NavDropdown({ label, items, isActive, icon: LabelIcon, showHeader, head
     timeoutRef.current = setTimeout(() => setIsOpen(false), 150)
   }
 
+  const handleClick = () => {
+    setIsOpen(!isOpen)
+  }
+
   useEffect(() => {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current)
     }
+  }, [])
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
   return (
@@ -155,13 +176,17 @@ function NavDropdown({ label, items, isActive, icon: LabelIcon, showHeader, head
       onMouseLeave={handleMouseLeave}
     >
       <button
+        type="button"
         className={cn(
           'px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-1.5',
+          'cursor-pointer select-none',
           isActive
             ? 'text-foreground bg-muted'
             : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
         )}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleClick}
+        aria-expanded={isOpen}
+        aria-haspopup="true"
       >
         {LabelIcon && <LabelIcon className="h-4 w-4" />}
         {label}
@@ -178,7 +203,7 @@ function NavDropdown({ label, items, isActive, icon: LabelIcon, showHeader, head
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.96 }}
             transition={{ duration: 0.15 }}
-            className="absolute top-full left-0 mt-2 w-72 p-2 rounded-xl bg-background/95 backdrop-blur-xl border border-border shadow-xl z-50"
+            className="absolute top-full left-0 mt-2 w-72 p-2 rounded-xl bg-background/95 backdrop-blur-xl border border-border shadow-xl z-[60]"
           >
             {showHeader && headerText && (
               <div className="px-3 py-2 mb-1 border-b border-border">
@@ -188,7 +213,7 @@ function NavDropdown({ label, items, isActive, icon: LabelIcon, showHeader, head
               </div>
             )}
             {items.map((item) => {
-              const Icon = item.icon
+              const ItemIcon = item.icon
               return (
                 <Link
                   key={item.href}
@@ -200,7 +225,7 @@ function NavDropdown({ label, items, isActive, icon: LabelIcon, showHeader, head
                     'p-2 rounded-lg transition-colors',
                     item.bgColor || 'bg-muted group-hover:bg-cyber-cyan/20'
                   )}>
-                    <Icon className={cn(
+                    <ItemIcon className={cn(
                       'h-4 w-4 transition-colors',
                       item.color || 'text-muted-foreground group-hover:text-cyber-cyan'
                     )} />
@@ -239,25 +264,25 @@ export function Navbar() {
     setMobileSubmenu(null)
   }, [pathname])
 
-  const isPillarsActive = pathname.startsWith('/pillars')
-  const isExploreActive = EXPLORE_ITEMS.some(item => pathname.startsWith(item.href))
-  const isAIActive = AI_ITEMS.some(item => pathname.startsWith(item.href))
+  const isPillarsActive = pathname.startsWith('/pillars') || pathname.startsWith('/interests')
+  const isExploreActive = EXPLORE_ITEMS.some(item => pathname.startsWith(item.href.split('#')[0]))
+  const isAIActive = AI_ITEMS.some(item => pathname.startsWith(item.href.split('#')[0]))
 
   return (
     <>
       <header
         className={cn(
-          'fixed top-0 left-0 right-0 z-40 transition-all duration-300',
+          'fixed top-0 left-0 right-0 z-[52] transition-all duration-300 pointer-events-auto',
           isScrolled
             ? 'bg-background/80 dark:bg-background/70 backdrop-blur-xl border-b border-border/50 dark:border-primary/10 py-3 shadow-sm dark:shadow-primary/5'
             : 'bg-transparent py-5'
         )}
       >
-        <nav className="container flex items-center justify-between">
+        <nav className="container flex items-center justify-between pointer-events-auto">
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center gap-2 text-xl font-bold tracking-tight"
+            className="flex items-center gap-2 text-xl font-bold tracking-tight relative z-10 cursor-pointer"
           >
             <span className="gradient-text">IBNU</span>
             <span className="w-2 h-2 rounded-full bg-cyber-cyan animate-pulse" />
@@ -269,7 +294,7 @@ export function Navbar() {
             <Link
               href="/"
               className={cn(
-                'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+                'px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer',
                 pathname === '/'
                   ? 'text-foreground bg-muted'
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
@@ -278,7 +303,7 @@ export function Navbar() {
               Home
             </Link>
 
-            {/* 3 Pillars Dropdown - NEW */}
+            {/* 3 Pillars Dropdown */}
             <NavDropdown
               label="3 Pillars"
               items={PILLARS_ITEMS}
@@ -308,7 +333,7 @@ export function Navbar() {
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
+                  'px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer',
                   pathname === link.href
                     ? 'text-foreground bg-muted'
                     : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
@@ -320,7 +345,7 @@ export function Navbar() {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 relative z-10">
             {/* Theme Toggle */}
             <ThemeToggle />
 
@@ -376,7 +401,7 @@ export function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-16 z-30 p-4 md:hidden"
+            className="fixed inset-x-0 top-16 z-[53] p-4 md:hidden"
           >
             <div className="rounded-2xl bg-background/95 backdrop-blur-xl border border-border p-4 shadow-xl max-h-[80vh] overflow-y-auto">
               <nav className="flex flex-col gap-1">
@@ -393,9 +418,10 @@ export function Navbar() {
                   Home
                 </Link>
 
-                {/* 3 Pillars Section - NEW */}
+                {/* 3 Pillars Section */}
                 <div className="mt-2">
                   <button
+                    type="button"
                     onClick={() => setMobileSubmenu(mobileSubmenu === 'pillars' ? null : 'pillars')}
                     className={cn(
                       'w-full px-4 py-3 rounded-xl text-sm font-medium transition-colors flex items-center justify-between',
@@ -406,7 +432,7 @@ export function Navbar() {
                   >
                     <span className="flex items-center gap-2">
                       <Sparkles className="h-4 w-4" />
-                      3 Pillars of the Future
+                      3 Pillars
                     </span>
                     <ChevronDown className={cn(
                       'h-4 w-4 transition-transform',
@@ -423,20 +449,20 @@ export function Navbar() {
                       >
                         <div className="pl-4 mt-1 space-y-1">
                           {PILLARS_ITEMS.map((item) => {
-                            const Icon = item.icon
+                            const ItemIcon = item.icon
                             return (
                               <Link
                                 key={item.href}
                                 href={item.href}
                                 className={cn(
                                   'flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm transition-colors',
-                                  pathname === item.href
+                                  pathname === item.href || pathname === item.href.split('#')[0]
                                     ? 'text-foreground bg-muted/50'
                                     : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
                                 )}
                               >
                                 <div className={cn('p-1.5 rounded-md', item.bgColor)}>
-                                  <Icon className={cn('h-4 w-4', item.color)} />
+                                  <ItemIcon className={cn('h-4 w-4', item.color)} />
                                 </div>
                                 <span>{item.label}</span>
                               </Link>
@@ -451,6 +477,7 @@ export function Navbar() {
                 {/* Explore Section */}
                 <div>
                   <button
+                    type="button"
                     onClick={() => setMobileSubmenu(mobileSubmenu === 'explore' ? null : 'explore')}
                     className={cn(
                       'w-full px-4 py-3 rounded-xl text-sm font-medium transition-colors flex items-center justify-between',
@@ -478,7 +505,7 @@ export function Navbar() {
                       >
                         <div className="pl-4 mt-1 space-y-1">
                           {EXPLORE_ITEMS.map((item) => {
-                            const Icon = item.icon
+                            const ItemIcon = item.icon
                             return (
                               <Link
                                 key={item.href}
@@ -490,7 +517,7 @@ export function Navbar() {
                                     : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
                                 )}
                               >
-                                <Icon className="h-4 w-4" />
+                                <ItemIcon className="h-4 w-4" />
                                 {item.label}
                               </Link>
                             )
@@ -504,6 +531,7 @@ export function Navbar() {
                 {/* AI Section */}
                 <div>
                   <button
+                    type="button"
                     onClick={() => setMobileSubmenu(mobileSubmenu === 'ai' ? null : 'ai')}
                     className={cn(
                       'w-full px-4 py-3 rounded-xl text-sm font-medium transition-colors flex items-center justify-between',
@@ -531,7 +559,7 @@ export function Navbar() {
                       >
                         <div className="pl-4 mt-1 space-y-1">
                           {AI_ITEMS.map((item) => {
-                            const Icon = item.icon
+                            const ItemIcon = item.icon
                             return (
                               <Link
                                 key={item.href}
@@ -543,7 +571,7 @@ export function Navbar() {
                                     : 'text-muted-foreground hover:text-foreground hover:bg-muted/30'
                                 )}
                               >
-                                <Icon className="h-4 w-4" />
+                                <ItemIcon className="h-4 w-4" />
                                 {item.label}
                               </Link>
                             )
@@ -554,21 +582,31 @@ export function Navbar() {
                   </AnimatePresence>
                 </div>
 
-                {/* Other Links */}
-                {NAV_LINKS.slice(1).map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={cn(
-                      'px-4 py-3 rounded-xl text-sm font-medium transition-colors',
-                      pathname === link.href
-                        ? 'text-foreground bg-muted'
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
-                    )}
-                  >
-                    {link.label}
-                  </Link>
-                ))}
+                {/* About */}
+                <Link
+                  href="/about"
+                  className={cn(
+                    'px-4 py-3 rounded-xl text-sm font-medium transition-colors',
+                    pathname === '/about'
+                      ? 'text-foreground bg-muted'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  )}
+                >
+                  About
+                </Link>
+
+                {/* Credentials */}
+                <Link
+                  href="/certifications"
+                  className={cn(
+                    'px-4 py-3 rounded-xl text-sm font-medium transition-colors',
+                    pathname === '/certifications'
+                      ? 'text-foreground bg-muted'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  )}
+                >
+                  Credentials
+                </Link>
 
                 <Button variant="gradient" className="mt-4" asChild>
                   <Link href="/contact">Let&apos;s Connect</Link>
