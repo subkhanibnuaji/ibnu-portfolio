@@ -434,3 +434,45 @@ export function getAuditLogs(
 ): AuditLogEntry[] {
   return auditLog.slice(-limit - offset, auditLog.length - offset)
 }
+
+// =============================================================================
+// RE-EXPORTS FROM ADVANCED PROTECTION
+// =============================================================================
+
+export {
+  performSecurityCheck,
+  checkRequestBody,
+  checkDDoS,
+  checkSQLInjection,
+  checkXSS,
+  checkPathTraversal,
+  checkUserAgent,
+  checkBruteForce,
+  isBot,
+  isHoneypotPath,
+  handleHoneypot,
+  blockIP,
+  unblockIP,
+  isIPBlocked,
+  getThreatLogs,
+  getBlockedIPs,
+  getSuspicionScores,
+  getSecurityStats,
+  SECURITY_CONFIG,
+  HONEYPOT_PATHS,
+} from './advanced-protection'
+
+// =============================================================================
+// RE-EXPORTS FROM CAPTCHA
+// =============================================================================
+
+export {
+  verifyTurnstileToken,
+  validateHoneypot,
+  validateSubmissionTime,
+  generateFormTimestamp,
+  decodeFormTimestamp,
+  validateFormSecurity,
+  getTurnstileSiteKey,
+  isTurnstileConfigured,
+} from './captcha'
