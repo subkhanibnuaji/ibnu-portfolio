@@ -1,0 +1,20 @@
+# CODEOWNERS file
+# These owners will be automatically requested for review
+# when someone opens a pull request that modifies code they own.
+
+# Default owner for everything
+* @subkhanibnuaji
+
+# Security-related files require explicit review
+src/middleware.ts @subkhanibnuaji
+src/lib/security/** @subkhanibnuaji
+src/lib/validations/** @subkhanibnuaji
+.github/workflows/** @subkhanibnuaji
+
+# Configuration files
+next.config.ts @subkhanibnuaji
+package.json @subkhanibnuaji
+tsconfig.json @subkhanibnuaji
+
+# Documentation
+*.md @subkhanibnuaji
