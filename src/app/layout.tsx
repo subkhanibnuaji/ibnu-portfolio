@@ -22,6 +22,12 @@ import { BookmarkManager } from '@/components/bookmarks/bookmark-manager'
 import { NavigationProgress } from '@/components/transitions/page-transition'
 import { AccessibilityWidget } from '@/components/accessibility/accessibility-widget'
 import { NetworkStatus } from '@/components/network/network-status'
+import { RecentlyViewed } from '@/components/history/recently-viewed'
+import { ShareWidget } from '@/components/share/share-widget'
+import { ReadingProgress, ScrollToTopWithProgress } from '@/components/progress/reading-progress'
+import { CustomCursor, SpotlightEffect } from '@/components/cursor/custom-cursor'
+import { MicroInteractionStyles } from '@/components/micro-interactions'
+import { ToastProvider } from '@/components/toast/custom-toast'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import '@/styles/globals.css'
@@ -142,6 +148,13 @@ export default function RootLayout({
               <NavigationProgress />
               <AccessibilityWidget />
               <NetworkStatus />
+              <RecentlyViewed />
+              <ShareWidget />
+              <ReadingProgress />
+              <ScrollToTopWithProgress />
+              <CustomCursor />
+              <SpotlightEffect />
+              <MicroInteractionStyles />
             </ThemeProvider>
           </SessionProvider>
         </CanvasFixProvider>
