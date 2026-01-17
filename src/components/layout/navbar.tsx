@@ -17,7 +17,6 @@ const NAV_LINKS = [
   { href: '/certifications', label: 'Credentials' },
   { href: '/about', label: 'About' },
   { href: '/mobile', label: 'Mobile' },
-  { href: '/ai-tools', label: 'AI Tools' },
 ]
 
 export function Navbar() {
@@ -60,9 +59,9 @@ export function Navbar() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.map((link) => (
+            {NAV_LINKS.map((link, index) => (
               <Link
-                key={link.href}
+                key={`${link.href}-${index}`}
                 href={link.href}
                 className={cn(
                   'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
@@ -137,9 +136,9 @@ export function Navbar() {
           >
             <div className="rounded-2xl bg-background/95 backdrop-blur-xl border border-border p-4 shadow-xl">
               <nav className="flex flex-col gap-1">
-                {NAV_LINKS.map((link) => (
+                {NAV_LINKS.map((link, index) => (
                   <Link
-                    key={link.href}
+                    key={`mobile-${link.href}-${index}`}
                     href={link.href}
                     className={cn(
                       'px-4 py-3 rounded-xl text-sm font-medium transition-colors',
