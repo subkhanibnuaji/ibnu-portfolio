@@ -18,5 +18,9 @@ export {
   TokenCounter,
   PromptTemplateBuilder,
   TextReadabilityAnalyzer,
-  JSONSchemaGenerator
+  JSONSchemaGenerator,
+  RegexTester,
+  TextDiffViewer,
+  ModelComparison,
+  SystemPromptLibrary
 } from './ai-tools';
