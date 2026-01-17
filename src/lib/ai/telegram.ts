@@ -19,6 +19,7 @@
 import { ChatGroq } from '@langchain/groq';
 import { HumanMessage, AIMessage, SystemMessage, BaseMessage } from '@langchain/core/messages';
 import { AI_MODELS, AI_DEFAULTS, type GroqModelId } from './config';
+import * as SuperApp from './telegram-features';
 
 // ============================================
 // TYPES
@@ -872,36 +873,49 @@ export async function handleStart(chatId: number, user?: TelegramUser): Promise<
 
   const welcomeMessage = `👋 <b>Hello ${escapeHtml(name)}!</b>
 
-Welcome to <b>IbnuGPT Bot v2.0</b> - Advanced AI Assistant
+Welcome to <b>IbnuGPT Super App</b> 🚀
 
-🚀 <b>Features:</b>
-• 💬 AI Chat with context memory
-• 🔍 Web search integration (/search)
-• 📰 URL summarization (/summarize)
-• 🖼️ Image analysis (send photo)
-• 🎤 Voice message support
-• 💻 Code execution (/run)
-• 🌐 Multi-language support
+<b>🤖 AI Features:</b>
+💬 Smart Chat • 🎨 Image Generation
+🌐 Translation • 💻 Code Execution
 
-📝 <b>Commands:</b>
-/help - All commands
-/model - Change AI model
-/persona - Change AI personality
-/settings - View/change settings
-/stats - Your usage statistics
-/clear - Clear conversation
+<b>🔍 Info & Research:</b>
+🔍 Web Search • 📰 News
+🌤️ Weather • 💰 Crypto Prices
 
-Just send any message to start chatting! 💬`;
+<b>🛠️ Utility Tools:</b>
+📱 QR Code • 🔢 Calculator
+💱 Currency • 📐 Unit Converter
+
+<b>🎮 Fun & Games:</b>
+🎯 Trivia • 📝 Word Games
+😂 Jokes • 🔮 Horoscope
+
+<b>📝 Productivity:</b>
+📋 Notes • ✅ Todo List
+
+Type /menu for interactive menu!
+Type /help for all commands!
+
+Just send any message to start! 💬`;
 
   const keyboard: TelegramInlineKeyboard = {
     inline_keyboard: [
       [
+        { text: '📋 Menu', callback_data: 'action_menu' },
         { text: '💬 Start Chat', callback_data: 'action_chat' },
-        { text: '🔍 Search Web', switch_inline_query_current_chat: 'search: ' },
       ],
       [
-        { text: '🤖 Change Model', callback_data: 'action_model' },
-        { text: '🎭 Personas', callback_data: 'action_persona' },
+        { text: '🎨 Generate Image', callback_data: 'menu_image' },
+        { text: '🔍 Search', switch_inline_query_current_chat: '' },
+      ],
+      [
+        { text: '🌤️ Weather', callback_data: 'menu_weather' },
+        { text: '💰 Crypto', callback_data: 'menu_crypto' },
+      ],
+      [
+        { text: '🎮 Games', callback_data: 'menu_games' },
+        { text: '🛠️ Tools', callback_data: 'menu_tools' },
       ],
       [
         { text: '📖 Help', callback_data: 'action_help' },
@@ -916,47 +930,53 @@ Just send any message to start chatting! 💬`;
 export async function handleHelp(chatId: number): Promise<void> {
   botStats.commandUsage['help'] = (botStats.commandUsage['help'] || 0) + 1;
 
-  const helpMessage = `📖 <b>IbnuGPT Bot - Complete Guide</b>
+  const helpMessage = `📖 <b>IbnuGPT Super App - Complete Guide</b>
 
-<b>💬 Chat Commands:</b>
-• /start - Welcome & quick actions
-• /clear - Clear conversation history
-• /retry - Regenerate last response
+<b>🚀 Quick Access:</b>
+• /menu - Interactive menu
+• /start - Welcome message
 
-<b>🤖 AI Settings:</b>
+<b>🤖 AI Features:</b>
 • /model - Switch AI model
-• /persona - Change AI personality
-• /settings - View all settings
+• /persona - Change personality
+• /run js [code] - Execute code
+• /imagine [prompt] - Generate AI image
+• /translate [lang] [text] - Translate
 
 <b>🔍 Search & Research:</b>
-• /search [query] - Search the web
-• /summarize [url] - Summarize a webpage
-• /websearch on|off - Toggle auto web search
+• /search [query] - Web search
+• /summarize [url] - Summarize page
+• /news [category] - Latest news
 
-<b>💻 Code Features:</b>
-• /run [lang] [code] - Execute code
-  Example: /run js console.log("Hello")
+<b>🌍 Info & Weather:</b>
+• /weather [city] - Weather info
+• /crypto [symbol] - Crypto prices
 
-<b>📊 Statistics:</b>
-• /stats - Your usage stats
-• /mystats - Detailed statistics
+<b>🛠️ Utility Tools:</b>
+• /calc [expr] - Calculator
+• /convert [val] [from] to [to]
+• /currency [amt] [from] to [to]
+• /qr [text] - Generate QR code
+• /shorten [url] - URL shortener
 
-<b>🎭 Available Personas:</b>
-• default - Friendly assistant
-• professional - Expert consultant
-• creative - Imaginative responses
-• teacher - Patient explanations
-• coder - Programming focused
+<b>📝 Productivity:</b>
+• /notes - Manage notes
+• /todo - Todo list
 
-<b>📱 Media Support:</b>
-• Send photos for AI analysis
-• Send voice messages for transcription
-• Send URLs for summarization
+<b>🎮 Games & Fun:</b>
+• /trivia - Trivia quiz
+• /math - Math quiz
+• /word - Word guess game
+• /joke - Random joke
+• /quote - Inspirational quote
+• /horoscope [sign] - Horoscope
 
-<b>💡 Tips:</b>
-• Reply to a message to provide context
-• Use inline mode: @IbnuGPT_Bot query
-• Add me to groups (mention @IbnuGPT_Bot)`;
+<b>💻 Developer Tools:</b>
+• /dev - All dev tools
+• /json, /base64, /hash
+• /uuid, /password, /color
+
+Use /menu for interactive buttons!`;
 
   await sendMessage(chatId, helpMessage);
 }
@@ -1267,6 +1287,616 @@ export async function handleRetry(chatId: number): Promise<void> {
   await sendMessage(chatId, `🔄 <b>Regenerated Response:</b>\n\n${response}`);
 }
 
+// ============================================
+// SUPER APP COMMAND HANDLERS
+// ============================================
+
+// Image Generation
+export async function handleImageGeneration(chatId: number, prompt: string): Promise<void> {
+  if (!prompt.trim()) {
+    await sendMessage(chatId, `🎨 <b>AI Image Generation</b>
+
+<b>Usage:</b> /imagine [description]
+
+<b>Examples:</b>
+• /imagine a sunset over mountains
+• /imagine cyberpunk city at night
+• /imagine cute robot playing guitar
+
+Powered by Pollinations.ai (free)`);
+    return;
+  }
+
+  await sendChatAction(chatId, 'upload_photo');
+  await sendMessage(chatId, `🎨 Generating image: "${prompt}"...`);
+
+  const result = await SuperApp.generateImage(prompt);
+
+  if (result.success && result.imageUrl) {
+    // Send photo via Telegram API
+    await callTelegramAPI('sendPhoto', {
+      chat_id: chatId,
+      photo: result.imageUrl,
+      caption: `🎨 <b>AI Generated Image</b>\n\nPrompt: ${prompt}`,
+      parse_mode: 'HTML',
+    });
+  } else {
+    await sendMessage(chatId, `❌ Failed to generate image: ${result.error}`);
+  }
+}
+
+// Translation
+export async function handleTranslate(chatId: number, args: string): Promise<void> {
+  const parts = args.split(' ');
+  const targetLang = parts[0]?.toLowerCase();
+  const text = parts.slice(1).join(' ');
+
+  if (!targetLang || !text) {
+    await sendMessage(chatId, `🌐 <b>Translation</b>
+
+<b>Usage:</b> /translate [lang] [text]
+
+<b>Examples:</b>
+• /translate en Halo apa kabar?
+• /translate id Hello how are you?
+• /translate ja Good morning
+
+<b>Languages:</b>
+${SuperApp.getLanguageList()}`);
+    return;
+  }
+
+  await sendChatAction(chatId, 'typing');
+  const result = await SuperApp.translateText(text, targetLang);
+
+  if (result.success) {
+    await sendMessage(chatId, `🌐 <b>Translation</b>
+
+<b>Original:</b> ${text}
+<b>Translated (${targetLang}):</b> ${result.translation}`);
+  } else {
+    await sendMessage(chatId, `❌ Translation failed: ${result.error}`);
+  }
+}
+
+// Weather
+export async function handleWeather(chatId: number, city: string): Promise<void> {
+  if (!city.trim()) {
+    await sendMessage(chatId, `🌤️ <b>Weather</b>
+
+<b>Usage:</b> /weather [city]
+
+<b>Examples:</b>
+• /weather Jakarta
+• /weather Tokyo
+• /weather New York`);
+    return;
+  }
+
+  await sendChatAction(chatId, 'typing');
+  const result = await SuperApp.getWeather(city);
+
+  if (result.success && result.data) {
+    const w = result.data;
+    await sendMessage(chatId, `${w.icon} <b>Weather in ${w.city}, ${w.country}</b>
+
+🌡️ <b>Temperature:</b> ${w.temp}°C (feels like ${w.feels_like}°C)
+💧 <b>Humidity:</b> ${w.humidity}%
+💨 <b>Wind:</b> ${w.wind} km/h
+📝 <b>Condition:</b> ${w.description}`);
+  } else {
+    await sendMessage(chatId, `❌ ${result.error}`);
+  }
+}
+
+// News
+export async function handleNews(chatId: number, category: string): Promise<void> {
+  const validCategories = ['technology', 'business', 'sports', 'entertainment', 'world'];
+  const cat = category.toLowerCase() || 'technology';
+
+  if (category && !validCategories.includes(cat)) {
+    await sendMessage(chatId, `📰 <b>News Categories:</b>
+
+• /news technology
+• /news business
+• /news sports
+• /news entertainment
+• /news world`);
+    return;
+  }
+
+  await sendChatAction(chatId, 'typing');
+  const result = await SuperApp.getNews(cat);
+
+  if (result.success && result.articles) {
+    let message = `📰 <b>${cat.charAt(0).toUpperCase() + cat.slice(1)} News</b>\n\n`;
+    result.articles.forEach((article, i) => {
+      message += `<b>${i + 1}. ${article.title}</b>\n`;
+      message += `📍 ${article.source}\n`;
+      message += `🔗 ${article.link}\n\n`;
+    });
+    await sendMessage(chatId, message, { disableWebPagePreview: true });
+  } else {
+    await sendMessage(chatId, `❌ ${result.error}`);
+  }
+}
+
+// Calculator
+export async function handleCalculator(chatId: number, expression: string): Promise<void> {
+  if (!expression.trim()) {
+    await sendMessage(chatId, `🔢 <b>Calculator</b>
+
+<b>Usage:</b> /calc [expression]
+
+<b>Examples:</b>
+• /calc 2 + 2
+• /calc 15 * 7
+• /calc 100 / 4
+• /calc 2 ^ 10
+• /calc (5 + 3) * 2`);
+    return;
+  }
+
+  const result = SuperApp.calculate(expression);
+
+  if (result.success) {
+    await sendMessage(chatId, `🔢 <b>Calculator</b>
+
+${expression} = <b>${result.result}</b>`);
+  } else {
+    await sendMessage(chatId, `❌ ${result.error}`);
+  }
+}
+
+// Unit Converter
+export async function handleConvert(chatId: number, args: string): Promise<void> {
+  const match = args.match(/^([\d.]+)\s*(\w+)\s+to\s+(\w+)$/i);
+
+  if (!match) {
+    await sendMessage(chatId, `📐 <b>Unit Converter</b>
+
+<b>Usage:</b> /convert [value] [from] to [to]
+
+<b>Examples:</b>
+• /convert 100 km to mi
+• /convert 50 kg to lb
+• /convert 30 c to f
+• /convert 1 gb to mb
+• /convert 2 h to min
+
+<b>Categories:</b>
+📏 Length: m, km, cm, mm, mi, ft, in, yd
+⚖️ Weight: kg, g, mg, lb, oz, ton
+🌡️ Temperature: c, f, k
+📦 Volume: l, ml, gal, qt, pt, cup
+📐 Area: m2, km2, ha, acre, ft2
+⏱️ Time: s, ms, min, h, day, week
+💾 Data: b, kb, mb, gb, tb`);
+    return;
+  }
+
+  const [, value, fromUnit, toUnit] = match;
+  const result = SuperApp.convertUnit(parseFloat(value), fromUnit, toUnit);
+
+  if (result.success) {
+    await sendMessage(chatId, `📐 <b>Conversion</b>
+
+${result.formatted}`);
+  } else {
+    await sendMessage(chatId, `❌ ${result.error}`);
+  }
+}
+
+// Currency Converter
+export async function handleCurrency(chatId: number, args: string): Promise<void> {
+  const match = args.match(/^([\d.]+)\s*(\w+)\s+to\s+(\w+)$/i);
+
+  if (!match) {
+    await sendMessage(chatId, `💱 <b>Currency Converter</b>
+
+<b>Usage:</b> /currency [amount] [from] to [to]
+
+<b>Examples:</b>
+• /currency 100 usd to idr
+• /currency 1000000 idr to usd
+• /currency 50 eur to gbp
+
+Common currencies: USD, EUR, GBP, JPY, IDR, SGD, MYR, CNY`);
+    return;
+  }
+
+  await sendChatAction(chatId, 'typing');
+  const [, amount, from, to] = match;
+  const result = await SuperApp.convertCurrency(parseFloat(amount), from, to);
+
+  if (result.success) {
+    await sendMessage(chatId, `💱 <b>Currency Conversion</b>
+
+${parseFloat(amount).toLocaleString()} ${from.toUpperCase()} = <b>${result.result!.toLocaleString(undefined, { maximumFractionDigits: 2 })} ${to.toUpperCase()}</b>
+
+Rate: 1 ${from.toUpperCase()} = ${result.rate!.toFixed(4)} ${to.toUpperCase()}`);
+  } else {
+    await sendMessage(chatId, `❌ ${result.error}`);
+  }
+}
+
+// QR Code Generator
+export async function handleQRCode(chatId: number, data: string): Promise<void> {
+  if (!data.trim()) {
+    await sendMessage(chatId, `📱 <b>QR Code Generator</b>
+
+<b>Usage:</b> /qr [text or URL]
+
+<b>Examples:</b>
+• /qr https://example.com
+• /qr Hello World
+• /qr +62812345678`);
+    return;
+  }
+
+  const qrUrl = SuperApp.generateQRCode(data);
+  await callTelegramAPI('sendPhoto', {
+    chat_id: chatId,
+    photo: qrUrl,
+    caption: `📱 <b>QR Code</b>\n\nData: ${data}`,
+    parse_mode: 'HTML',
+  });
+}
+
+// URL Shortener
+export async function handleShorten(chatId: number, url: string): Promise<void> {
+  if (!url.trim() || !url.startsWith('http')) {
+    await sendMessage(chatId, `🔗 <b>URL Shortener</b>
+
+<b>Usage:</b> /shorten [URL]
+
+<b>Example:</b>
+/shorten https://example.com/very/long/url`);
+    return;
+  }
+
+  await sendChatAction(chatId, 'typing');
+  const result = await SuperApp.shortenUrl(url);
+
+  if (result.success) {
+    await sendMessage(chatId, `🔗 <b>URL Shortened</b>
+
+<b>Original:</b> ${url}
+<b>Short:</b> ${result.shortUrl}`);
+  } else {
+    await sendMessage(chatId, `❌ ${result.error}`);
+  }
+}
+
+// Notes
+export async function handleNotes(chatId: number, userId: number, args: string): Promise<void> {
+  const [action, ...rest] = args.split(' ');
+
+  switch (action?.toLowerCase()) {
+    case 'add': {
+      const [title, ...contentParts] = rest.join(' ').split('|');
+      const content = contentParts.join('|').trim();
+      if (!title || !content) {
+        await sendMessage(chatId, `📝 <b>Add Note</b>\n\nUsage: /notes add Title | Content`);
+        return;
+      }
+      const note = SuperApp.addNote(userId, title.trim(), content);
+      await sendMessage(chatId, `✅ Note saved!\n\nID: ${note.id}\nTitle: ${note.title}`);
+      break;
+    }
+    case 'delete': {
+      const noteId = rest[0];
+      if (SuperApp.deleteNote(userId, noteId)) {
+        await sendMessage(chatId, `🗑️ Note deleted!`);
+      } else {
+        await sendMessage(chatId, `❌ Note not found`);
+      }
+      break;
+    }
+    default: {
+      const notes = SuperApp.getNotes(userId);
+      if (notes.length === 0) {
+        await sendMessage(chatId, `📝 <b>Notes</b>
+
+No notes yet.
+
+<b>Commands:</b>
+• /notes add Title | Content
+• /notes delete [id]`);
+      } else {
+        let message = `📝 <b>Your Notes</b> (${notes.length})\n\n`;
+        notes.forEach(note => {
+          message += `<b>${note.title}</b> (${note.id})\n${note.content.slice(0, 50)}...\n\n`;
+        });
+        await sendMessage(chatId, message);
+      }
+    }
+  }
+}
+
+// Todos
+export async function handleTodos(chatId: number, userId: number, args: string): Promise<void> {
+  const [action, ...rest] = args.split(' ');
+
+  switch (action?.toLowerCase()) {
+    case 'add': {
+      const task = rest.join(' ');
+      if (!task) {
+        await sendMessage(chatId, `✅ <b>Add Todo</b>\n\nUsage: /todo add Your task here`);
+        return;
+      }
+      const todo = SuperApp.addTodo(userId, task);
+      await sendMessage(chatId, `✅ Todo added!\n\nID: ${todo.id}\nTask: ${todo.task}`);
+      break;
+    }
+    case 'done': {
+      const todoId = rest[0];
+      if (SuperApp.toggleTodo(userId, todoId)) {
+        await sendMessage(chatId, `✅ Todo marked as done!`);
+      } else {
+        await sendMessage(chatId, `❌ Todo not found`);
+      }
+      break;
+    }
+    case 'delete': {
+      const todoId = rest[0];
+      if (SuperApp.deleteTodo(userId, todoId)) {
+        await sendMessage(chatId, `🗑️ Todo deleted!`);
+      } else {
+        await sendMessage(chatId, `❌ Todo not found`);
+      }
+      break;
+    }
+    default: {
+      const todos = SuperApp.getTodos(userId);
+      if (todos.length === 0) {
+        await sendMessage(chatId, `✅ <b>Todos</b>
+
+No todos yet.
+
+<b>Commands:</b>
+• /todo add Task description
+• /todo done [id]
+• /todo delete [id]`);
+      } else {
+        let message = `✅ <b>Your Todos</b>\n\n`;
+        todos.forEach(todo => {
+          message += `${todo.completed ? '✅' : '⬜'} ${todo.task} (${todo.id})\n`;
+        });
+        await sendMessage(chatId, message);
+      }
+    }
+  }
+}
+
+// Entertainment
+export async function handleJoke(chatId: number): Promise<void> {
+  await sendMessage(chatId, `😂 <b>Random Joke</b>\n\n${SuperApp.getRandomJoke()}`);
+}
+
+export async function handleFact(chatId: number): Promise<void> {
+  await sendMessage(chatId, `${SuperApp.getRandomFact()}`);
+}
+
+export async function handleQuote(chatId: number): Promise<void> {
+  await sendMessage(chatId, `💡 <b>Quote of the Day</b>\n\n${SuperApp.getRandomQuote()}`);
+}
+
+export async function handleHoroscope(chatId: number, sign: string): Promise<void> {
+  if (!sign.trim()) {
+    await sendMessage(chatId, `🔮 <b>Horoscope</b>
+
+<b>Usage:</b> /horoscope [sign]
+
+<b>Signs:</b>
+♈ Aries ♉ Taurus ♊ Gemini ♋ Cancer
+♌ Leo ♍ Virgo ♎ Libra ♏ Scorpio
+♐ Sagittarius ♑ Capricorn ♒ Aquarius ♓ Pisces`);
+    return;
+  }
+  await sendMessage(chatId, `🔮 <b>Daily Horoscope</b>\n\n${SuperApp.getHoroscope(sign)}`);
+}
+
+// Games
+export async function handleTrivia(chatId: number, userId: number, answer?: string): Promise<void> {
+  if (answer) {
+    const result = SuperApp.answerTrivia(userId, answer);
+    if (result.correct) {
+      await sendMessage(chatId, `✅ <b>Correct!</b> 🎉\n\nScore: ${result.score}\n\nSend /trivia for next question!`);
+    } else {
+      await sendMessage(chatId, `❌ Wrong! The answer was: <b>${result.correctAnswer}</b>\n\nScore: ${result.score}\n\nSend /trivia for next question!`);
+    }
+  } else {
+    const game = SuperApp.startTrivia(userId);
+    let message = `🎯 <b>Trivia Time!</b>\n\n${game.question}\n\n`;
+    game.options.forEach((opt, i) => {
+      message += `${i + 1}. ${opt}\n`;
+    });
+    message += `\nReply with: /trivia [your answer]`;
+    await sendMessage(chatId, message);
+  }
+}
+
+export async function handleMathQuiz(chatId: number, userId: number, answer?: string): Promise<void> {
+  if (answer) {
+    const result = SuperApp.answerMathQuiz(userId, parseInt(answer));
+    if (result.correct) {
+      await sendMessage(chatId, `✅ <b>Correct!</b> 🎉\n\nScore: ${result.score}\n\nSend /math for next question!`);
+    } else {
+      await sendMessage(chatId, `❌ Wrong! The answer was: <b>${result.correctAnswer}</b>\n\nScore: ${result.score}\n\nSend /math for next question!`);
+    }
+  } else {
+    const game = SuperApp.startMathQuiz(userId);
+    await sendMessage(chatId, `🔢 <b>Math Quiz!</b>\n\n${game.question}\n\nReply with: /math [your answer]`);
+  }
+}
+
+export async function handleWordGame(chatId: number, userId: number, guess?: string): Promise<void> {
+  if (guess) {
+    const result = SuperApp.guessWord(userId, guess);
+    if (result.correct) {
+      await sendMessage(chatId, `✅ <b>Correct!</b> The word was: <b>${result.answer}</b>\n\nScore: ${result.score}\n\nSend /word for new game!`);
+    } else if (result.attemptsLeft > 0) {
+      await sendMessage(chatId, `❌ Wrong! ${result.attemptsLeft} attempts left.\n\nTry again: /word [guess]`);
+    } else {
+      await sendMessage(chatId, `❌ Game Over! The word was: <b>${result.answer}</b>\n\nScore: ${result.score}\n\nSend /word for new game!`);
+    }
+  } else {
+    const game = SuperApp.startWordGuess(userId);
+    await sendMessage(chatId, `📝 <b>Word Guess!</b>\n\nHint: ${game.hint} (${game.length} letters)\n\nGuess with: /word [your guess]`);
+  }
+}
+
+// Developer Tools
+export async function handleDevTools(chatId: number, tool: string, args: string): Promise<void> {
+  switch (tool) {
+    case 'json': {
+      const result = SuperApp.formatJSON(args);
+      if (result.success) {
+        await sendMessage(chatId, `📋 <b>Formatted JSON</b>\n\n<code>${escapeHtml(result.formatted!)}</code>`);
+      } else {
+        await sendMessage(chatId, `❌ ${result.error}`);
+      }
+      break;
+    }
+    case 'base64': {
+      const [action, ...text] = args.split(' ');
+      if (action === 'encode') {
+        const encoded = SuperApp.base64Encode(text.join(' '));
+        await sendMessage(chatId, `🔐 <b>Base64 Encoded</b>\n\n<code>${encoded}</code>`);
+      } else if (action === 'decode') {
+        const result = SuperApp.base64Decode(text.join(' '));
+        if (result.success) {
+          await sendMessage(chatId, `🔓 <b>Base64 Decoded</b>\n\n${result.result}`);
+        } else {
+          await sendMessage(chatId, `❌ ${result.error}`);
+        }
+      } else {
+        await sendMessage(chatId, `🔐 <b>Base64</b>\n\n/base64 encode [text]\n/base64 decode [base64]`);
+      }
+      break;
+    }
+    case 'hash': {
+      const [algo, ...text] = args.split(' ');
+      const validAlgos = ['md5', 'sha1', 'sha256', 'sha512'];
+      if (!validAlgos.includes(algo) || !text.length) {
+        await sendMessage(chatId, `🔒 <b>Hash Generator</b>\n\n/hash md5|sha1|sha256|sha512 [text]`);
+        return;
+      }
+      const hash = await SuperApp.generateHash(text.join(' '), algo as 'md5' | 'sha1' | 'sha256' | 'sha512');
+      await sendMessage(chatId, `🔒 <b>${algo.toUpperCase()} Hash</b>\n\n<code>${hash}</code>`);
+      break;
+    }
+    case 'uuid': {
+      const uuid = SuperApp.generateUUID();
+      await sendMessage(chatId, `🆔 <b>Generated UUID</b>\n\n<code>${uuid}</code>`);
+      break;
+    }
+    case 'lorem': {
+      const paragraphs = parseInt(args) || 1;
+      const text = SuperApp.generateLoremIpsum(Math.min(paragraphs, 5));
+      await sendMessage(chatId, `📝 <b>Lorem Ipsum</b>\n\n${text}`);
+      break;
+    }
+    case 'color': {
+      const result = SuperApp.convertColor(args);
+      if (result.error) {
+        await sendMessage(chatId, `❌ ${result.error}`);
+      } else {
+        await sendMessage(chatId, `🎨 <b>Color Conversion</b>\n\nHEX: ${result.hex}\nRGB: ${result.rgb}\nHSL: ${result.hsl}`);
+      }
+      break;
+    }
+    case 'password': {
+      const length = parseInt(args) || 16;
+      const password = SuperApp.generatePassword(Math.min(length, 64));
+      await sendMessage(chatId, `🔑 <b>Generated Password</b>\n\n<code>${password}</code>\n\n⚠️ Copy and delete this message!`);
+      break;
+    }
+    default:
+      await sendMessage(chatId, `🛠️ <b>Developer Tools</b>
+
+/json [json] - Format JSON
+/base64 encode|decode [text]
+/hash md5|sha1|sha256|sha512 [text]
+/uuid - Generate UUID
+/lorem [paragraphs] - Lorem Ipsum
+/color #RRGGBB - Color converter
+/password [length] - Generate password`);
+  }
+}
+
+// Crypto
+export async function handleCrypto(chatId: number, symbol: string): Promise<void> {
+  if (!symbol.trim()) {
+    await sendChatAction(chatId, 'typing');
+    const result = await SuperApp.getTopCryptos(10);
+    if (result.success && result.data) {
+      let message = `💰 <b>Top 10 Cryptocurrencies</b>\n\n`;
+      result.data.forEach(coin => {
+        const change = coin.change24h >= 0 ? `📈 +${coin.change24h.toFixed(2)}%` : `📉 ${coin.change24h.toFixed(2)}%`;
+        message += `${coin.rank}. <b>${coin.symbol}</b> $${coin.price.toLocaleString(undefined, { maximumFractionDigits: 2 })}\n   ${change}\n`;
+      });
+      message += `\n/crypto [symbol] for details`;
+      await sendMessage(chatId, message);
+    } else {
+      await sendMessage(chatId, `❌ ${result.error}`);
+    }
+    return;
+  }
+
+  await sendChatAction(chatId, 'typing');
+  const result = await SuperApp.getCryptoPrice(symbol);
+
+  if (result.success && result.data) {
+    const c = result.data;
+    const change = c.change24h >= 0 ? `📈 +${c.change24h.toFixed(2)}%` : `📉 ${c.change24h.toFixed(2)}%`;
+    await sendMessage(chatId, `💰 <b>${c.symbol}</b>
+
+💵 <b>Price:</b> $${c.price.toLocaleString(undefined, { maximumFractionDigits: 8 })}
+📊 <b>24h Change:</b> ${change}
+📈 <b>Market Cap:</b> $${(c.marketCap / 1e9).toFixed(2)}B`);
+  } else {
+    await sendMessage(chatId, `❌ ${result.error}`);
+  }
+}
+
+// Super App Menu
+export async function handleMenu(chatId: number): Promise<void> {
+  const keyboard: TelegramInlineKeyboard = {
+    inline_keyboard: [
+      [
+        { text: '🤖 AI Chat', callback_data: 'menu_ai' },
+        { text: '🔍 Search', callback_data: 'menu_search' },
+      ],
+      [
+        { text: '🎨 Generate Image', callback_data: 'menu_image' },
+        { text: '🌐 Translate', callback_data: 'menu_translate' },
+      ],
+      [
+        { text: '🌤️ Weather', callback_data: 'menu_weather' },
+        { text: '📰 News', callback_data: 'menu_news' },
+      ],
+      [
+        { text: '💰 Crypto', callback_data: 'menu_crypto' },
+        { text: '💱 Currency', callback_data: 'menu_currency' },
+      ],
+      [
+        { text: '🛠️ Tools', callback_data: 'menu_tools' },
+        { text: '🎮 Games', callback_data: 'menu_games' },
+      ],
+      [
+        { text: '📝 Productivity', callback_data: 'menu_productivity' },
+        { text: '😂 Fun', callback_data: 'menu_fun' },
+      ],
+    ],
+  };
+
+  await sendMessage(chatId, `🚀 <b>IbnuGPT Super App Menu</b>
+
+Choose a category:`, { replyMarkup: keyboard });
+}
+
 // Admin commands
 export async function handleAdminStats(chatId: number, userId: number): Promise<void> {
   if (!ADMIN_USER_IDS.includes(userId)) {
@@ -1359,6 +1989,10 @@ export async function handleCallbackQuery(
       await answerCallbackQuery(callbackQueryId);
       await handleHelp(chatId);
       break;
+    case 'action_menu':
+      await answerCallbackQuery(callbackQueryId);
+      await handleMenu(chatId);
+      break;
     case 'action_model':
       await answerCallbackQuery(callbackQueryId);
       await handleModelSelection(chatId);
@@ -1371,6 +2005,148 @@ export async function handleCallbackQuery(
       await answerCallbackQuery(callbackQueryId, '🗑️ Cleared!');
       await handleClear(chatId);
       break;
+
+    // Menu categories
+    case 'menu_ai':
+      await answerCallbackQuery(callbackQueryId);
+      await sendMessage(chatId, `🤖 <b>AI Features</b>
+
+• Just chat - Send any message
+• /imagine [prompt] - Generate AI image
+• /translate [lang] [text] - Translate text
+• /run js [code] - Execute JavaScript
+• /model - Change AI model
+• /persona - Change AI personality`);
+      break;
+    case 'menu_search':
+      await answerCallbackQuery(callbackQueryId);
+      await sendMessage(chatId, `🔍 <b>Search & Research</b>
+
+• /search [query] - Web search + AI summary
+• /summarize [url] - Summarize webpage
+• /news [category] - Latest news
+  Categories: technology, business, sports, entertainment, world`);
+      break;
+    case 'menu_image':
+      await answerCallbackQuery(callbackQueryId);
+      await sendMessage(chatId, `🎨 <b>AI Image Generation</b>
+
+Usage: /imagine [description]
+
+Examples:
+• /imagine sunset over mountains
+• /imagine cyberpunk city at night
+• /imagine cute robot playing guitar`);
+      break;
+    case 'menu_translate':
+      await answerCallbackQuery(callbackQueryId);
+      await sendMessage(chatId, `🌐 <b>Translation</b>
+
+Usage: /translate [lang] [text]
+
+Examples:
+• /translate en Halo apa kabar?
+• /translate id Hello how are you?
+• /translate ja Good morning
+
+Languages: en, id, es, fr, de, ja, ko, zh, ar, ru...`);
+      break;
+    case 'menu_weather':
+      await answerCallbackQuery(callbackQueryId);
+      await sendMessage(chatId, `🌤️ <b>Weather</b>
+
+Usage: /weather [city]
+
+Examples:
+• /weather Jakarta
+• /weather Tokyo
+• /weather New York`);
+      break;
+    case 'menu_news':
+      await answerCallbackQuery(callbackQueryId);
+      await sendMessage(chatId, `📰 <b>News</b>
+
+Usage: /news [category]
+
+Categories:
+• /news technology
+• /news business
+• /news sports
+• /news entertainment
+• /news world`);
+      break;
+    case 'menu_crypto':
+      await answerCallbackQuery(callbackQueryId);
+      await sendMessage(chatId, `💰 <b>Cryptocurrency</b>
+
+• /crypto - Top 10 crypto prices
+• /crypto bitcoin - Bitcoin price
+• /crypto ethereum - Ethereum price
+• /crypto solana - Solana price`);
+      break;
+    case 'menu_currency':
+      await answerCallbackQuery(callbackQueryId);
+      await sendMessage(chatId, `💱 <b>Currency Converter</b>
+
+Usage: /currency [amount] [from] to [to]
+
+Examples:
+• /currency 100 usd to idr
+• /currency 1000000 idr to usd
+• /currency 50 eur to gbp`);
+      break;
+    case 'menu_tools':
+      await answerCallbackQuery(callbackQueryId);
+      await sendMessage(chatId, `🛠️ <b>Utility Tools</b>
+
+• /calc [expression] - Calculator
+• /convert [value] [from] to [to] - Unit converter
+• /qr [text] - Generate QR code
+• /shorten [url] - URL shortener
+• /dev - Developer tools (JSON, Base64, Hash, UUID, Password)`);
+      break;
+    case 'menu_games':
+      await answerCallbackQuery(callbackQueryId);
+      await sendMessage(chatId, `🎮 <b>Games & Fun</b>
+
+• /trivia - Trivia quiz
+• /math - Math quiz
+• /word - Word guess game
+• /joke - Random joke
+• /fact - Fun fact
+• /quote - Inspirational quote
+• /horoscope [sign] - Daily horoscope`);
+      break;
+    case 'menu_productivity':
+      await answerCallbackQuery(callbackQueryId);
+      await sendMessage(chatId, `📝 <b>Productivity</b>
+
+<b>Notes:</b>
+• /notes - View all notes
+• /notes add Title | Content
+• /notes delete [id]
+
+<b>Todos:</b>
+• /todo - View all todos
+• /todo add Task description
+• /todo done [id]
+• /todo delete [id]`);
+      break;
+    case 'menu_fun':
+      await answerCallbackQuery(callbackQueryId);
+      await sendMessage(chatId, `😂 <b>Fun & Entertainment</b>
+
+• /joke - Random programming joke
+• /fact - Fun tech fact
+• /quote - Inspirational quote
+• /horoscope [sign] - Daily horoscope
+
+<b>Games:</b>
+• /trivia - Answer trivia questions
+• /math - Solve math problems
+• /word - Guess the word`);
+      break;
+
     default:
       await answerCallbackQuery(callbackQueryId, 'Unknown action');
   }
@@ -1588,11 +2364,15 @@ export async function handleUpdate(update: TelegramUpdate): Promise<void> {
       const args = argParts.join(' ');
 
       switch (command) {
+        // Core Commands
         case '/start':
           await handleStart(chat.id, from);
           break;
         case '/help':
           await handleHelp(chat.id);
+          break;
+        case '/menu':
+          await handleMenu(chat.id);
           break;
         case '/about':
           await handleAbout(chat.id);
@@ -1612,27 +2392,146 @@ export async function handleUpdate(update: TelegramUpdate): Promise<void> {
         case '/stats':
           await handleStats(chat.id, userId);
           break;
+
+        // Search & Research
         case '/search':
           await handleSearch(chat.id, args);
           break;
         case '/summarize':
           await handleSummarize(chat.id, args);
           break;
+        case '/websearch':
+          const enabled = toggleWebSearch(chat.id);
+          await sendMessage(chat.id, `🔍 Web search is now <b>${enabled ? 'enabled' : 'disabled'}</b>`);
+          break;
+
+        // AI Features
         case '/run':
           await handleRunCode(chat.id, args);
           break;
         case '/retry':
           await handleRetry(chat.id);
           break;
-        case '/websearch':
-          const enabled = toggleWebSearch(chat.id);
-          await sendMessage(chat.id, `🔍 Web search is now <b>${enabled ? 'enabled' : 'disabled'}</b>`);
+        case '/imagine':
+        case '/image':
+          await handleImageGeneration(chat.id, args);
           break;
+        case '/translate':
+        case '/tr':
+          await handleTranslate(chat.id, args);
+          break;
+
+        // Info & News
+        case '/weather':
+        case '/cuaca':
+          await handleWeather(chat.id, args);
+          break;
+        case '/news':
+        case '/berita':
+          await handleNews(chat.id, args);
+          break;
+
+        // Utility Tools
+        case '/calc':
+        case '/calculator':
+          await handleCalculator(chat.id, args);
+          break;
+        case '/convert':
+          await handleConvert(chat.id, args);
+          break;
+        case '/currency':
+        case '/forex':
+          await handleCurrency(chat.id, args);
+          break;
+        case '/qr':
+        case '/qrcode':
+          await handleQRCode(chat.id, args);
+          break;
+        case '/shorten':
+        case '/short':
+          await handleShorten(chat.id, args);
+          break;
+
+        // Productivity
+        case '/notes':
+        case '/note':
+          await handleNotes(chat.id, userId, args);
+          break;
+        case '/todo':
+        case '/todos':
+          await handleTodos(chat.id, userId, args);
+          break;
+
+        // Entertainment
+        case '/joke':
+          await handleJoke(chat.id);
+          break;
+        case '/fact':
+          await handleFact(chat.id);
+          break;
+        case '/quote':
+          await handleQuote(chat.id);
+          break;
+        case '/horoscope':
+        case '/zodiac':
+          await handleHoroscope(chat.id, args);
+          break;
+
+        // Games
+        case '/trivia':
+          await handleTrivia(chat.id, userId, args || undefined);
+          break;
+        case '/math':
+        case '/mathquiz':
+          await handleMathQuiz(chat.id, userId, args || undefined);
+          break;
+        case '/word':
+        case '/wordgame':
+          await handleWordGame(chat.id, userId, args || undefined);
+          break;
+
+        // Developer Tools
+        case '/json':
+          await handleDevTools(chat.id, 'json', args);
+          break;
+        case '/base64':
+          await handleDevTools(chat.id, 'base64', args);
+          break;
+        case '/hash':
+          await handleDevTools(chat.id, 'hash', args);
+          break;
+        case '/uuid':
+          await handleDevTools(chat.id, 'uuid', args);
+          break;
+        case '/lorem':
+          await handleDevTools(chat.id, 'lorem', args);
+          break;
+        case '/color':
+          await handleDevTools(chat.id, 'color', args);
+          break;
+        case '/password':
+        case '/genpass':
+          await handleDevTools(chat.id, 'password', args);
+          break;
+        case '/dev':
+        case '/devtools':
+          await handleDevTools(chat.id, '', '');
+          break;
+
+        // Finance
+        case '/crypto':
+        case '/btc':
+        case '/coin':
+          await handleCrypto(chat.id, args);
+          break;
+
+        // Admin
         case '/adminstats':
           await handleAdminStats(chat.id, userId);
           break;
+
         default:
-          await sendMessage(chat.id, '❓ Unknown command. Use /help for available commands.');
+          await sendMessage(chat.id, '❓ Unknown command. Use /help or /menu to see available commands.');
       }
       return;
     }
