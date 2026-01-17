@@ -18,7 +18,7 @@ import { cn } from '@/lib/utils';
 
 export interface ChatInputProps {
   onSend?: (message: string) => void;
-  onSubmit?: (e?: React.FormEvent) => void; // Alternative to onSend
+  onSubmit?: (e?: FormEvent) => void;
   value?: string;
   onChange?: (value: string) => void;
   isLoading?: boolean;
@@ -27,6 +27,8 @@ export interface ChatInputProps {
   showAttachment?: boolean;
   onAttach?: () => void;
   className?: string;
+  initialValue?: string;
+  onValueChange?: (value: string) => void;
 }
 
 // ============================================
@@ -44,16 +46,26 @@ export function ChatInput({
   showAttachment = false,
   onAttach,
   className,
+  initialValue = '',
+  onValueChange,
 }: ChatInputProps) {
-  const [internalInput, setInternalInput] = useState('');
+  const [internalInput, setInternalInput] = useState(initialValue || '');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Use controlled value if provided, otherwise internal state
+  // Support both controlled and uncontrolled modes
   const isControlled = controlledValue !== undefined;
   const input = isControlled ? controlledValue : internalInput;
   const setInput = isControlled
     ? (val: string) => controlledOnChange?.(val)
     : setInternalInput;
+
+  // Sync with external initialValue changes
+  useEffect(() => {
+    if (initialValue && initialValue !== internalInput && !isControlled) {
+      setInternalInput(initialValue);
+      onValueChange?.('');
+    }
+  }, [initialValue, isControlled, internalInput, onValueChange]);
 
   // Auto-resize textarea
   useEffect(() => {

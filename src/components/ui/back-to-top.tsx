@@ -75,7 +75,7 @@ export function ReadingProgress() {
   }, [])
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 h-1 bg-muted">
+    <div className="fixed top-0 left-0 right-0 z-[45] h-1 bg-muted pointer-events-none">
       <motion.div
         className="h-full bg-cyber-gradient"
         style={{ width: `${progress}%` }}
