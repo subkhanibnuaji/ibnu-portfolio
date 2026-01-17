@@ -846,11 +846,625 @@ export function GasFeeEstimator() {
 // CRYPTO TOOLS GRID
 // ============================================
 
+// ============================================
+// IMPERMANENT LOSS CALCULATOR
+// ============================================
+
+export function ImpermanentLossCalculator() {
+  const [initialPrice, setInitialPrice] = useState('1000')
+  const [currentPrice, setCurrentPrice] = useState('1500')
+  const [result, setResult] = useState<{
+    priceRatio: number
+    impermanentLoss: number
+    holdValue: number
+    lpValue: number
+  } | null>(null)
+
+  const calculate = useCallback(() => {
+    const initial = parseFloat(initialPrice)
+    const current = parseFloat(currentPrice)
+
+    if (isNaN(initial) || isNaN(current) || initial <= 0) {
+      setResult(null)
+      return
+    }
+
+    const priceRatio = current / initial
+    // IL formula: 2 * sqrt(priceRatio) / (1 + priceRatio) - 1
+    const ilFactor = (2 * Math.sqrt(priceRatio)) / (1 + priceRatio)
+    const impermanentLoss = (1 - ilFactor) * 100
+
+    // Assuming $1000 initial investment, 50/50 split
+    const initialInvestment = 1000
+    const holdValue = (initialInvestment / 2) + (initialInvestment / 2) * priceRatio
+    const lpValue = holdValue * ilFactor
+
+    setResult({
+      priceRatio,
+      impermanentLoss,
+      holdValue,
+      lpValue,
+    })
+  }, [initialPrice, currentPrice])
+
+  useEffect(() => {
+    calculate()
+  }, [calculate])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
+          <TrendingUp className="w-5 h-5 text-red-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Impermanent Loss Calculator</h3>
+          <p className="text-xs text-muted-foreground">Calculate LP impermanent loss</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Initial Price ($)</label>
+            <input
+              type="number"
+              value={initialPrice}
+              onChange={(e) => setInitialPrice(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-red-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Current Price ($)</label>
+            <input
+              type="number"
+              value={currentPrice}
+              onChange={(e) => setCurrentPrice(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-red-500 focus:outline-none text-sm"
+            />
+          </div>
+        </div>
+
+        {result && (
+          <div className="space-y-3">
+            <div className="p-4 bg-red-500/10 rounded-lg text-center">
+              <p className="text-3xl font-bold text-red-500">-{result.impermanentLoss.toFixed(2)}%</p>
+              <p className="text-sm text-muted-foreground">Impermanent Loss</p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div className="p-3 bg-muted/50 rounded-lg text-center">
+                <p className="text-lg font-bold">${result.holdValue.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground">If HODL</p>
+              </div>
+              <div className="p-3 bg-muted/50 rounded-lg text-center">
+                <p className="text-lg font-bold">${result.lpValue.toFixed(2)}</p>
+                <p className="text-xs text-muted-foreground">If LP</p>
+              </div>
+            </div>
+
+            <p className="text-xs text-muted-foreground text-center">
+              Price ratio: {result.priceRatio.toFixed(2)}x | Assumes 50/50 pool with $1000 initial
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// STAKING REWARDS CALCULATOR
+// ============================================
+
+export function StakingRewardsCalculator() {
+  const [amount, setAmount] = useState('10000')
+  const [apy, setApy] = useState('5')
+  const [duration, setDuration] = useState('12')
+  const [compounding, setCompounding] = useState<'none' | 'daily' | 'weekly' | 'monthly'>('daily')
+  const [result, setResult] = useState<{
+    finalAmount: number
+    rewards: number
+    effectiveApy: number
+  } | null>(null)
+
+  const calculate = useCallback(() => {
+    const principal = parseFloat(amount)
+    const apyPercent = parseFloat(apy) / 100
+    const months = parseFloat(duration)
+
+    if (isNaN(principal) || isNaN(apyPercent) || isNaN(months)) {
+      setResult(null)
+      return
+    }
+
+    const years = months / 12
+    let finalAmount: number
+    let effectiveApy: number
+
+    switch (compounding) {
+      case 'none':
+        finalAmount = principal * (1 + apyPercent * years)
+        effectiveApy = apyPercent * 100
+        break
+      case 'daily':
+        finalAmount = principal * Math.pow(1 + apyPercent / 365, 365 * years)
+        effectiveApy = (Math.pow(1 + apyPercent / 365, 365) - 1) * 100
+        break
+      case 'weekly':
+        finalAmount = principal * Math.pow(1 + apyPercent / 52, 52 * years)
+        effectiveApy = (Math.pow(1 + apyPercent / 52, 52) - 1) * 100
+        break
+      case 'monthly':
+        finalAmount = principal * Math.pow(1 + apyPercent / 12, 12 * years)
+        effectiveApy = (Math.pow(1 + apyPercent / 12, 12) - 1) * 100
+        break
+    }
+
+    setResult({
+      finalAmount,
+      rewards: finalAmount - principal,
+      effectiveApy,
+    })
+  }, [amount, apy, duration, compounding])
+
+  useEffect(() => {
+    calculate()
+  }, [calculate])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+          <PiggyBank className="w-5 h-5 text-green-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Staking Rewards</h3>
+          <p className="text-xs text-muted-foreground">Calculate staking earnings</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Amount ($)</label>
+            <input
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-green-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">APY (%)</label>
+            <input
+              type="number"
+              value={apy}
+              onChange={(e) => setApy(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-green-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Duration (months)</label>
+            <input
+              type="number"
+              value={duration}
+              onChange={(e) => setDuration(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-green-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Compounding</label>
+            <select
+              value={compounding}
+              onChange={(e) => setCompounding(e.target.value as typeof compounding)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-green-500 focus:outline-none text-sm"
+            >
+              <option value="none">None</option>
+              <option value="daily">Daily</option>
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+            </select>
+          </div>
+        </div>
+
+        {result && (
+          <div className="p-4 bg-muted/50 rounded-lg space-y-2">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Final Amount:</span>
+              <span className="font-mono font-bold text-green-500">${result.finalAmount.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Total Rewards:</span>
+              <span className="font-mono font-bold">+${result.rewards.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Effective APY:</span>
+              <span className="font-mono">{result.effectiveApy.toFixed(2)}%</span>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// LIQUIDATION PRICE CALCULATOR
+// ============================================
+
+export function LiquidationCalculator() {
+  const [entryPrice, setEntryPrice] = useState('50000')
+  const [leverage, setLeverage] = useState('10')
+  const [positionType, setPositionType] = useState<'long' | 'short'>('long')
+  const [maintenanceMargin, setMaintenanceMargin] = useState('0.5')
+  const [result, setResult] = useState<{
+    liquidationPrice: number
+    distance: number
+  } | null>(null)
+
+  const calculate = useCallback(() => {
+    const entry = parseFloat(entryPrice)
+    const lev = parseFloat(leverage)
+    const mm = parseFloat(maintenanceMargin) / 100
+
+    if (isNaN(entry) || isNaN(lev) || isNaN(mm) || lev <= 0) {
+      setResult(null)
+      return
+    }
+
+    let liquidationPrice: number
+    if (positionType === 'long') {
+      // Liq price for long: Entry * (1 - 1/leverage + mm)
+      liquidationPrice = entry * (1 - (1 / lev) + mm)
+    } else {
+      // Liq price for short: Entry * (1 + 1/leverage - mm)
+      liquidationPrice = entry * (1 + (1 / lev) - mm)
+    }
+
+    const distance = Math.abs((liquidationPrice - entry) / entry) * 100
+
+    setResult({
+      liquidationPrice,
+      distance,
+    })
+  }, [entryPrice, leverage, positionType, maintenanceMargin])
+
+  useEffect(() => {
+    calculate()
+  }, [calculate])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center">
+          <AlertTriangle className="w-5 h-5 text-yellow-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Liquidation Calculator</h3>
+          <p className="text-xs text-muted-foreground">Calculate liquidation price</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex gap-2 rounded-lg overflow-hidden border border-border">
+          <button
+            onClick={() => setPositionType('long')}
+            className={cn(
+              'flex-1 py-2 text-sm font-medium transition-colors',
+              positionType === 'long' ? 'bg-green-500 text-white' : 'bg-muted/50 hover:bg-muted'
+            )}
+          >
+            Long
+          </button>
+          <button
+            onClick={() => setPositionType('short')}
+            className={cn(
+              'flex-1 py-2 text-sm font-medium transition-colors',
+              positionType === 'short' ? 'bg-red-500 text-white' : 'bg-muted/50 hover:bg-muted'
+            )}
+          >
+            Short
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Entry Price ($)</label>
+            <input
+              type="number"
+              value={entryPrice}
+              onChange={(e) => setEntryPrice(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-yellow-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Leverage (x)</label>
+            <input
+              type="number"
+              value={leverage}
+              onChange={(e) => setLeverage(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-yellow-500 focus:outline-none text-sm"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="text-xs text-muted-foreground mb-1 block">Maintenance Margin (%)</label>
+          <input
+            type="number"
+            value={maintenanceMargin}
+            onChange={(e) => setMaintenanceMargin(e.target.value)}
+            className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-yellow-500 focus:outline-none text-sm"
+          />
+        </div>
+
+        {result && (
+          <div className="p-4 bg-yellow-500/10 rounded-lg text-center">
+            <p className="text-2xl font-bold text-yellow-500">${result.liquidationPrice.toFixed(2)}</p>
+            <p className="text-sm text-muted-foreground">
+              {result.distance.toFixed(1)}% {positionType === 'long' ? 'below' : 'above'} entry
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// BITCOIN HALVING COUNTDOWN
+// ============================================
+
+export function BitcoinHalvingCountdown() {
+  // Next halving estimated April 2028 (block 1,050,000)
+  const NEXT_HALVING_DATE = new Date('2028-04-15T00:00:00Z')
+  const CURRENT_REWARD = 3.125 // BTC per block
+  const NEXT_REWARD = 1.5625 // BTC per block after halving
+
+  const [timeLeft, setTimeLeft] = useState({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  })
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = new Date()
+      const diff = NEXT_HALVING_DATE.getTime() - now.getTime()
+
+      if (diff > 0) {
+        setTimeLeft({
+          days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+          minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((diff % (1000 * 60)) / 1000),
+        })
+      }
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
+          <Bitcoin className="w-5 h-5 text-orange-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Bitcoin Halving Countdown</h3>
+          <p className="text-xs text-muted-foreground">Time until next block reward halving</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {/* Countdown */}
+        <div className="grid grid-cols-4 gap-2">
+          {[
+            { value: timeLeft.days, label: 'Days' },
+            { value: timeLeft.hours, label: 'Hours' },
+            { value: timeLeft.minutes, label: 'Mins' },
+            { value: timeLeft.seconds, label: 'Secs' },
+          ].map((item) => (
+            <div key={item.label} className="p-3 bg-orange-500/10 rounded-lg text-center">
+              <p className="text-2xl font-bold text-orange-500 font-mono">{item.value.toString().padStart(2, '0')}</p>
+              <p className="text-xs text-muted-foreground">{item.label}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Info */}
+        <div className="p-3 bg-muted/50 rounded-lg space-y-2">
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Current Reward:</span>
+            <span className="font-mono font-bold">{CURRENT_REWARD} BTC</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">After Halving:</span>
+            <span className="font-mono font-bold text-orange-500">{NEXT_REWARD} BTC</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-muted-foreground">Est. Date:</span>
+            <span className="font-mono">April 2028</span>
+          </div>
+        </div>
+
+        {/* Historical Halvings */}
+        <div className="text-xs text-muted-foreground">
+          <p className="font-medium mb-1">Previous Halvings:</p>
+          <div className="grid grid-cols-2 gap-1">
+            <span>2012: 50 → 25 BTC</span>
+            <span>2016: 25 → 12.5 BTC</span>
+            <span>2020: 12.5 → 6.25 BTC</span>
+            <span>2024: 6.25 → 3.125 BTC</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// MINING PROFITABILITY CALCULATOR
+// ============================================
+
+export function MiningCalculator() {
+  const [hashrate, setHashrate] = useState('100')
+  const [power, setPower] = useState('3000')
+  const [electricityCost, setElectricityCost] = useState('0.10')
+  const [btcPrice, setBtcPrice] = useState('60000')
+  const [poolFee, setPoolFee] = useState('2')
+  const [result, setResult] = useState<{
+    dailyBTC: number
+    dailyRevenue: number
+    dailyPowerCost: number
+    dailyProfit: number
+    monthlyProfit: number
+  } | null>(null)
+
+  // Network hashrate ~600 EH/s, block reward 3.125 BTC, 144 blocks/day
+  const NETWORK_HASHRATE = 600e18 // 600 EH/s
+  const BLOCKS_PER_DAY = 144
+  const BLOCK_REWARD = 3.125
+
+  const calculate = useCallback(() => {
+    const hr = parseFloat(hashrate) * 1e12 // Convert TH/s to H/s
+    const pw = parseFloat(power)
+    const elec = parseFloat(electricityCost)
+    const price = parseFloat(btcPrice)
+    const fee = parseFloat(poolFee) / 100
+
+    if (isNaN(hr) || isNaN(pw) || isNaN(elec) || isNaN(price) || isNaN(fee)) {
+      setResult(null)
+      return
+    }
+
+    // Daily BTC mined = (hashrate / network_hashrate) * blocks_per_day * block_reward
+    const dailyBTC = (hr / NETWORK_HASHRATE) * BLOCKS_PER_DAY * BLOCK_REWARD * (1 - fee)
+    const dailyRevenue = dailyBTC * price
+    const dailyPowerCost = (pw / 1000) * 24 * elec // kWh * 24 hours * cost
+    const dailyProfit = dailyRevenue - dailyPowerCost
+
+    setResult({
+      dailyBTC,
+      dailyRevenue,
+      dailyPowerCost,
+      dailyProfit,
+      monthlyProfit: dailyProfit * 30,
+    })
+  }, [hashrate, power, electricityCost, btcPrice, poolFee])
+
+  useEffect(() => {
+    calculate()
+  }, [calculate])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center">
+          <BarChart3 className="w-5 h-5 text-yellow-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Mining Calculator</h3>
+          <p className="text-xs text-muted-foreground">Estimate BTC mining profitability</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Hashrate (TH/s)</label>
+            <input
+              type="number"
+              value={hashrate}
+              onChange={(e) => setHashrate(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-yellow-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Power (W)</label>
+            <input
+              type="number"
+              value={power}
+              onChange={(e) => setPower(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-yellow-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">Electricity ($/kWh)</label>
+            <input
+              type="number"
+              value={electricityCost}
+              onChange={(e) => setElectricityCost(e.target.value)}
+              step="0.01"
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-yellow-500 focus:outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground mb-1 block">BTC Price ($)</label>
+            <input
+              type="number"
+              value={btcPrice}
+              onChange={(e) => setBtcPrice(e.target.value)}
+              className="w-full px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-yellow-500 focus:outline-none text-sm"
+            />
+          </div>
+        </div>
+
+        {result && (
+          <div className="p-4 bg-muted/50 rounded-lg space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Daily BTC:</span>
+              <span className="font-mono">{result.dailyBTC.toFixed(8)} BTC</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Daily Revenue:</span>
+              <span className="font-mono text-green-500">${result.dailyRevenue.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Daily Power Cost:</span>
+              <span className="font-mono text-red-500">-${result.dailyPowerCost.toFixed(2)}</span>
+            </div>
+            <div className="border-t border-border pt-2 mt-2">
+              <div className="flex justify-between">
+                <span className="font-medium">Daily Profit:</span>
+                <span className={cn(
+                  'font-mono font-bold',
+                  result.dailyProfit >= 0 ? 'text-green-500' : 'text-red-500'
+                )}>
+                  ${result.dailyProfit.toFixed(2)}
+                </span>
+              </div>
+              <div className="flex justify-between text-sm mt-1">
+                <span className="text-muted-foreground">Monthly Profit:</span>
+                <span className={cn(
+                  'font-mono',
+                  result.monthlyProfit >= 0 ? 'text-green-500' : 'text-red-500'
+                )}>
+                  ${result.monthlyProfit.toFixed(2)}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// CRYPTO TOOLS GRID
+// ============================================
+
 const TOOL_CATEGORIES = [
   { id: 'converter', label: 'Converter', icon: ArrowRightLeft },
   { id: 'calculator', label: 'Calculator', icon: Calculator },
   { id: 'validator', label: 'Validator', icon: Wallet },
   { id: 'estimator', label: 'Estimator', icon: Coins },
+  { id: 'defi', label: 'DeFi', icon: TrendingUp },
+  { id: 'mining', label: 'Mining', icon: BarChart3 },
 ]
 
 export function CryptoToolsGrid() {
@@ -882,6 +1496,21 @@ export function CryptoToolsGrid() {
         return (
           <div className="grid md:grid-cols-1 gap-6">
             <GasFeeEstimator />
+          </div>
+        )
+      case 'defi':
+        return (
+          <div className="grid md:grid-cols-2 gap-6">
+            <ImpermanentLossCalculator />
+            <StakingRewardsCalculator />
+            <LiquidationCalculator />
+            <BitcoinHalvingCountdown />
+          </div>
+        )
+      case 'mining':
+        return (
+          <div className="grid md:grid-cols-1 gap-6">
+            <MiningCalculator />
           </div>
         )
       default:

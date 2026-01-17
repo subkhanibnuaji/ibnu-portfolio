@@ -1273,6 +1273,648 @@ export function EncryptionTool() {
 }
 
 // ============================================
+// CVSS SCORE CALCULATOR
+// ============================================
+
+const CVSS_METRICS = {
+  attackVector: [
+    { value: 'N', label: 'Network', score: 0.85 },
+    { value: 'A', label: 'Adjacent', score: 0.62 },
+    { value: 'L', label: 'Local', score: 0.55 },
+    { value: 'P', label: 'Physical', score: 0.2 },
+  ],
+  attackComplexity: [
+    { value: 'L', label: 'Low', score: 0.77 },
+    { value: 'H', label: 'High', score: 0.44 },
+  ],
+  privilegesRequired: [
+    { value: 'N', label: 'None', score: 0.85 },
+    { value: 'L', label: 'Low', score: 0.62 },
+    { value: 'H', label: 'High', score: 0.27 },
+  ],
+  userInteraction: [
+    { value: 'N', label: 'None', score: 0.85 },
+    { value: 'R', label: 'Required', score: 0.62 },
+  ],
+  scope: [
+    { value: 'U', label: 'Unchanged', score: 0 },
+    { value: 'C', label: 'Changed', score: 1 },
+  ],
+  confidentiality: [
+    { value: 'N', label: 'None', score: 0 },
+    { value: 'L', label: 'Low', score: 0.22 },
+    { value: 'H', label: 'High', score: 0.56 },
+  ],
+  integrity: [
+    { value: 'N', label: 'None', score: 0 },
+    { value: 'L', label: 'Low', score: 0.22 },
+    { value: 'H', label: 'High', score: 0.56 },
+  ],
+  availability: [
+    { value: 'N', label: 'None', score: 0 },
+    { value: 'L', label: 'Low', score: 0.22 },
+    { value: 'H', label: 'High', score: 0.56 },
+  ],
+}
+
+export function CVSSCalculator() {
+  const [metrics, setMetrics] = useState({
+    attackVector: 'N',
+    attackComplexity: 'L',
+    privilegesRequired: 'N',
+    userInteraction: 'N',
+    scope: 'U',
+    confidentiality: 'H',
+    integrity: 'H',
+    availability: 'H',
+  })
+
+  const calculateCVSS = useCallback(() => {
+    const av = CVSS_METRICS.attackVector.find(m => m.value === metrics.attackVector)?.score || 0
+    const ac = CVSS_METRICS.attackComplexity.find(m => m.value === metrics.attackComplexity)?.score || 0
+    const pr = CVSS_METRICS.privilegesRequired.find(m => m.value === metrics.privilegesRequired)?.score || 0
+    const ui = CVSS_METRICS.userInteraction.find(m => m.value === metrics.userInteraction)?.score || 0
+    const scopeChanged = metrics.scope === 'C'
+    const c = CVSS_METRICS.confidentiality.find(m => m.value === metrics.confidentiality)?.score || 0
+    const i = CVSS_METRICS.integrity.find(m => m.value === metrics.integrity)?.score || 0
+    const a = CVSS_METRICS.availability.find(m => m.value === metrics.availability)?.score || 0
+
+    // Exploitability
+    const exploitability = 8.22 * av * ac * pr * ui
+
+    // Impact
+    const iscBase = 1 - ((1 - c) * (1 - i) * (1 - a))
+    const impact = scopeChanged
+      ? 7.52 * (iscBase - 0.029) - 3.25 * Math.pow(iscBase - 0.02, 15)
+      : 6.42 * iscBase
+
+    if (impact <= 0) return 0
+
+    const baseScore = scopeChanged
+      ? Math.min(1.08 * (impact + exploitability), 10)
+      : Math.min(impact + exploitability, 10)
+
+    return Math.ceil(baseScore * 10) / 10
+  }, [metrics])
+
+  const score = calculateCVSS()
+
+  const getSeverity = (score: number) => {
+    if (score === 0) return { label: 'None', color: 'text-gray-500', bg: 'bg-gray-500/10' }
+    if (score < 4) return { label: 'Low', color: 'text-green-500', bg: 'bg-green-500/10' }
+    if (score < 7) return { label: 'Medium', color: 'text-yellow-500', bg: 'bg-yellow-500/10' }
+    if (score < 9) return { label: 'High', color: 'text-orange-500', bg: 'bg-orange-500/10' }
+    return { label: 'Critical', color: 'text-red-500', bg: 'bg-red-500/10' }
+  }
+
+  const severity = getSeverity(score)
+
+  const generateVector = () => {
+    return `CVSS:3.1/AV:${metrics.attackVector}/AC:${metrics.attackComplexity}/PR:${metrics.privilegesRequired}/UI:${metrics.userInteraction}/S:${metrics.scope}/C:${metrics.confidentiality}/I:${metrics.integrity}/A:${metrics.availability}`
+  }
+
+  const [copied, setCopied] = useState(false)
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(generateVector())
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
+          <AlertTriangle className="w-5 h-5 text-red-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">CVSS 3.1 Calculator</h3>
+          <p className="text-xs text-muted-foreground">Calculate vulnerability severity scores</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {/* Score Display */}
+        <div className={cn('p-4 rounded-lg text-center', severity.bg)}>
+          <p className={cn('text-4xl font-bold', severity.color)}>{score.toFixed(1)}</p>
+          <p className={cn('text-sm font-medium', severity.color)}>{severity.label}</p>
+        </div>
+
+        {/* Metrics */}
+        <div className="grid grid-cols-2 gap-3">
+          {Object.entries(CVSS_METRICS).map(([key, options]) => (
+            <div key={key}>
+              <label className="text-xs text-muted-foreground capitalize mb-1 block">
+                {key.replace(/([A-Z])/g, ' $1').trim()}
+              </label>
+              <select
+                value={metrics[key as keyof typeof metrics]}
+                onChange={(e) => setMetrics(prev => ({ ...prev, [key]: e.target.value }))}
+                className="w-full px-2 py-1.5 bg-muted/50 border border-border rounded text-sm focus:border-red-500 focus:outline-none"
+              >
+                {options.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </div>
+          ))}
+        </div>
+
+        {/* Vector String */}
+        <div className="p-3 bg-muted/50 rounded-lg">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-xs text-muted-foreground">Vector String</span>
+            <button onClick={handleCopy} className="text-xs text-primary hover:underline flex items-center gap-1">
+              {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+              {copied ? 'Copied!' : 'Copy'}
+            </button>
+          </div>
+          <code className="text-xs font-mono break-all">{generateVector()}</code>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// CSP POLICY GENERATOR
+// ============================================
+
+const CSP_DIRECTIVES = [
+  { key: 'default-src', label: 'Default Source', description: 'Fallback for other directives' },
+  { key: 'script-src', label: 'Script Source', description: 'Valid sources for JavaScript' },
+  { key: 'style-src', label: 'Style Source', description: 'Valid sources for stylesheets' },
+  { key: 'img-src', label: 'Image Source', description: 'Valid sources for images' },
+  { key: 'font-src', label: 'Font Source', description: 'Valid sources for fonts' },
+  { key: 'connect-src', label: 'Connect Source', description: 'Valid sources for fetch/XHR' },
+  { key: 'frame-src', label: 'Frame Source', description: 'Valid sources for iframes' },
+  { key: 'object-src', label: 'Object Source', description: 'Valid sources for plugins' },
+  { key: 'media-src', label: 'Media Source', description: 'Valid sources for audio/video' },
+]
+
+const CSP_VALUES = ["'self'", "'none'", "'unsafe-inline'", "'unsafe-eval'", 'data:', 'blob:', 'https:', '*']
+
+export function CSPGenerator() {
+  const [directives, setDirectives] = useState<Record<string, string[]>>({
+    'default-src': ["'self'"],
+    'script-src': ["'self'"],
+    'style-src': ["'self'", "'unsafe-inline'"],
+    'img-src': ["'self'", 'data:', 'https:'],
+  })
+  const [copied, setCopied] = useState(false)
+
+  const toggleDirectiveValue = (directive: string, value: string) => {
+    setDirectives(prev => {
+      const current = prev[directive] || []
+      if (current.includes(value)) {
+        const updated = current.filter(v => v !== value)
+        if (updated.length === 0) {
+          const { [directive]: _, ...rest } = prev
+          return rest
+        }
+        return { ...prev, [directive]: updated }
+      }
+      return { ...prev, [directive]: [...current, value] }
+    })
+  }
+
+  const generateCSP = () => {
+    return Object.entries(directives)
+      .filter(([, values]) => values.length > 0)
+      .map(([key, values]) => `${key} ${values.join(' ')}`)
+      .join('; ')
+  }
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(generateCSP())
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+          <Shield className="w-5 h-5 text-blue-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">CSP Policy Generator</h3>
+          <p className="text-xs text-muted-foreground">Generate Content Security Policy headers</p>
+        </div>
+      </div>
+
+      <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+        {CSP_DIRECTIVES.map(dir => (
+          <div key={dir.key} className="p-3 bg-muted/30 rounded-lg">
+            <div className="flex justify-between items-center mb-2">
+              <span className="font-medium text-sm">{dir.label}</span>
+              <span className="text-xs text-muted-foreground">{dir.key}</span>
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {CSP_VALUES.map(val => (
+                <button
+                  key={val}
+                  onClick={() => toggleDirectiveValue(dir.key, val)}
+                  className={cn(
+                    'px-2 py-0.5 rounded text-xs transition-colors',
+                    (directives[dir.key] || []).includes(val)
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                  )}
+                >
+                  {val}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {Object.keys(directives).length > 0 && (
+        <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-xs font-medium">Generated Policy</span>
+            <button onClick={handleCopy} className="text-xs text-primary hover:underline flex items-center gap-1">
+              {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+              {copied ? 'Copied!' : 'Copy'}
+            </button>
+          </div>
+          <code className="text-xs font-mono break-all block">{generateCSP()}</code>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ============================================
+// ENTROPY ANALYZER
+// ============================================
+
+export function EntropyAnalyzer() {
+  const [input, setInput] = useState('')
+  const [analysis, setAnalysis] = useState<{
+    entropy: number
+    maxEntropy: number
+    normalized: number
+    isRandom: boolean
+    frequency: Record<string, number>
+  } | null>(null)
+
+  const analyzeEntropy = useCallback(() => {
+    if (!input) {
+      setAnalysis(null)
+      return
+    }
+
+    const freq: Record<string, number> = {}
+    for (const char of input) {
+      freq[char] = (freq[char] || 0) + 1
+    }
+
+    const len = input.length
+    let entropy = 0
+
+    for (const count of Object.values(freq)) {
+      const p = count / len
+      entropy -= p * Math.log2(p)
+    }
+
+    const uniqueChars = Object.keys(freq).length
+    const maxEntropy = Math.log2(uniqueChars) || 0
+    const normalized = maxEntropy > 0 ? entropy / maxEntropy : 0
+
+    setAnalysis({
+      entropy: Math.round(entropy * 1000) / 1000,
+      maxEntropy: Math.round(maxEntropy * 1000) / 1000,
+      normalized: Math.round(normalized * 100),
+      isRandom: entropy > 3.5 && normalized > 0.8,
+      frequency: freq,
+    })
+  }, [input])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+          <Zap className="w-5 h-5 text-purple-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Entropy Analyzer</h3>
+          <p className="text-xs text-muted-foreground">Analyze randomness and detect encryption</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <textarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Paste text, password, or data to analyze entropy..."
+          rows={3}
+          className="w-full px-4 py-3 bg-muted/50 border border-border rounded-lg focus:border-purple-500 focus:outline-none resize-none font-mono text-sm"
+        />
+
+        <button
+          onClick={analyzeEntropy}
+          disabled={!input}
+          className="w-full py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-medium disabled:opacity-50 transition-colors"
+        >
+          Analyze Entropy
+        </button>
+
+        {analysis && (
+          <div className="space-y-3">
+            <div className="grid grid-cols-3 gap-2">
+              <div className="p-3 bg-muted/50 rounded-lg text-center">
+                <p className="text-xl font-bold text-purple-500">{analysis.entropy}</p>
+                <p className="text-xs text-muted-foreground">Entropy (bits)</p>
+              </div>
+              <div className="p-3 bg-muted/50 rounded-lg text-center">
+                <p className="text-xl font-bold">{analysis.normalized}%</p>
+                <p className="text-xs text-muted-foreground">Normalized</p>
+              </div>
+              <div className="p-3 bg-muted/50 rounded-lg text-center">
+                <p className="text-xl font-bold">{Object.keys(analysis.frequency).length}</p>
+                <p className="text-xs text-muted-foreground">Unique Chars</p>
+              </div>
+            </div>
+
+            <div className={cn(
+              'p-3 rounded-lg flex items-center gap-2',
+              analysis.isRandom ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'
+            )}>
+              {analysis.isRandom ? <CheckCircle className="w-4 h-4" /> : <Info className="w-4 h-4" />}
+              <span className="text-sm">
+                {analysis.isRandom
+                  ? 'High entropy - likely encrypted/compressed/random data'
+                  : 'Low entropy - likely natural text or structured data'}
+              </span>
+            </div>
+
+            <div className="p-3 bg-muted/30 rounded-lg">
+              <p className="text-xs text-muted-foreground mb-2">Character frequency (top 10)</p>
+              <div className="flex flex-wrap gap-1">
+                {Object.entries(analysis.frequency)
+                  .sort((a, b) => b[1] - a[1])
+                  .slice(0, 10)
+                  .map(([char, count]) => (
+                    <span key={char} className="px-2 py-0.5 bg-muted rounded text-xs font-mono">
+                      {char === ' ' ? '␣' : char === '\n' ? '↵' : char}: {count}
+                    </span>
+                  ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// PHISHING URL DETECTOR
+// ============================================
+
+const SUSPICIOUS_PATTERNS = [
+  { pattern: /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/, reason: 'Contains IP address instead of domain' },
+  { pattern: /@/, reason: 'Contains @ symbol (potential URL spoofing)' },
+  { pattern: /\.(tk|ml|ga|cf|gq)$/i, reason: 'Uses free/suspicious TLD' },
+  { pattern: /-{2,}/, reason: 'Contains multiple consecutive hyphens' },
+  { pattern: /login|signin|account|verify|secure|update|confirm/i, reason: 'Contains suspicious keywords' },
+  { pattern: /paypal|amazon|apple|google|microsoft|facebook|bank/i, reason: 'Contains brand name (potential impersonation)' },
+  { pattern: /%[0-9a-f]{2}/i, reason: 'Contains URL-encoded characters' },
+  { pattern: /\.(exe|zip|rar|js|vbs|bat|cmd|ps1)$/i, reason: 'Links to executable file' },
+  { pattern: /bit\.ly|tinyurl|t\.co|goo\.gl|ow\.ly/i, reason: 'Uses URL shortener' },
+  { pattern: /^https?:\/\/[^\/]+\.[^\/]+\.[^\/]+\.[^\/]+/, reason: 'Excessive subdomains' },
+]
+
+export function PhishingDetector() {
+  const [url, setUrl] = useState('')
+  const [result, setResult] = useState<{
+    score: number
+    warnings: string[]
+    safe: boolean
+  } | null>(null)
+
+  const analyzeURL = useCallback(() => {
+    if (!url) {
+      setResult(null)
+      return
+    }
+
+    const warnings: string[] = []
+    let score = 100
+
+    // Check for HTTPS
+    if (!url.startsWith('https://')) {
+      warnings.push('Not using HTTPS (insecure connection)')
+      score -= 20
+    }
+
+    // Check suspicious patterns
+    for (const { pattern, reason } of SUSPICIOUS_PATTERNS) {
+      if (pattern.test(url)) {
+        warnings.push(reason)
+        score -= 15
+      }
+    }
+
+    // Check URL length
+    if (url.length > 100) {
+      warnings.push('Unusually long URL')
+      score -= 10
+    }
+
+    // Check for homograph attacks (mixed scripts)
+    if (/[а-яА-Я]/.test(url) || /[\u0400-\u04FF]/.test(url)) {
+      warnings.push('Contains Cyrillic characters (potential homograph attack)')
+      score -= 30
+    }
+
+    setResult({
+      score: Math.max(0, score),
+      warnings,
+      safe: score >= 70,
+    })
+  }, [url])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
+          <Search className="w-5 h-5 text-orange-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Phishing URL Detector</h3>
+          <p className="text-xs text-muted-foreground">Analyze URLs for suspicious patterns</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <input
+          type="text"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="Enter URL to analyze..."
+          className="w-full px-4 py-3 bg-muted/50 border border-border rounded-lg focus:border-orange-500 focus:outline-none font-mono text-sm"
+        />
+
+        <button
+          onClick={analyzeURL}
+          disabled={!url}
+          className="w-full py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium disabled:opacity-50 transition-colors"
+        >
+          Analyze URL
+        </button>
+
+        {result && (
+          <div className="space-y-3">
+            {/* Score */}
+            <div className={cn(
+              'p-4 rounded-lg text-center',
+              result.safe ? 'bg-green-500/10' : 'bg-red-500/10'
+            )}>
+              <p className={cn(
+                'text-3xl font-bold',
+                result.safe ? 'text-green-500' : 'text-red-500'
+              )}>
+                {result.score}/100
+              </p>
+              <p className={cn(
+                'text-sm font-medium',
+                result.safe ? 'text-green-500' : 'text-red-500'
+              )}>
+                {result.safe ? 'Likely Safe' : 'Potentially Dangerous'}
+              </p>
+            </div>
+
+            {/* Warnings */}
+            {result.warnings.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-muted-foreground">Warnings Found:</p>
+                {result.warnings.map((warning, idx) => (
+                  <div key={idx} className="flex items-start gap-2 p-2 bg-red-500/10 rounded-lg">
+                    <AlertTriangle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />
+                    <span className="text-xs text-red-500">{warning}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {result.warnings.length === 0 && (
+              <div className="flex items-center gap-2 p-3 bg-green-500/10 rounded-lg">
+                <CheckCircle className="w-4 h-4 text-green-500" />
+                <span className="text-sm text-green-500">No suspicious patterns detected</span>
+              </div>
+            )}
+
+            <p className="text-xs text-muted-foreground text-center">
+              Note: This is a heuristic analysis. Always verify URLs manually before clicking.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// SECURITY HEADERS GENERATOR
+// ============================================
+
+export function SecurityHeadersGenerator() {
+  const [headers, setHeaders] = useState({
+    strictTransportSecurity: true,
+    xContentTypeOptions: true,
+    xFrameOptions: true,
+    xXssProtection: true,
+    referrerPolicy: true,
+    permissionsPolicy: false,
+  })
+  const [copied, setCopied] = useState(false)
+
+  const generateHeaders = () => {
+    const lines: string[] = []
+
+    if (headers.strictTransportSecurity) {
+      lines.push('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload')
+    }
+    if (headers.xContentTypeOptions) {
+      lines.push('X-Content-Type-Options: nosniff')
+    }
+    if (headers.xFrameOptions) {
+      lines.push('X-Frame-Options: DENY')
+    }
+    if (headers.xXssProtection) {
+      lines.push('X-XSS-Protection: 1; mode=block')
+    }
+    if (headers.referrerPolicy) {
+      lines.push('Referrer-Policy: strict-origin-when-cross-origin')
+    }
+    if (headers.permissionsPolicy) {
+      lines.push('Permissions-Policy: geolocation=(), microphone=(), camera=()')
+    }
+
+    return lines.join('\n')
+  }
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(generateHeaders())
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+          <Server className="w-5 h-5 text-cyan-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Security Headers</h3>
+          <p className="text-xs text-muted-foreground">Generate HTTP security headers</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="space-y-2">
+          {[
+            { key: 'strictTransportSecurity', label: 'Strict-Transport-Security', desc: 'Force HTTPS' },
+            { key: 'xContentTypeOptions', label: 'X-Content-Type-Options', desc: 'Prevent MIME sniffing' },
+            { key: 'xFrameOptions', label: 'X-Frame-Options', desc: 'Prevent clickjacking' },
+            { key: 'xXssProtection', label: 'X-XSS-Protection', desc: 'XSS filter' },
+            { key: 'referrerPolicy', label: 'Referrer-Policy', desc: 'Control referrer info' },
+            { key: 'permissionsPolicy', label: 'Permissions-Policy', desc: 'Restrict browser features' },
+          ].map(item => (
+            <label key={item.key} className="flex items-center justify-between p-2 bg-muted/30 rounded-lg cursor-pointer hover:bg-muted/50">
+              <div>
+                <span className="text-sm font-medium">{item.label}</span>
+                <span className="text-xs text-muted-foreground ml-2">{item.desc}</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={headers[item.key as keyof typeof headers]}
+                onChange={(e) => setHeaders(prev => ({ ...prev, [item.key]: e.target.checked }))}
+                className="accent-cyan-500"
+              />
+            </label>
+          ))}
+        </div>
+
+        <div className="p-3 bg-muted/50 rounded-lg">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-xs font-medium">Generated Headers</span>
+            <button onClick={handleCopy} className="text-xs text-primary hover:underline flex items-center gap-1">
+              {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+              {copied ? 'Copied!' : 'Copy'}
+            </button>
+          </div>
+          <pre className="text-xs font-mono whitespace-pre-wrap break-all">{generateHeaders()}</pre>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
 // SECURITY TOOLS GRID
 // ============================================
 
@@ -1285,6 +1927,7 @@ export function SecurityToolsGrid() {
     { id: 'encoding', label: 'Encoding', icon: Binary },
     { id: 'crypto', label: 'Crypto', icon: Lock },
     { id: 'network', label: 'Network', icon: Network },
+    { id: 'advanced', label: 'Advanced', icon: Zap },
   ]
 
   return (
@@ -1391,6 +2034,22 @@ export function SecurityToolsGrid() {
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'advanced' && (
+            <div className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <CVSSCalculator />
+                <PhishingDetector />
+              </div>
+              <div className="grid md:grid-cols-2 gap-6">
+                <CSPGenerator />
+                <SecurityHeadersGenerator />
+              </div>
+              <div className="grid md:grid-cols-1 gap-6">
+                <EntropyAnalyzer />
               </div>
             </div>
           )}
