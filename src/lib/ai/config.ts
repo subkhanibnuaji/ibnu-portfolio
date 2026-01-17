@@ -52,10 +52,47 @@ export const AI_MODELS = {
   },
 } as const;
 
-export type GroqModelId = keyof typeof AI_MODELS.groq;
+// Export GROQ_MODELS explicitly for proper bundling
+export const GROQ_MODELS = {
+  'llama-3.3-70b-versatile': {
+    id: 'llama-3.3-70b-versatile' as const,
+    name: 'Llama 3.3 70B',
+    description: 'Most capable, best for complex reasoning',
+    provider: 'groq' as const,
+    maxTokens: 8192,
+    contextWindow: 128000,
+    free: true,
+  },
+  'llama-3.1-8b-instant': {
+    id: 'llama-3.1-8b-instant' as const,
+    name: 'Llama 3.1 8B',
+    description: 'Fastest responses, good for simple tasks',
+    provider: 'groq' as const,
+    maxTokens: 8192,
+    contextWindow: 128000,
+    free: true,
+  },
+  'mixtral-8x7b-32768': {
+    id: 'mixtral-8x7b-32768' as const,
+    name: 'Mixtral 8x7B',
+    description: 'Great for complex multi-step tasks',
+    provider: 'groq' as const,
+    maxTokens: 32768,
+    contextWindow: 32768,
+    free: true,
+  },
+  'gemma2-9b-it': {
+    id: 'gemma2-9b-it' as const,
+    name: 'Gemma 2 9B',
+    description: "Google's efficient instruction-tuned model",
+    provider: 'groq' as const,
+    maxTokens: 8192,
+    contextWindow: 8192,
+    free: true,
+  },
+} as const;
 
-// Alias for backward compatibility
-export const GROQ_MODELS = AI_MODELS.groq;
+export type GroqModelId = keyof typeof GROQ_MODELS;
 
 // ============================================
 // DEFAULT SETTINGS

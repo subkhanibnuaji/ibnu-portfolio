@@ -6,6 +6,26 @@ const nextConfig: NextConfig = {
       bodySizeLimit: '2mb',
     },
   },
+  // Webpack configuration to handle Node.js modules in client-side bundles
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Don't bundle these Node.js modules for the client
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        http: false,
+        https: false,
+        stream: false,
+        crypto: false,
+        path: false,
+        os: false,
+        zlib: false,
+      };
+    }
+    return config;
+  },
   images: {
     remotePatterns: [
       {

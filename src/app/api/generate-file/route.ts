@@ -3,10 +3,14 @@
  * Handles server-side file generation (PPT)
  *
  * This keeps pptxgenjs on the server-side only to avoid webpack bundling issues
+ * Uses dynamic import to prevent webpack from bundling Node.js modules
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import PptxGenJS from 'pptxgenjs';
+
+// Force Node.js runtime for this route (pptxgenjs requires Node.js APIs)
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
 
 interface PPTData {
   title: string;
@@ -22,7 +26,9 @@ const THEME_COLORS: Record<string, { primary: string; secondary: string; accent:
   orange: { primary: 'FF6600', secondary: '993300', accent: 'FFAA66' },
 };
 
-function generatePPTBuffer(data: PPTData): Promise<Blob> {
+async function generatePPTBuffer(data: PPTData): Promise<Blob> {
+  // Dynamic import to avoid webpack bundling issues with Node.js modules
+  const PptxGenJS = (await import('pptxgenjs')).default;
   const pptx = new PptxGenJS();
   const colors = THEME_COLORS[data.theme || 'blue'] || THEME_COLORS.blue;
 
