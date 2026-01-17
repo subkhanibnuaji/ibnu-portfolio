@@ -1915,6 +1915,620 @@ export function SecurityHeadersGenerator() {
 }
 
 // ============================================
+// SSL CERTIFICATE CHECKER
+// ============================================
+
+export function SSLCertificateChecker() {
+  const [domain, setDomain] = useState('')
+  const [isChecking, setIsChecking] = useState(false)
+  const [result, setResult] = useState<{
+    valid: boolean
+    issuer: string
+    validFrom: string
+    validTo: string
+    daysRemaining: number
+    grade: string
+    protocols: string[]
+  } | null>(null)
+
+  const checkCertificate = useCallback(() => {
+    if (!domain.trim()) return
+
+    setIsChecking(true)
+
+    // Simulate SSL check
+    setTimeout(() => {
+      const validFrom = new Date()
+      validFrom.setMonth(validFrom.getMonth() - 6)
+      const validTo = new Date()
+      validTo.setMonth(validTo.getMonth() + 6)
+      const daysRemaining = Math.floor((validTo.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+
+      setResult({
+        valid: true,
+        issuer: "Let's Encrypt Authority X3",
+        validFrom: validFrom.toISOString().split('T')[0],
+        validTo: validTo.toISOString().split('T')[0],
+        daysRemaining,
+        grade: 'A+',
+        protocols: ['TLS 1.3', 'TLS 1.2'],
+      })
+      setIsChecking(false)
+    }, 1500)
+  }, [domain])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+          <Lock className="w-5 h-5 text-green-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">SSL Certificate Checker</h3>
+          <p className="text-xs text-muted-foreground">Analyze SSL/TLS certificates</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={domain}
+            onChange={(e) => setDomain(e.target.value)}
+            placeholder="example.com"
+            className="flex-1 px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-green-500 focus:outline-none text-sm font-mono"
+          />
+          <button
+            onClick={checkCertificate}
+            disabled={isChecking || !domain}
+            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+          >
+            {isChecking ? 'Checking...' : 'Check'}
+          </button>
+        </div>
+
+        {result && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 p-3 bg-green-500/10 rounded-lg">
+              <CheckCircle className="w-6 h-6 text-green-500" />
+              <div>
+                <p className="font-bold text-green-500">Valid Certificate</p>
+                <p className="text-xs text-muted-foreground">Grade: {result.grade}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 bg-muted/50 rounded-lg">
+                <p className="text-xs text-muted-foreground">Issuer</p>
+                <p className="text-sm font-medium truncate">{result.issuer}</p>
+              </div>
+              <div className={cn(
+                'p-3 rounded-lg',
+                result.daysRemaining < 30 ? 'bg-red-500/10' : 'bg-muted/50'
+              )}>
+                <p className="text-xs text-muted-foreground">Days Remaining</p>
+                <p className={cn(
+                  'text-sm font-bold',
+                  result.daysRemaining < 30 ? 'text-red-500' : 'text-green-500'
+                )}>
+                  {result.daysRemaining} days
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3 bg-muted/50 rounded-lg">
+              <p className="text-xs text-muted-foreground mb-2">Supported Protocols</p>
+              <div className="flex gap-2">
+                {result.protocols.map(protocol => (
+                  <span key={protocol} className="px-2 py-1 bg-green-500/20 text-green-500 rounded text-xs">
+                    {protocol}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="text-xs text-muted-foreground">
+              Valid: {result.validFrom} to {result.validTo}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// DNS LOOKUP TOOL
+// ============================================
+
+const DNS_RECORD_TYPES = ['A', 'AAAA', 'CNAME', 'MX', 'TXT', 'NS', 'SOA']
+
+export function DNSLookupTool() {
+  const [domain, setDomain] = useState('')
+  const [recordType, setRecordType] = useState('A')
+  const [isLooking, setIsLooking] = useState(false)
+  const [results, setResults] = useState<{ type: string; value: string; ttl: number }[]>([])
+
+  const performLookup = useCallback(() => {
+    if (!domain.trim()) return
+
+    setIsLooking(true)
+
+    // Simulate DNS lookup
+    setTimeout(() => {
+      const mockResults: { type: string; value: string; ttl: number }[] = []
+
+      switch (recordType) {
+        case 'A':
+          mockResults.push(
+            { type: 'A', value: '104.21.234.123', ttl: 300 },
+            { type: 'A', value: '172.67.182.45', ttl: 300 }
+          )
+          break
+        case 'AAAA':
+          mockResults.push(
+            { type: 'AAAA', value: '2606:4700:3030::6815:ea7b', ttl: 300 }
+          )
+          break
+        case 'MX':
+          mockResults.push(
+            { type: 'MX', value: '10 mail.example.com', ttl: 3600 },
+            { type: 'MX', value: '20 mail2.example.com', ttl: 3600 }
+          )
+          break
+        case 'TXT':
+          mockResults.push(
+            { type: 'TXT', value: 'v=spf1 include:_spf.google.com ~all', ttl: 3600 },
+            { type: 'TXT', value: 'google-site-verification=abc123xyz', ttl: 3600 }
+          )
+          break
+        case 'NS':
+          mockResults.push(
+            { type: 'NS', value: 'ns1.cloudflare.com', ttl: 86400 },
+            { type: 'NS', value: 'ns2.cloudflare.com', ttl: 86400 }
+          )
+          break
+        default:
+          mockResults.push(
+            { type: recordType, value: 'ns1.example.com admin.example.com 2024010101 10800 3600 604800 3600', ttl: 86400 }
+          )
+      }
+
+      setResults(mockResults)
+      setIsLooking(false)
+    }, 1000)
+  }, [domain, recordType])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+          <Globe className="w-5 h-5 text-blue-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">DNS Lookup</h3>
+          <p className="text-xs text-muted-foreground">Query DNS records</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={domain}
+            onChange={(e) => setDomain(e.target.value)}
+            placeholder="example.com"
+            className="flex-1 px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-blue-500 focus:outline-none text-sm font-mono"
+          />
+          <select
+            value={recordType}
+            onChange={(e) => setRecordType(e.target.value)}
+            className="px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-blue-500 focus:outline-none text-sm"
+          >
+            {DNS_RECORD_TYPES.map(type => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
+        </div>
+
+        <button
+          onClick={performLookup}
+          disabled={isLooking || !domain}
+          className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+        >
+          {isLooking ? 'Looking up...' : 'Lookup'}
+        </button>
+
+        {results.length > 0 && (
+          <div className="space-y-2">
+            {results.map((record, index) => (
+              <div key={index} className="p-3 bg-muted/50 rounded-lg">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <span className="px-2 py-0.5 bg-blue-500/20 text-blue-500 rounded text-xs font-mono mr-2">
+                      {record.type}
+                    </span>
+                    <span className="text-xs text-muted-foreground">TTL: {record.ttl}s</span>
+                  </div>
+                </div>
+                <p className="text-sm font-mono mt-2 break-all">{record.value}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// HTTP HEADERS ANALYZER
+// ============================================
+
+export function HTTPHeadersAnalyzer() {
+  const [url, setUrl] = useState('')
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [headers, setHeaders] = useState<{ name: string; value: string; secure: boolean; recommendation?: string }[]>([])
+
+  const analyzeHeaders = useCallback(() => {
+    if (!url.trim()) return
+
+    setIsAnalyzing(true)
+
+    // Simulate header analysis
+    setTimeout(() => {
+      setHeaders([
+        { name: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains', secure: true },
+        { name: 'X-Content-Type-Options', value: 'nosniff', secure: true },
+        { name: 'X-Frame-Options', value: 'SAMEORIGIN', secure: true },
+        { name: 'X-XSS-Protection', value: '1; mode=block', secure: true },
+        { name: 'Content-Security-Policy', value: 'Missing', secure: false, recommendation: 'Add CSP header to prevent XSS attacks' },
+        { name: 'Referrer-Policy', value: 'strict-origin-when-cross-origin', secure: true },
+        { name: 'Permissions-Policy', value: 'Missing', secure: false, recommendation: 'Add to control browser features' },
+        { name: 'Server', value: 'nginx/1.18.0', secure: false, recommendation: 'Hide server version for security' },
+      ])
+      setIsAnalyzing(false)
+    }, 1500)
+  }, [url])
+
+  const secureCount = headers.filter(h => h.secure).length
+  const totalCount = headers.length
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+          <Server className="w-5 h-5 text-purple-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">HTTP Headers Analyzer</h3>
+          <p className="text-xs text-muted-foreground">Check security headers</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="https://example.com"
+            className="flex-1 px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-purple-500 focus:outline-none text-sm font-mono"
+          />
+          <button
+            onClick={analyzeHeaders}
+            disabled={isAnalyzing || !url}
+            className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+          >
+            {isAnalyzing ? 'Analyzing...' : 'Analyze'}
+          </button>
+        </div>
+
+        {headers.length > 0 && (
+          <>
+            <div className="p-3 bg-muted/50 rounded-lg">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium">Security Score</span>
+                <span className={cn(
+                  'text-lg font-bold',
+                  secureCount >= totalCount * 0.8 ? 'text-green-500' :
+                  secureCount >= totalCount * 0.5 ? 'text-yellow-500' : 'text-red-500'
+                )}>
+                  {secureCount}/{totalCount}
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-2 max-h-60 overflow-y-auto">
+              {headers.map((header, index) => (
+                <div
+                  key={index}
+                  className={cn(
+                    'p-3 rounded-lg border-l-4',
+                    header.secure ? 'bg-green-500/10 border-green-500' : 'bg-red-500/10 border-red-500'
+                  )}
+                >
+                  <div className="flex justify-between items-start">
+                    <p className="font-mono text-sm font-medium">{header.name}</p>
+                    {header.secure ? (
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                    ) : (
+                      <AlertTriangle className="w-4 h-4 text-red-500" />
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1 break-all">{header.value}</p>
+                  {header.recommendation && (
+                    <p className="text-xs text-yellow-500 mt-1">{header.recommendation}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// PORT SCANNER SIMULATOR
+// ============================================
+
+const COMMON_PORTS = [
+  { port: 21, service: 'FTP', risk: 'medium' },
+  { port: 22, service: 'SSH', risk: 'low' },
+  { port: 23, service: 'Telnet', risk: 'high' },
+  { port: 25, service: 'SMTP', risk: 'medium' },
+  { port: 53, service: 'DNS', risk: 'low' },
+  { port: 80, service: 'HTTP', risk: 'medium' },
+  { port: 110, service: 'POP3', risk: 'medium' },
+  { port: 143, service: 'IMAP', risk: 'medium' },
+  { port: 443, service: 'HTTPS', risk: 'low' },
+  { port: 445, service: 'SMB', risk: 'high' },
+  { port: 3306, service: 'MySQL', risk: 'high' },
+  { port: 3389, service: 'RDP', risk: 'high' },
+  { port: 5432, service: 'PostgreSQL', risk: 'high' },
+  { port: 6379, service: 'Redis', risk: 'high' },
+  { port: 8080, service: 'HTTP-Alt', risk: 'medium' },
+  { port: 27017, service: 'MongoDB', risk: 'high' },
+]
+
+export function PortScannerSimulator() {
+  const [target, setTarget] = useState('')
+  const [isScanning, setIsScanning] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [results, setResults] = useState<{ port: number; service: string; status: 'open' | 'closed' | 'filtered'; risk: string }[]>([])
+
+  const startScan = useCallback(() => {
+    if (!target.trim()) return
+
+    setIsScanning(true)
+    setProgress(0)
+    setResults([])
+
+    const scanResults: typeof results = []
+    let index = 0
+
+    const scanInterval = setInterval(() => {
+      if (index >= COMMON_PORTS.length) {
+        clearInterval(scanInterval)
+        setIsScanning(false)
+        setProgress(100)
+        return
+      }
+
+      const portInfo = COMMON_PORTS[index]
+      const status = Math.random() > 0.7 ? 'open' : Math.random() > 0.5 ? 'closed' : 'filtered'
+
+      if (status === 'open') {
+        scanResults.push({ ...portInfo, status })
+        setResults([...scanResults])
+      }
+
+      setProgress(Math.round(((index + 1) / COMMON_PORTS.length) * 100))
+      index++
+    }, 200)
+  }, [target])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
+          <Search className="w-5 h-5 text-red-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Port Scanner (Simulator)</h3>
+          <p className="text-xs text-muted-foreground">Simulate common port scan</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={target}
+            onChange={(e) => setTarget(e.target.value)}
+            placeholder="192.168.1.1 or example.com"
+            className="flex-1 px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-red-500 focus:outline-none text-sm font-mono"
+          />
+          <button
+            onClick={startScan}
+            disabled={isScanning || !target}
+            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+          >
+            {isScanning ? 'Scanning...' : 'Scan'}
+          </button>
+        </div>
+
+        {isScanning && (
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Progress</span>
+              <span>{progress}%</span>
+            </div>
+            <div className="h-2 bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full bg-red-500 transition-all duration-200"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {results.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Open Ports Found: {results.length}</p>
+            {results.map((result, index) => (
+              <div
+                key={index}
+                className={cn(
+                  'p-3 rounded-lg flex justify-between items-center',
+                  result.risk === 'high' ? 'bg-red-500/10' :
+                  result.risk === 'medium' ? 'bg-yellow-500/10' : 'bg-green-500/10'
+                )}
+              >
+                <div>
+                  <span className="font-mono font-bold">:{result.port}</span>
+                  <span className="text-sm text-muted-foreground ml-2">{result.service}</span>
+                </div>
+                <span className={cn(
+                  'text-xs px-2 py-0.5 rounded',
+                  result.risk === 'high' ? 'bg-red-500/20 text-red-500' :
+                  result.risk === 'medium' ? 'bg-yellow-500/20 text-yellow-500' : 'bg-green-500/20 text-green-500'
+                )}>
+                  {result.risk} risk
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <p className="text-xs text-muted-foreground">
+          Note: This is a simulation for educational purposes. Only scan systems you own or have permission to test.
+        </p>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// SECURITY CHECKLIST
+// ============================================
+
+const SECURITY_CHECKLIST = [
+  { id: 'https', category: 'Transport', item: 'Use HTTPS everywhere', critical: true },
+  { id: 'hsts', category: 'Headers', item: 'Enable HSTS header', critical: true },
+  { id: 'csp', category: 'Headers', item: 'Implement Content-Security-Policy', critical: true },
+  { id: 'xframe', category: 'Headers', item: 'Set X-Frame-Options', critical: false },
+  { id: 'xcontent', category: 'Headers', item: 'Set X-Content-Type-Options', critical: false },
+  { id: 'cors', category: 'API', item: 'Configure CORS properly', critical: true },
+  { id: 'csrf', category: 'API', item: 'Implement CSRF protection', critical: true },
+  { id: 'ratelimit', category: 'API', item: 'Enable rate limiting', critical: false },
+  { id: 'input', category: 'Code', item: 'Validate all user input', critical: true },
+  { id: 'escape', category: 'Code', item: 'Escape output properly', critical: true },
+  { id: 'sqli', category: 'Code', item: 'Use parameterized queries', critical: true },
+  { id: 'hash', category: 'Auth', item: 'Hash passwords with bcrypt/argon2', critical: true },
+  { id: '2fa', category: 'Auth', item: 'Offer 2FA authentication', critical: false },
+  { id: 'session', category: 'Auth', item: 'Secure session management', critical: true },
+  { id: 'logs', category: 'Ops', item: 'Enable security logging', critical: false },
+  { id: 'updates', category: 'Ops', item: 'Keep dependencies updated', critical: true },
+]
+
+export function SecurityChecklist() {
+  const [checked, setChecked] = useState<string[]>([])
+
+  const toggleItem = (id: string) => {
+    setChecked(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    )
+  }
+
+  const totalItems = SECURITY_CHECKLIST.length
+  const checkedCount = checked.length
+  const criticalTotal = SECURITY_CHECKLIST.filter(i => i.critical).length
+  const criticalChecked = checked.filter(id => SECURITY_CHECKLIST.find(i => i.id === id)?.critical).length
+  const score = Math.round((checkedCount / totalItems) * 100)
+
+  const categories = [...new Set(SECURITY_CHECKLIST.map(i => i.category))]
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+          <CheckCircle className="w-5 h-5 text-cyan-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Security Checklist</h3>
+          <p className="text-xs text-muted-foreground">Web application security audit</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="grid grid-cols-3 gap-3">
+          <div className="p-3 bg-muted/50 rounded-lg text-center">
+            <p className={cn(
+              'text-2xl font-bold',
+              score >= 80 ? 'text-green-500' : score >= 50 ? 'text-yellow-500' : 'text-red-500'
+            )}>
+              {score}%
+            </p>
+            <p className="text-xs text-muted-foreground">Score</p>
+          </div>
+          <div className="p-3 bg-muted/50 rounded-lg text-center">
+            <p className="text-2xl font-bold">{checkedCount}/{totalItems}</p>
+            <p className="text-xs text-muted-foreground">Completed</p>
+          </div>
+          <div className="p-3 bg-red-500/10 rounded-lg text-center">
+            <p className={cn(
+              'text-2xl font-bold',
+              criticalChecked === criticalTotal ? 'text-green-500' : 'text-red-500'
+            )}>
+              {criticalChecked}/{criticalTotal}
+            </p>
+            <p className="text-xs text-muted-foreground">Critical</p>
+          </div>
+        </div>
+
+        <div className="space-y-4 max-h-60 overflow-y-auto">
+          {categories.map(category => (
+            <div key={category}>
+              <p className="text-xs font-medium text-muted-foreground mb-2">{category}</p>
+              <div className="space-y-1">
+                {SECURITY_CHECKLIST.filter(i => i.category === category).map(item => (
+                  <button
+                    key={item.id}
+                    onClick={() => toggleItem(item.id)}
+                    className={cn(
+                      'w-full flex items-center gap-2 p-2 rounded-lg text-sm transition-colors text-left',
+                      checked.includes(item.id) ? 'bg-green-500/10' : 'bg-muted/30 hover:bg-muted/50'
+                    )}
+                  >
+                    <div className={cn(
+                      'w-4 h-4 rounded border flex items-center justify-center shrink-0',
+                      checked.includes(item.id) ? 'bg-green-500 border-green-500' : 'border-border'
+                    )}>
+                      {checked.includes(item.id) && <Check className="w-3 h-3 text-white" />}
+                    </div>
+                    <span className={checked.includes(item.id) ? 'line-through text-muted-foreground' : ''}>
+                      {item.item}
+                    </span>
+                    {item.critical && !checked.includes(item.id) && (
+                      <span className="text-xs px-1.5 py-0.5 bg-red-500/20 text-red-500 rounded ml-auto">
+                        Critical
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
 // SECURITY TOOLS GRID
 // ============================================
 
@@ -1927,6 +2541,7 @@ export function SecurityToolsGrid() {
     { id: 'encoding', label: 'Encoding', icon: Binary },
     { id: 'crypto', label: 'Crypto', icon: Lock },
     { id: 'network', label: 'Network', icon: Network },
+    { id: 'recon', label: 'Recon', icon: Search },
     { id: 'advanced', label: 'Advanced', icon: Zap },
   ]
 
@@ -2034,6 +2649,22 @@ export function SecurityToolsGrid() {
                     </div>
                   ))}
                 </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'recon' && (
+            <div className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <SSLCertificateChecker />
+                <DNSLookupTool />
+              </div>
+              <div className="grid md:grid-cols-2 gap-6">
+                <HTTPHeadersAnalyzer />
+                <PortScannerSimulator />
+              </div>
+              <div className="grid md:grid-cols-1 gap-6">
+                <SecurityChecklist />
               </div>
             </div>
           )}
