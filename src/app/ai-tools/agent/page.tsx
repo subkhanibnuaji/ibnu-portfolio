@@ -506,7 +506,7 @@ export default function AgentPage() {
             </div>
           ) : (
             <ChatInput
-              onSend={handleSend}
+              onSend={handleSubmit}
               placeholder="Ask the agent to do something... (press / for tools)"
               disabled={isLoading}
               initialValue={inputValue}

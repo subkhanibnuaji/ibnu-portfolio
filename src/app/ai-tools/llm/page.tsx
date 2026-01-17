@@ -36,7 +36,7 @@ export default function LLMChatPage() {
   const [showSearch, setShowSearch] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showHistory, setShowHistory] = useState(false);
-  const [savedChats, setSavedChats] = useState<Array<{ id: string; title: string; messages: Message[]; date: string }>>([]);
+  const [savedChats, setSavedChats] = useState<Array<{ id: string; title: string; messages: ChatMessageType[]; date: string }>>([]);
   const abortControllerRef = useRef<AbortController | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const exportMenuRef = useRef<HTMLDivElement>(null);
@@ -152,7 +152,7 @@ export default function LLMChatPage() {
     }
   }, [messages, savedChats]);
 
-  const loadSavedChat = useCallback((chat: { messages: Message[] }) => {
+  const loadSavedChat = useCallback((chat: { messages: ChatMessageType[] }) => {
     setMessages(chat.messages);
     setShowHistory(false);
   }, []);

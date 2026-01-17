@@ -56,6 +56,7 @@ function ChatMessageComponent({
   };
 
   const handleFeedback = (type: 'up' | 'down') => {
+    if (!id) return;
     const newFeedback = localFeedback === type ? null : type;
     setLocalFeedback(newFeedback);
     onFeedback?.(id, newFeedback);
