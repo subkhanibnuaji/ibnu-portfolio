@@ -13,14 +13,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChatMessage, ChatInput, StopButton, ModelSelector } from '@/components/ai';
 import { GROQ_MODELS, AI_DEFAULTS, type GroqModelId } from '@/lib/ai/config';
 
-// Simple message interface for this page
-interface Message {
-  role: 'user' | 'assistant';
+// Simplified message type for this component
+interface ChatMessageType {
+  id?: string;
+  role: 'user' | 'assistant' | 'system';
   content: string;
 }
 
 export default function LLMChatPage() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<ChatMessageType[]>([]);
+  const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [model, setModel] = useState<GroqModelId>(AI_DEFAULTS.model);
   const [error, setError] = useState<string | null>(null);
@@ -43,18 +45,21 @@ export default function LLMChatPage() {
     }
   }, []);
 
-  const handleSend = useCallback(
-    async (message: string) => {
-      if (!message.trim() || isLoading) return;
+  const handleSubmit = useCallback(
+    async (e?: React.FormEvent) => {
+      e?.preventDefault();
+      if (!input.trim() || isLoading) return;
 
-      const userMessage: Message = { role: 'user', content: message.trim() };
+      const userMessage: ChatMessageType = { id: `user-${Date.now()}`, role: 'user', content: input.trim() };
       const newMessages = [...messages, userMessage];
       setMessages(newMessages);
+      setInput('');
       setError(null);
       setIsLoading(true);
 
       // Add placeholder assistant message
-      setMessages([...newMessages, { role: 'assistant', content: '' }]);
+      const assistantId = `assistant-${Date.now()}`;
+      setMessages([...newMessages, { id: assistantId, role: 'assistant', content: '' }]);
 
       abortControllerRef.current = new AbortController();
 
@@ -95,7 +100,7 @@ export default function LLMChatPage() {
                   assistantContent += parsed.content;
                   setMessages([
                     ...newMessages,
-                    { role: 'assistant', content: assistantContent },
+                    { id: assistantId, role: 'assistant', content: assistantContent },
                   ]);
                 }
                 if (parsed.error) {
@@ -121,7 +126,7 @@ export default function LLMChatPage() {
         abortControllerRef.current = null;
       }
     },
-    [isLoading, messages, model]
+    [input, isLoading, messages, model]
   );
 
   const handleClear = useCallback(() => {
@@ -191,7 +196,7 @@ export default function LLMChatPage() {
               ].map((suggestion) => (
                 <button
                   key={suggestion}
-                  onClick={() => handleSend(suggestion)}
+                  onClick={() => setInput(suggestion)}
                   className="rounded-full bg-gray-700/50 px-4 py-2 text-sm text-gray-300 transition-colors hover:bg-gray-700"
                 >
                   {suggestion}
@@ -210,14 +215,9 @@ export default function LLMChatPage() {
                 transition={{ duration: 0.2 }}
               >
                 <ChatMessage
-                  id={`msg-${index}`}
+                  id={message.id || `msg-${index}`}
                   role={message.role}
                   content={message.content}
-                  isStreaming={
-                    isLoading &&
-                    index === messages.length - 1 &&
-                    message.role === 'assistant'
-                  }
                 />
               </motion.div>
             ))}
@@ -245,7 +245,83 @@ export default function LLMChatPage() {
           </div>
         ) : (
           <ChatInput
-            onSend={handleSend}
+            onSend={(message) => {
+              setInput(message);
+              // We need to call handleSubmit with the message directly
+              // since state update is async
+              const userMessage: ChatMessageType = { id: `user-${Date.now()}`, role: 'user', content: message.trim() };
+              const newMessages = [...messages, userMessage];
+              setMessages(newMessages);
+              setInput('');
+              setError(null);
+              setIsLoading(true);
+
+              // Continue with the API call
+              const assistantId = `assistant-${Date.now()}`;
+              setMessages([...newMessages, { id: assistantId, role: 'assistant', content: '' }]);
+
+              const abortController = new AbortController();
+              abortControllerRef.current = abortController;
+
+              fetch('/api/ai/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: newMessages, model }),
+                signal: abortController.signal,
+              }).then(async (response) => {
+                if (!response.ok) {
+                  const errorData = await response.json();
+                  throw new Error(errorData.error || 'Failed to get response');
+                }
+
+                const reader = response.body?.getReader();
+                if (!reader) throw new Error('No response stream');
+
+                const decoder = new TextDecoder();
+                let assistantContent = '';
+
+                while (true) {
+                  const { done, value } = await reader.read();
+                  if (done) break;
+
+                  const chunk = decoder.decode(value);
+                  const lines = chunk.split('\n');
+
+                  for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                      const data = line.slice(6);
+                      if (data === '[DONE]') continue;
+
+                      try {
+                        const parsed = JSON.parse(data);
+                        if (parsed.content) {
+                          assistantContent += parsed.content;
+                          setMessages([
+                            ...newMessages,
+                            { id: assistantId, role: 'assistant', content: assistantContent },
+                          ]);
+                        }
+                        if (parsed.error) {
+                          throw new Error(parsed.error);
+                        }
+                      } catch {
+                        // Skip invalid JSON lines
+                      }
+                    }
+                  }
+                }
+              }).catch((err) => {
+                if (err instanceof Error && err.name === 'AbortError') {
+                  return;
+                }
+                console.error('Chat error:', err);
+                setError(err instanceof Error ? err.message : 'An error occurred');
+                setMessages(newMessages);
+              }).finally(() => {
+                setIsLoading(false);
+                abortControllerRef.current = null;
+              });
+            }}
             placeholder="Type your message..."
             disabled={isLoading}
           />

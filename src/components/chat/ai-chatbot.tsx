@@ -697,10 +697,10 @@ Built with modern technologies:
 - NextAuth.js
 - Resend (emails)
 
-Fully open source!`,
+Built with modern best practices!`,
     quickReplies: [
       { label: 'Skills', value: 'What are your skills?' },
-      { label: 'GitHub', value: 'Where is the source code?' }
+      { label: 'Projects', value: 'What projects have you built?' }
     ]
   },
   funfacts: {
@@ -961,6 +961,7 @@ const ChatMessageItem = memo(function ChatMessageItem({ message, mode }: ChatMes
 export function AIChatbot() {
   const [isOpen, setIsOpen] = useState(false)
   const [mode, setMode] = useState<ChatMode>('quick')
+  const [isMounted, setIsMounted] = useState(false)
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',

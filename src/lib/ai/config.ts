@@ -156,7 +156,7 @@ export const AI_FEATURES = {
   },
   rag: {
     enabled: true,
-    supportedFormats: ['.txt', '.md', '.pdf', '.json'],
+    supportedFormats: ['.txt', '.md', '.pdf', '.json'] as readonly string[],
     maxChunkSize: 1000,
     chunkOverlap: 200,
     maxDocumentsPerUser: 10,

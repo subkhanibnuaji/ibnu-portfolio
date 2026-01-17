@@ -277,7 +277,7 @@ export function truncateMessages(
 // EXPORTS
 // ============================================
 
-// Re-export LangChain utilities (excluding AIMessage to avoid collision with config.ts)
+// Re-export LangChain primitives
 export {
   HumanMessage,
   SystemMessage,
@@ -286,5 +286,5 @@ export {
   StringOutputParser,
 };
 
-// Export AIMessage as LangChainAIMessage to avoid collision with config.ts AIMessage type
+// Export AIMessage with a different name to avoid conflict with config.ts
 export { AIMessage as LangChainAIMessage } from '@langchain/core/messages';

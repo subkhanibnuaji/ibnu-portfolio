@@ -37,7 +37,7 @@ export interface UploadedDocument {
 
 export interface DocumentUploadProps {
   documents: UploadedDocument[];
-  onUpload: (files: File[]) => Promise<void> | Promise<UploadedDocument | UploadedDocument[] | void>;
+  onUpload: (files: File[]) => Promise<void | UploadedDocument | UploadedDocument[]>;
   onRemove: (documentId: string) => void;
   onDocumentsChange?: (docs: UploadedDocument[]) => void;
   disabled?: boolean;

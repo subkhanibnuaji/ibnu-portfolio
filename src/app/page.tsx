@@ -4,6 +4,7 @@ import { InterestsSection } from '@/components/sections/interests'
 import { ConvergenceSection } from '@/components/sections/convergence'
 import { FeaturedProjectSection } from '@/components/sections/featured-project'
 import { AIPlaygroundSection } from '@/components/sections/ai-playground'
+import { AIAgentsSection } from '@/components/sections/ai-agents'
 import { SkillsSection } from '@/components/sections/skills'
 import { CredentialsSection } from '@/components/sections/credentials'
 import { ContactCTASection } from '@/components/sections/contact-cta'
@@ -40,6 +41,9 @@ export default function HomePage() {
         <ConvergenceSection />
         <FeaturedProjectSection />
         <AIPlaygroundSection />
+        <div id="ai-agents">
+          <AIAgentsSection />
+        </div>
         <SkillsSection />
         <TestimonialsSection />
         <NetworkingGallery />
