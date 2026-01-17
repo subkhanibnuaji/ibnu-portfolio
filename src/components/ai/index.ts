@@ -6,7 +6,7 @@
  * Import from '@/components/ai' instead of individual files.
  */
 
-export { ChatMessage, type ChatMessageProps } from './ChatMessage';
+export { ChatMessage, type ChatMessageProps, type FeedbackType } from './ChatMessage';
 export { ChatInput, StopButton, type ChatInputProps, type StopButtonProps } from './ChatInput';
 export { ModelSelector, type ModelSelectorProps } from './ModelSelector';
 export { DocumentUpload, type DocumentUploadProps, type UploadedDocument } from './DocumentUpload';

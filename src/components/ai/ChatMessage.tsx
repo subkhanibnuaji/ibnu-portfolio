@@ -8,15 +8,16 @@
  * Isolated component - no dependencies on existing components.
  */
 
-import { memo } from 'react';
-import { Bot, User, Copy, Check, Loader2 } from 'lucide-react';
-import { useState } from 'react';
+import { memo, useState } from 'react';
+import { Bot, User, Copy, Check, Loader2, ThumbsUp, ThumbsDown } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { cn } from '@/lib/utils';
 
 // ============================================
 // TYPES
 // ============================================
+
+export type FeedbackType = 'up' | 'down' | null;
 
 export interface ChatMessageProps {
   id: string;
@@ -25,6 +26,8 @@ export interface ChatMessageProps {
   timestamp?: Date;
   isStreaming?: boolean;
   model?: string;
+  feedback?: FeedbackType;
+  onFeedback?: (id: string, feedback: FeedbackType) => void;
 }
 
 // ============================================
@@ -32,16 +35,26 @@ export interface ChatMessageProps {
 // ============================================
 
 function ChatMessageComponent({
+  id,
   role,
   content,
   isStreaming = false,
+  feedback,
+  onFeedback,
 }: ChatMessageProps) {
   const [copied, setCopied] = useState(false);
+  const [localFeedback, setLocalFeedback] = useState<FeedbackType>(feedback || null);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(content);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleFeedback = (type: 'up' | 'down') => {
+    const newFeedback = localFeedback === type ? null : type;
+    setLocalFeedback(newFeedback);
+    onFeedback?.(id, newFeedback);
   };
 
   const isUser = role === 'user';
@@ -133,39 +146,80 @@ function ChatMessageComponent({
                 {content}
               </ReactMarkdown>
             ) : (
-              <span className="flex items-center gap-2 text-muted-foreground">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                {isStreaming ? 'Generating...' : 'Thinking...'}
-              </span>
+              <div className="flex items-center gap-3 text-muted-foreground py-1">
+                {/* Animated typing dots with custom animation */}
+                <div className="flex items-center gap-1.5">
+                  <span className="typing-dot h-2.5 w-2.5 rounded-full bg-gradient-to-r from-purple-500 to-pink-500" />
+                  <span className="typing-dot h-2.5 w-2.5 rounded-full bg-gradient-to-r from-pink-500 to-cyan-500" />
+                  <span className="typing-dot h-2.5 w-2.5 rounded-full bg-gradient-to-r from-cyan-500 to-purple-500" />
+                </div>
+                <span className="text-sm font-medium">
+                  {isStreaming ? 'Generating response...' : 'Thinking...'}
+                </span>
+              </div>
             )}
           </div>
         ) : (
           <p className="text-sm whitespace-pre-wrap">{content}</p>
         )}
 
-        {/* Copy Button */}
+        {/* Action Buttons */}
         {content && !isStreaming && (
-          <button
-            onClick={handleCopy}
+          <div
             className={cn(
-              'ai-copy-btn absolute -bottom-6 opacity-0 group-hover:opacity-100',
-              'transition-opacity text-xs text-muted-foreground hover:text-foreground',
-              'flex items-center gap-1',
+              'ai-action-btns absolute -bottom-7 flex items-center gap-3',
+              'opacity-0 group-hover:opacity-100 transition-opacity',
               isUser ? 'left-0' : 'right-0'
             )}
           >
-            {copied ? (
-              <>
-                <Check className="h-3 w-3" />
-                Copied
-              </>
-            ) : (
-              <>
-                <Copy className="h-3 w-3" />
-                Copy
-              </>
+            {/* Copy Button */}
+            <button
+              onClick={handleCopy}
+              className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+            >
+              {copied ? (
+                <>
+                  <Check className="h-3 w-3" />
+                  Copied
+                </>
+              ) : (
+                <>
+                  <Copy className="h-3 w-3" />
+                  Copy
+                </>
+              )}
+            </button>
+
+            {/* Feedback Buttons - Only for assistant */}
+            {isAssistant && (
+              <div className="flex items-center gap-1 border-l border-gray-600 pl-3">
+                <button
+                  onClick={() => handleFeedback('up')}
+                  className={cn(
+                    'p-1 rounded transition-colors',
+                    localFeedback === 'up'
+                      ? 'text-green-400 bg-green-400/20'
+                      : 'text-muted-foreground hover:text-green-400 hover:bg-green-400/10'
+                  )}
+                  title="Good response"
+                >
+                  <ThumbsUp className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  onClick={() => handleFeedback('down')}
+                  className={cn(
+                    'p-1 rounded transition-colors',
+                    localFeedback === 'down'
+                      ? 'text-red-400 bg-red-400/20'
+                      : 'text-muted-foreground hover:text-red-400 hover:bg-red-400/10'
+                  )}
+                  title="Poor response"
+                >
+                  <ThumbsDown className="h-3.5 w-3.5" />
+                </button>
+              </div>
             )}
-          </button>
+          </div>
         )}
       </div>
     </div>

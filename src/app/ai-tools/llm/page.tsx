@@ -12,6 +12,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChatMessage, ChatInput, StopButton, ModelSelector } from '@/components/ai';
 import { GROQ_MODELS, AI_DEFAULTS, type GroqModelId } from '@/lib/ai/config';
+import { exportToMarkdown, exportToPDF, exportToJSON } from '@/lib/ai/file-generators';
 
 // Simple message interface for this page
 interface Message {
@@ -24,8 +25,10 @@ export default function LLMChatPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [model, setModel] = useState<GroqModelId>(AI_DEFAULTS.model);
   const [error, setError] = useState<string | null>(null);
+  const [showExportMenu, setShowExportMenu] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const exportMenuRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -129,6 +132,44 @@ export default function LLMChatPage() {
     setError(null);
   }, []);
 
+  const handleExport = useCallback(
+    async (format: 'markdown' | 'pdf' | 'json') => {
+      const exportData = {
+        title: 'LLM Chat Conversation',
+        messages: messages,
+        model: GROQ_MODELS[model].name,
+        exportedAt: new Date(),
+      };
+
+      try {
+        if (format === 'markdown') {
+          exportToMarkdown(exportData);
+        } else if (format === 'pdf') {
+          await exportToPDF(exportData);
+        } else if (format === 'json') {
+          exportToJSON(exportData);
+        }
+      } catch (err) {
+        console.error('Export error:', err);
+        setError('Failed to export conversation');
+      }
+
+      setShowExportMenu(false);
+    },
+    [messages, model]
+  );
+
+  // Close export menu on click outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(event.target as Node)) {
+        setShowExportMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
   return (
     <div className="flex h-[calc(100vh-12rem)] flex-col">
       {/* Header */}
@@ -146,13 +187,78 @@ export default function LLMChatPage() {
             disabled={isLoading}
           />
           {messages.length > 0 && (
-            <button
-              onClick={handleClear}
-              className="rounded-lg border border-gray-600 px-3 py-2 text-sm text-gray-300 transition-colors hover:bg-gray-700 disabled:opacity-50"
-              disabled={isLoading}
-            >
-              Clear
-            </button>
+            <>
+              {/* Export Button */}
+              <div className="relative" ref={exportMenuRef}>
+                <button
+                  onClick={() => setShowExportMenu(!showExportMenu)}
+                  className="rounded-lg border border-gray-600 px-3 py-2 text-sm text-gray-300 transition-colors hover:bg-gray-700 disabled:opacity-50"
+                  disabled={isLoading}
+                >
+                  <svg
+                    className="inline-block h-4 w-4 mr-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
+                    />
+                  </svg>
+                  Export
+                </button>
+                {/* Export Dropdown */}
+                <AnimatePresence>
+                  {showExportMenu && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute right-0 mt-2 w-48 rounded-lg border border-gray-700 bg-gray-800 py-1 shadow-xl z-50"
+                    >
+                      <button
+                        onClick={() => handleExport('markdown')}
+                        className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700"
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        Export as Markdown
+                      </button>
+                      <button
+                        onClick={() => handleExport('pdf')}
+                        className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700"
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                        Export as PDF
+                      </button>
+                      <button
+                        onClick={() => handleExport('json')}
+                        className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-gray-300 hover:bg-gray-700"
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                        </svg>
+                        Export as JSON
+                      </button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+              {/* Clear Button */}
+              <button
+                onClick={handleClear}
+                className="rounded-lg border border-gray-600 px-3 py-2 text-sm text-gray-300 transition-colors hover:bg-gray-700 disabled:opacity-50"
+                disabled={isLoading}
+              >
+                Clear
+              </button>
+            </>
           )}
         </div>
       </div>

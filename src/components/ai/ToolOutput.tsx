@@ -38,6 +38,10 @@ import {
   Ruler,
   Palette,
   Hash,
+  Quote,
+  Link2,
+  Calendar,
+  SmilePlus,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { AIToolCall } from '@/lib/ai/config';
@@ -65,6 +69,8 @@ const TOOL_ICONS: Record<string, React.ElementType> = {
   current_time: Clock,
   weather: Cloud,
   convert_unit: Ruler,
+  date_calculator: Calendar,
+  shorten_url: Link2,
 
   // Generation
   generate_image: ImageIcon,
@@ -77,11 +83,13 @@ const TOOL_ICONS: Record<string, React.ElementType> = {
   generate_colors: Palette,
   generate_hashtags: Hash,
   generate_code: Code,
+  emoji_picker: SmilePlus,
 
   // Knowledge
   wikipedia_search: Library,
   define_word: BookOpen,
   random_fact: Lightbulb,
+  quote_of_day: Quote,
 
   // Finance
   crypto_price: Bitcoin,

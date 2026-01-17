@@ -1085,6 +1085,255 @@ const hashtagGeneratorTool: Tool = {
 };
 
 // ============================================
+// QUOTE OF THE DAY TOOL
+// ============================================
+
+const quoteOfDayTool: Tool = {
+  name: 'quote_of_day',
+  description: 'Get an inspirational or motivational quote. Perfect for daily motivation!',
+  parameters: {
+    type: 'object',
+    properties: {
+      category: {
+        type: 'string',
+        description: 'Category: inspirational, motivational, wisdom, funny, love, success, or random (default)',
+      },
+    },
+    required: [],
+  },
+  execute: async (args) => {
+    const quotes: Record<string, Array<{ quote: string; author: string }>> = {
+      inspirational: [
+        { quote: "The only way to do great work is to love what you do.", author: "Steve Jobs" },
+        { quote: "In the middle of difficulty lies opportunity.", author: "Albert Einstein" },
+        { quote: "Believe you can and you're halfway there.", author: "Theodore Roosevelt" },
+        { quote: "The future belongs to those who believe in the beauty of their dreams.", author: "Eleanor Roosevelt" },
+        { quote: "It is during our darkest moments that we must focus to see the light.", author: "Aristotle" },
+      ],
+      motivational: [
+        { quote: "Success is not final, failure is not fatal: it is the courage to continue that counts.", author: "Winston Churchill" },
+        { quote: "The only limit to our realization of tomorrow is our doubts of today.", author: "Franklin D. Roosevelt" },
+        { quote: "Don't watch the clock; do what it does. Keep going.", author: "Sam Levenson" },
+        { quote: "Everything you've ever wanted is on the other side of fear.", author: "George Addair" },
+        { quote: "The harder you work for something, the greater you'll feel when you achieve it.", author: "Anonymous" },
+      ],
+      wisdom: [
+        { quote: "The only true wisdom is in knowing you know nothing.", author: "Socrates" },
+        { quote: "Knowledge speaks, but wisdom listens.", author: "Jimi Hendrix" },
+        { quote: "In seeking wisdom, the first step is silence, the second listening.", author: "Solomon Ibn Gabirol" },
+        { quote: "The measure of intelligence is the ability to change.", author: "Albert Einstein" },
+        { quote: "Turn your wounds into wisdom.", author: "Oprah Winfrey" },
+      ],
+      funny: [
+        { quote: "I'm not lazy, I'm on energy-saving mode.", author: "Anonymous" },
+        { quote: "I'm not arguing, I'm just explaining why I'm right.", author: "Anonymous" },
+        { quote: "I used to think I was indecisive, but now I'm not so sure.", author: "Anonymous" },
+        { quote: "Common sense is like deodorant. The people who need it most never use it.", author: "Anonymous" },
+        { quote: "Life is short. Smile while you still have teeth.", author: "Anonymous" },
+      ],
+      love: [
+        { quote: "The best thing to hold onto in life is each other.", author: "Audrey Hepburn" },
+        { quote: "Being deeply loved by someone gives you strength, while loving someone deeply gives you courage.", author: "Lao Tzu" },
+        { quote: "Love is not about how many days, months, or years you've been together. It's all about how much you love each other every day.", author: "Anonymous" },
+        { quote: "The greatest thing you'll ever learn is just to love and be loved in return.", author: "Nat King Cole" },
+      ],
+      success: [
+        { quote: "Success is not the key to happiness. Happiness is the key to success.", author: "Albert Schweitzer" },
+        { quote: "The road to success and the road to failure are almost exactly the same.", author: "Colin R. Davis" },
+        { quote: "Success usually comes to those who are too busy to be looking for it.", author: "Henry David Thoreau" },
+        { quote: "Don't be afraid to give up the good to go for the great.", author: "John D. Rockefeller" },
+        { quote: "I find that the harder I work, the more luck I seem to have.", author: "Thomas Jefferson" },
+      ],
+    };
+
+    const category = (args.category as string)?.toLowerCase() || 'random';
+    let selectedQuotes: Array<{ quote: string; author: string }>;
+
+    if (category === 'random' || !quotes[category]) {
+      selectedQuotes = Object.values(quotes).flat();
+    } else {
+      selectedQuotes = quotes[category];
+    }
+
+    const randomQuote = selectedQuotes[Math.floor(Math.random() * selectedQuotes.length)];
+    return `💭 **Quote of the Day**\n\n"${randomQuote.quote}"\n\n— *${randomQuote.author}*`;
+  },
+};
+
+// ============================================
+// URL SHORTENER TOOL (Using TinyURL - FREE)
+// ============================================
+
+const urlShortenerTool: Tool = {
+  name: 'shorten_url',
+  description: 'Shorten a long URL using TinyURL. Makes links easier to share.',
+  parameters: {
+    type: 'object',
+    properties: {
+      url: {
+        type: 'string',
+        description: 'The URL to shorten',
+      },
+    },
+    required: ['url'],
+  },
+  execute: async (args) => {
+    const url = args.url as string;
+
+    // Validate URL
+    try {
+      new URL(url);
+    } catch {
+      return `Invalid URL: "${url}". Please provide a valid URL starting with http:// or https://`;
+    }
+
+    try {
+      // TinyURL API is FREE and doesn't require an API key
+      const response = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`);
+
+      if (!response.ok) {
+        return `Could not shorten URL. Please try again.`;
+      }
+
+      const shortUrl = await response.text();
+      return `🔗 **URL Shortened**\n\nOriginal: ${url}\nShort: ${shortUrl}\n\n_Click the short link to test it!_`;
+    } catch {
+      return `Could not connect to URL shortener service.`;
+    }
+  },
+};
+
+// ============================================
+// COUNTDOWN/DATE CALCULATOR TOOL
+// ============================================
+
+const dateCalculatorTool: Tool = {
+  name: 'date_calculator',
+  description: 'Calculate days until/since a date, or find what date is X days from now.',
+  parameters: {
+    type: 'object',
+    properties: {
+      date: {
+        type: 'string',
+        description: 'Target date in YYYY-MM-DD format (e.g., 2024-12-25) or relative like "+30" (30 days from now)',
+      },
+      event: {
+        type: 'string',
+        description: 'Optional name for the event (e.g., "Christmas", "Project deadline")',
+      },
+    },
+    required: ['date'],
+  },
+  execute: async (args) => {
+    const dateStr = args.date as string;
+    const event = (args.event as string) || 'target date';
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+
+    let targetDate: Date;
+
+    // Check if relative date (+30, -15, etc.)
+    if (dateStr.match(/^[+-]?\d+$/)) {
+      const days = parseInt(dateStr);
+      targetDate = new Date(now);
+      targetDate.setDate(targetDate.getDate() + days);
+    } else {
+      targetDate = new Date(dateStr);
+      if (isNaN(targetDate.getTime())) {
+        return `Invalid date format: "${dateStr}". Use YYYY-MM-DD (e.g., 2024-12-25) or relative days (+30, -15).`;
+      }
+    }
+
+    targetDate.setHours(0, 0, 0, 0);
+    const diffTime = targetDate.getTime() - now.getTime();
+    const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24));
+
+    const formattedDate = targetDate.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+
+    let message = `📅 **Date Calculator**\n\n**${event}**: ${formattedDate}\n\n`;
+
+    if (diffDays === 0) {
+      message += `🎉 That's **today**!`;
+    } else if (diffDays > 0) {
+      message += `⏳ **${diffDays} days** from now`;
+      if (diffDays > 7) {
+        const weeks = Math.floor(diffDays / 7);
+        const remainingDays = diffDays % 7;
+        message += `\n📊 That's ${weeks} week${weeks > 1 ? 's' : ''}${remainingDays > 0 ? ` and ${remainingDays} day${remainingDays > 1 ? 's' : ''}` : ''}`;
+      }
+    } else {
+      message += `📆 **${Math.abs(diffDays)} days** ago`;
+    }
+
+    return message;
+  },
+};
+
+// ============================================
+// EMOJI PICKER TOOL
+// ============================================
+
+const emojiPickerTool: Tool = {
+  name: 'emoji_picker',
+  description: 'Find relevant emojis for a topic or mood. Great for social media posts!',
+  parameters: {
+    type: 'object',
+    properties: {
+      query: {
+        type: 'string',
+        description: 'Topic, mood, or keyword to find emojis for',
+      },
+    },
+    required: ['query'],
+  },
+  execute: async (args) => {
+    const query = (args.query as string).toLowerCase();
+
+    const emojiCategories: Record<string, string[]> = {
+      happy: ['😊', '😄', '😁', '🥰', '😍', '🤗', '😃', '😀', '🙂', '☺️', '😋', '🎉', '✨'],
+      sad: ['😢', '😭', '😞', '😔', '🥺', '😿', '💔', '😥', '😓', '😪'],
+      love: ['❤️', '💕', '💗', '💓', '💖', '💘', '💝', '😍', '🥰', '😘', '💋', '💑', '👫'],
+      work: ['💼', '📊', '📈', '💻', '🖥️', '📱', '✉️', '📧', '📝', '✍️', '🤝', '💡', '⚡'],
+      food: ['🍕', '🍔', '🍟', '🌮', '🍜', '🍣', '🍰', '🎂', '🍩', '☕', '🍷', '🥗', '🍎'],
+      travel: ['✈️', '🌍', '🗺️', '🏖️', '🏔️', '🚗', '🚀', '🏨', '📸', '🌅', '🌄', '🎒'],
+      celebration: ['🎉', '🎊', '🥳', '🎈', '🎁', '🎂', '🍾', '🥂', '🎆', '🎇', '✨', '💫'],
+      weather: ['☀️', '🌤️', '⛅', '🌧️', '⛈️', '❄️', '🌈', '🌪️', '🌊', '💨'],
+      nature: ['🌸', '🌺', '🌻', '🌷', '🌹', '🌲', '🌳', '🍀', '🌿', '🦋', '🐦', '🌙'],
+      sports: ['⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏓', '🏸', '🥊', '🏆', '🥇', '🎯'],
+      music: ['🎵', '🎶', '🎤', '🎧', '🎸', '🎹', '🎺', '🎷', '🥁', '🎻', '💃', '🕺'],
+      tech: ['💻', '🖥️', '📱', '⌨️', '🖱️', '🤖', '🔌', '💡', '🔋', '📡', '🛰️', '🎮'],
+      money: ['💰', '💵', '💸', '🤑', '💳', '💎', '📈', '💹', '🏦', '🪙'],
+      health: ['💪', '🏃', '🧘', '🥗', '💊', '🩺', '❤️‍🩹', '🏥', '🧠', '🦷'],
+      animal: ['🐶', '🐱', '🐰', '🦊', '🐻', '🐼', '🦁', '🐯', '🐮', '🐷', '🐸', '🦄'],
+    };
+
+    let matchedEmojis: string[] = [];
+
+    // Find matching categories
+    for (const [category, emojis] of Object.entries(emojiCategories)) {
+      if (query.includes(category) || category.includes(query)) {
+        matchedEmojis = [...matchedEmojis, ...emojis];
+      }
+    }
+
+    // If no match, provide popular emojis
+    if (matchedEmojis.length === 0) {
+      matchedEmojis = ['👍', '❤️', '😊', '🎉', '✨', '🔥', '💯', '👏', '🙌', '💪'];
+    }
+
+    // Remove duplicates and limit
+    const uniqueEmojis = [...new Set(matchedEmojis)].slice(0, 20);
+
+    return `😀 **Emojis for "${query}"**\n\n${uniqueEmojis.join(' ')}\n\n_Copy and paste these emojis!_`;
+  },
+};
+
+// ============================================
 // AVAILABLE TOOLS
 // ============================================
 
@@ -1094,6 +1343,8 @@ export const AVAILABLE_TOOLS: Record<string, Tool> = {
   current_time: currentTimeTool,
   weather: weatherTool,
   convert_unit: unitConverterTool,
+  date_calculator: dateCalculatorTool,
+  shorten_url: urlShortenerTool,
 
   // Generation Tools
   generate_image: imageGenerationTool,
@@ -1106,11 +1357,13 @@ export const AVAILABLE_TOOLS: Record<string, Tool> = {
   generate_colors: colorPaletteTool,
   generate_hashtags: hashtagGeneratorTool,
   generate_code: codeGeneratorTool,
+  emoji_picker: emojiPickerTool,
 
   // Knowledge Tools
   wikipedia_search: wikipediaTool,
   define_word: dictionaryTool,
   random_fact: randomFactsTool,
+  quote_of_day: quoteOfDayTool,
 
   // Finance Tools
   crypto_price: cryptoPriceTool,
