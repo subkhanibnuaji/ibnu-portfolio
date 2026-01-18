@@ -34,6 +34,7 @@ import { AnimatedBackground } from '@/components/backgrounds/animated-background
 import { CelebrationProvider } from '@/components/celebration/confetti'
 import { SoundProvider } from '@/components/audio/sound-effects'
 import { LightboxProvider } from '@/components/gallery/lightbox'
+import { NotificationProvider, NotificationCenter } from '@/components/notifications/notification-center'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import '@/styles/globals.css'
@@ -137,7 +138,8 @@ export default function RootLayout({
             >
               <SoundProvider>
                 <LightboxProvider>
-                  {children}
+                  <NotificationProvider>
+                    {children}
               <Toaster richColors position="bottom-right" />
               <ScrollCapabilitiesPopup />
               <WelcomeTour />
@@ -167,6 +169,8 @@ export default function RootLayout({
               <KeyboardShortcuts />
               <AnimatedBackground variant="minimal" />
               <CelebrationProvider />
+              <NotificationCenter />
+                  </NotificationProvider>
                 </LightboxProvider>
               </SoundProvider>
             </ThemeProvider>
