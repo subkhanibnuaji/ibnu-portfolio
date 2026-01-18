@@ -20,6 +20,9 @@ import {
   MessageSquare,
   FileText,
   Cpu,
+  Bitcoin,
+  Shield,
+  Brain,
 } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { cn } from '@/lib/utils'
@@ -43,15 +46,19 @@ export function CommandPalette() {
   const commands: Command[] = [
     // Navigation
     { id: 'home', icon: Home, label: 'Go to Home', shortcut: 'G H', action: () => router.push('/'), category: 'navigation' },
-    { id: 'interests', icon: Star, label: 'Go to Interests', shortcut: 'G I', action: () => router.push('/interests'), category: 'navigation' },
     { id: 'projects', icon: FolderKanban, label: 'Go to Projects', shortcut: 'G P', action: () => router.push('/projects'), category: 'navigation' },
     { id: 'creds', icon: Award, label: 'Go to Credentials', shortcut: 'G C', action: () => router.push('/certifications'), category: 'navigation' },
     { id: 'about', icon: User, label: 'Go to About', shortcut: 'G A', action: () => router.push('/about'), category: 'navigation' },
     { id: 'contact', icon: Mail, label: 'Go to Contact', shortcut: 'G K', action: () => router.push('/contact'), category: 'navigation' },
-    { id: 'ai-tools', icon: Sparkles, label: 'Go to AI Tools', shortcut: 'G T', action: () => router.push('/ai-tools'), category: 'navigation' },
-    { id: 'ai-llm', icon: MessageSquare, label: 'Go to LLM Chat', shortcut: 'G L', action: () => router.push('/ai-tools/llm'), category: 'navigation' },
-    { id: 'ai-rag', icon: FileText, label: 'Go to RAG System', shortcut: 'G R', action: () => router.push('/ai-tools/rag'), category: 'navigation' },
-    { id: 'ai-agent', icon: Cpu, label: 'Go to AI Agent', shortcut: 'G N', action: () => router.push('/ai-tools/agent'), category: 'navigation' },
+    // 3 Pillars of the Future
+    { id: 'blockchain', icon: Bitcoin, label: 'Blockchain & Crypto', shortcut: 'G B', action: () => router.push('/pillars/blockchain-crypto'), category: 'navigation' },
+    { id: 'security', icon: Shield, label: 'Cyber Security', shortcut: 'G S', action: () => router.push('/pillars/cyber-security'), category: 'navigation' },
+    { id: 'ai-pillar', icon: Brain, label: 'Artificial Intelligence', shortcut: 'G I', action: () => router.push('/pillars/artificial-intelligence'), category: 'navigation' },
+    // AI Tools
+    { id: 'ai-tools', icon: Sparkles, label: 'AI Tools Playground', shortcut: 'G T', action: () => router.push('/ai-tools'), category: 'navigation' },
+    { id: 'ai-llm', icon: MessageSquare, label: 'LLM Chat', shortcut: 'G L', action: () => router.push('/ai-tools/llm'), category: 'navigation' },
+    { id: 'ai-rag', icon: FileText, label: 'RAG System', shortcut: 'G R', action: () => router.push('/ai-tools/rag'), category: 'navigation' },
+    { id: 'ai-agent', icon: Cpu, label: 'AI Agent', shortcut: 'G N', action: () => router.push('/ai-tools/agent'), category: 'navigation' },
     // Actions
     { id: 'terminal', icon: Terminal, label: 'Open Terminal', shortcut: 'T', action: () => {
       const event = new KeyboardEvent('keydown', { key: 't' })

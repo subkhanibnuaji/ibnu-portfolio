@@ -5,15 +5,9 @@ import { CanvasFixProvider } from '@/components/providers/canvas-fix-provider'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { SessionProvider } from '@/components/providers/session-provider'
 import { Toaster } from '@/components/ui/sonner'
-import { ScrollCapabilitiesPopup } from '@/components/effects/scroll-capabilities-popup'
-import { WelcomeTour } from '@/components/onboarding/welcome-tour'
 import { AchievementSystem } from '@/components/gamification/achievement-system'
-import { EasterEggs } from '@/components/effects/easter-eggs'
 import { QuickActionsFAB } from '@/components/ui/quick-actions-fab'
 import { SiteStatsWidget } from '@/components/widgets/site-stats-widget'
-import { SkillsGlobe } from '@/components/visualizations/skills-globe'
-import { VoiceCommands } from '@/components/voice/voice-commands'
-import { VisitorActivity } from '@/components/widgets/visitor-activity'
 import { PWAInstallPrompt } from '@/components/pwa/install-prompt'
 import { FocusMode } from '@/components/modes/focus-mode'
 import { SmartContextMenu } from '@/components/ui/smart-context-menu'
@@ -34,8 +28,12 @@ import { AnimatedBackground } from '@/components/backgrounds/animated-background
 import { CelebrationProvider } from '@/components/celebration/confetti'
 import { SoundProvider } from '@/components/audio/sound-effects'
 import { LightboxProvider } from '@/components/gallery/lightbox'
+import { SiteNavigator } from '@/components/site-navigator'
+import { SkipLink } from '@/components/accessibility/skip-link'
+import { HomePageSchema, AutoBreadcrumbSchema } from '@/components/seo/schema-markup'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { WebVitalsReporter } from '@/components/monitoring/web-vitals-reporter'
 import '@/styles/globals.css'
 
 export const metadata: Metadata = {
@@ -127,6 +125,13 @@ export default function RootLayout({
       className={`${GeistSans.variable} ${GeistMono.variable}`}
     >
       <body className="min-h-screen bg-background font-sans antialiased">
+        {/* Accessibility: Skip to main content link */}
+        <SkipLink />
+
+        {/* SEO: Structured Data */}
+        <HomePageSchema />
+        <AutoBreadcrumbSchema />
+
         <CanvasFixProvider>
           <SessionProvider>
             <ThemeProvider
@@ -138,35 +143,30 @@ export default function RootLayout({
               <SoundProvider>
                 <LightboxProvider>
                   {children}
-              <Toaster richColors position="bottom-right" />
-              <ScrollCapabilitiesPopup />
-              <WelcomeTour />
-              <AchievementSystem />
-              <EasterEggs />
-              <QuickActionsFAB />
-              <SiteStatsWidget />
-              <SkillsGlobe />
-              <VoiceCommands />
-              <VisitorActivity />
-              <PWAInstallPrompt />
-              <FocusMode />
-              <SmartContextMenu />
-              <PersonalizationPanel />
-              <BookmarkManager />
-              <NavigationProgress />
-              <AccessibilityWidget />
-              <NetworkStatus />
-              <RecentlyViewed />
-              <ShareWidget />
-              <ReadingProgress />
-              <ScrollToTopWithProgress />
-              <CustomCursor />
-              <SpotlightEffect />
-              <MicroInteractionStyles />
-              <CommandPalette />
-              <KeyboardShortcuts />
-              <AnimatedBackground variant="minimal" />
-              <CelebrationProvider />
+                  <SiteNavigator />
+                  <Toaster richColors position="bottom-right" />
+                  <AchievementSystem />
+                  <QuickActionsFAB />
+                  <SiteStatsWidget />
+                  <PWAInstallPrompt />
+                  <FocusMode />
+                  <SmartContextMenu />
+                  <PersonalizationPanel />
+                  <BookmarkManager />
+                  <NavigationProgress />
+                  <AccessibilityWidget />
+                  <NetworkStatus />
+                  <RecentlyViewed />
+                  <ShareWidget />
+                  <ReadingProgress />
+                  <ScrollToTopWithProgress />
+                  <CustomCursor />
+                  <SpotlightEffect />
+                  <MicroInteractionStyles />
+                  <CommandPalette />
+                  <KeyboardShortcuts />
+                  <AnimatedBackground variant="minimal" />
+                  <CelebrationProvider />
                 </LightboxProvider>
               </SoundProvider>
             </ThemeProvider>
@@ -174,6 +174,7 @@ export default function RootLayout({
         </CanvasFixProvider>
         <Analytics />
         <SpeedInsights />
+        <WebVitalsReporter />
       </body>
     </html>
   )

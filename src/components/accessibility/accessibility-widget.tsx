@@ -55,6 +55,13 @@ export function AccessibilityWidget() {
     }
   }, [])
 
+  // Listen for open event from Quick Actions FAB
+  useEffect(() => {
+    const handleOpen = () => setIsOpen(true)
+    window.addEventListener('openAccessibility', handleOpen)
+    return () => window.removeEventListener('openAccessibility', handleOpen)
+  }, [])
+
   // Apply settings
   useEffect(() => {
     const root = document.documentElement
@@ -193,17 +200,7 @@ export function AccessibilityWidget() {
         }
       `}</style>
 
-      {/* Toggle Button */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed top-68 left-4 z-40 p-3 rounded-full bg-card/80 backdrop-blur-sm border border-border/50 hover:border-primary/50 shadow-lg hover:shadow-xl transition-all group"
-        title="Accessibility Options"
-        aria-label="Open accessibility options"
-      >
-        <Accessibility className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-      </button>
-
-      {/* Panel */}
+      {/* Panel - triggered via Quick Actions FAB */}
       <AnimatePresence>
         {isOpen && (
           <>

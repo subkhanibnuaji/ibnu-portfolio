@@ -112,6 +112,13 @@ export function SiteStatsWidget() {
     return mins + ':' + secs.toString().padStart(2, '0')
   }
 
+  // Listen for open event from Quick Actions FAB
+  useEffect(() => {
+    const handleOpen = () => setIsExpanded(true)
+    window.addEventListener('openSiteStats', handleOpen)
+    return () => window.removeEventListener('openSiteStats', handleOpen)
+  }, [])
+
   const stats: Stat[] = [
     {
       label: 'Session Time',
@@ -178,99 +185,115 @@ export function SiteStatsWidget() {
   ]
 
   return (
-    <div className="fixed top-20 right-4 z-30">
-      {/* Toggle button */}
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className={cn(
-          'flex items-center gap-2 px-3 py-2 rounded-full bg-card/80 backdrop-blur-sm border border-border/50 hover:border-primary/50 shadow-lg hover:shadow-xl transition-all',
-          isExpanded && 'rounded-b-none border-b-0'
-        )}
-      >
-        <BarChart3 className="h-4 w-4 text-cyan-400" />
-        <span className="text-sm font-medium">{formatTime(sessionTime)}</span>
-        {isExpanded ? (
-          <ChevronUp className="h-4 w-4 text-muted-foreground" />
-        ) : (
-          <ChevronDown className="h-4 w-4 text-muted-foreground" />
-        )}
-      </button>
-
-      {/* Expanded panel */}
+    <>
+      {/* Stats Panel - triggered via Quick Actions FAB */}
       <AnimatePresence>
         {isExpanded && (
-          <motion.div
-            initial={{ opacity: 0, y: -10, height: 0 }}
-            animate={{ opacity: 1, y: 0, height: 'auto' }}
-            exit={{ opacity: 0, y: -10, height: 0 }}
-            className="overflow-hidden"
-          >
-            <div className="w-64 bg-card/95 backdrop-blur-xl border border-border/50 border-t-0 rounded-b-2xl rounded-tl-2xl shadow-2xl p-4">
-              {/* Your Session */}
-              <div className="mb-4">
-                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                  Your Session
-                </h3>
-                <div className="space-y-2">
-                  {stats.map((stat) => (
-                    <div
-                      key={stat.label}
-                      className="flex items-center justify-between p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
-                    >
-                      <div className="flex items-center gap-2">
-                        <stat.icon className={cn('h-4 w-4', stat.color)} />
-                        <span className="text-xs text-muted-foreground">{stat.label}</span>
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsExpanded(false)}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50"
+            />
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm z-50"
+            >
+              <div className="bg-card/95 backdrop-blur-xl border border-border/50 rounded-3xl shadow-2xl overflow-hidden">
+                {/* Header */}
+                <div className="p-4 border-b border-border/50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 rounded-xl bg-cyan-500/20">
+                        <BarChart3 className="h-5 w-5 text-cyan-400" />
                       </div>
-                      <span className={cn('text-sm font-bold', stat.color)}>{stat.value}</span>
+                      <div>
+                        <h2 className="font-bold">Site Statistics</h2>
+                        <p className="text-xs text-muted-foreground">Your session & site info</p>
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Divider */}
-              <div className="h-px bg-border/50 my-4" />
-
-              {/* Site Capabilities */}
-              <div>
-                <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                  Site Capabilities
-                </h3>
-                <div className="grid grid-cols-2 gap-2">
-                  {siteStats.map((stat) => (
-                    <div
-                      key={stat.label}
-                      className="flex flex-col items-center justify-center p-3 rounded-xl bg-gradient-to-br from-muted/30 to-muted/50 border border-border/30"
+                    <button
+                      onClick={() => setIsExpanded(false)}
+                      className="p-2 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      <stat.icon className={cn('h-5 w-5 mb-1', stat.color)} />
-                      <span className={cn('text-lg font-bold', stat.color)}>{stat.value}</span>
-                      <span className="text-[10px] text-muted-foreground text-center">{stat.label}</span>
-                    </div>
-                  ))}
+                      <X className="h-5 w-5" />
+                    </button>
+                  </div>
                 </div>
-              </div>
 
-              {/* Fun fact */}
-              <div className="mt-4 p-3 rounded-xl bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 border border-primary/20">
-                <div className="flex items-center gap-2 mb-1">
-                  <Zap className="h-3 w-3 text-amber-400" />
-                  <span className="text-[10px] font-semibold text-amber-400">FUN FACT</span>
+                <div className="p-4">
+                  {/* Your Session */}
+                  <div className="mb-4">
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                      Your Session
+                    </h3>
+                    <div className="space-y-2">
+                      {stats.map((stat) => (
+                        <div
+                          key={stat.label}
+                          className="flex items-center justify-between p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors"
+                        >
+                          <div className="flex items-center gap-2">
+                            <stat.icon className={cn('h-4 w-4', stat.color)} />
+                            <span className="text-xs text-muted-foreground">{stat.label}</span>
+                          </div>
+                          <span className={cn('text-sm font-bold', stat.color)}>{stat.value}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="h-px bg-border/50 my-4" />
+
+                  {/* Site Capabilities */}
+                  <div>
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+                      Site Capabilities
+                    </h3>
+                    <div className="grid grid-cols-2 gap-2">
+                      {siteStats.map((stat) => (
+                        <div
+                          key={stat.label}
+                          className="flex flex-col items-center justify-center p-3 rounded-xl bg-gradient-to-br from-muted/30 to-muted/50 border border-border/30"
+                        >
+                          <stat.icon className={cn('h-5 w-5 mb-1', stat.color)} />
+                          <span className={cn('text-lg font-bold', stat.color)}>{stat.value}</span>
+                          <span className="text-[10px] text-muted-foreground text-center">{stat.label}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Fun fact */}
+                  <div className="mt-4 p-3 rounded-xl bg-gradient-to-r from-cyan-500/10 via-purple-500/10 to-pink-500/10 border border-primary/20">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Zap className="h-3 w-3 text-amber-400" />
+                      <span className="text-[10px] font-semibold text-amber-400">FUN FACT</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      {clickCount > 50
+                        ? "You're a click master! Over 50 interactions!"
+                        : scrollDistance > 10
+                        ? "You've scrolled equivalent to a small building!"
+                        : sessionTime > 300
+                        ? "You've been here for over 5 minutes. Thank you!"
+                        : pageViews > 5
+                        ? "Explorer mode! You've visited multiple pages!"
+                        : "Keep exploring to discover hidden features!"}
+                    </p>
+                  </div>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {clickCount > 50
-                    ? "You're a click master! Over 50 interactions!"
-                    : scrollDistance > 10
-                    ? "You've scrolled equivalent to a small building!"
-                    : sessionTime > 300
-                    ? "You've been here for over 5 minutes. Thank you!"
-                    : pageViews > 5
-                    ? "Explorer mode! You've visited multiple pages!"
-                    : "Keep exploring to discover hidden features!"}
-                </p>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
-    </div>
+    </>
   )
 }

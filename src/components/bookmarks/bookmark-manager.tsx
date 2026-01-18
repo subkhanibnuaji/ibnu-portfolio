@@ -130,38 +130,16 @@ export function BookmarkManager() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [toggleBookmark])
 
+  // Listen for open event from Quick Actions FAB
+  useEffect(() => {
+    const handleOpen = () => setIsOpen(true)
+    window.addEventListener('openBookmarks', handleOpen)
+    return () => window.removeEventListener('openBookmarks', handleOpen)
+  }, [])
+
   return (
     <>
-      {/* Bookmark Button */}
-      <button
-        onClick={toggleBookmark}
-        className={cn(
-          'fixed top-56 left-4 z-40 p-3 rounded-full backdrop-blur-sm border shadow-lg hover:shadow-xl transition-all group',
-          isBookmarked
-            ? 'bg-amber-500/20 border-amber-500/50 text-amber-400'
-            : 'bg-card/80 border-border/50 hover:border-primary/50'
-        )}
-        title={isBookmarked ? 'Remove bookmark (⌘D)' : 'Bookmark page (⌘D)'}
-      >
-        {isBookmarked ? (
-          <BookmarkCheck className="h-5 w-5" />
-        ) : (
-          <Bookmark className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors" />
-        )}
-      </button>
-
-      {/* View Bookmarks Button */}
-      {bookmarks.length > 0 && (
-        <button
-          onClick={() => setIsOpen(true)}
-          className="fixed top-56 left-16 z-40 flex items-center gap-1 px-2 py-1 rounded-full bg-card/80 backdrop-blur-sm border border-border/50 hover:border-primary/50 shadow-lg text-xs font-medium text-muted-foreground hover:text-foreground transition-all"
-        >
-          <FolderHeart className="h-3 w-3" />
-          {bookmarks.length}
-        </button>
-      )}
-
-      {/* Bookmarks Panel */}
+      {/* Bookmarks Panel - triggered via Quick Actions FAB */}
       <AnimatePresence>
         {isOpen && (
           <>
