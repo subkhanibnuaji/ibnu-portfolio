@@ -75,19 +75,41 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  /* Ensure header/navbar is always clickable */
+  /* Ensure header/navbar is always clickable - Enhanced */
   header {
     pointer-events: auto !important;
+    z-index: 9998 !important;
+    isolation: isolate;
+    position: fixed !important;
   }
 
   header * {
-    pointer-events: auto;
+    pointer-events: auto !important;
   }
 
   header a,
-  header button {
+  header button,
+  header nav,
+  header nav a,
+  header nav button {
     pointer-events: auto !important;
     cursor: pointer !important;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Ensure overlays don't block navigation */
+  .pointer-events-none,
+  [class*="pointer-events-none"] {
+    pointer-events: none !important;
+  }
+
+  /* Navigation dropdowns should be clickable */
+  header [role="menu"],
+  header [data-radix-menu-content],
+  nav [role="menu"],
+  nav [data-radix-menu-content] {
+    pointer-events: auto !important;
   }
 
   /* Custom Scrollbar */
