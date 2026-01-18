@@ -97,13 +97,13 @@ export async function POST(req: NextRequest) {
     // Create project with validated data only
     const project = await prisma.project.create({
       data: {
-        title: data.title || '',
-        slug: data.slug || '',
-        description: data.description || '',
+        title: data.title,
+        slug: data.slug,
+        description: data.description,
         longDesc: data.longDesc || null,
         category: data.category || 'OTHER',
-        status: data.status || 'PLANNING',
-        featured: data.featured || false,
+        status: data.status || 'IN_PROGRESS',
+        featured: data.featured ?? false,
         imageUrl: data.imageUrl || null,
         liveUrl: data.liveUrl || null,
         githubUrl: data.githubUrl || null,

@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
           message,
           userAgent,
           status: 'NEW',
-          priority: determinePriority(subject || '', message),
+          priority: determinePriority(subject || 'General Inquiry', message),
         },
       })
       submissionId = submission.id
@@ -72,7 +72,7 @@ export async function POST(req: NextRequest) {
       const emailResult = await sendContactNotification({
         name,
         email,
-        subject,
+        subject: subject || 'General Inquiry',
         message,
       })
       emailSent = emailResult.success
