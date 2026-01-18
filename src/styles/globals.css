@@ -75,27 +75,53 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 
-  /* Ensure header/navbar is always clickable - Enhanced */
+  /* =======================================================
+   * NAVIGATION CLICK FIX - Comprehensive Solution
+   * Ensures header/navbar is ALWAYS clickable regardless
+   * of any overlays, modals, or floating elements
+   * ======================================================= */
+
+  /* Main header/navbar - Highest priority stacking context */
   header {
     pointer-events: auto !important;
     z-index: 9998 !important;
     isolation: isolate;
     position: fixed !important;
+    contain: layout style;
   }
 
+  /* All header children must be interactive */
   header * {
     pointer-events: auto !important;
   }
 
+  /* Navigation links and buttons - explicit click handling */
   header a,
   header button,
   header nav,
   header nav a,
-  header nav button {
+  header nav button,
+  header [role="link"],
+  header [role="button"],
+  header [class*="Link"] {
     pointer-events: auto !important;
     cursor: pointer !important;
     position: relative;
     z-index: 1;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Dropdown menus and popovers - Very high z-index */
+  header [data-state="open"],
+  header [role="menu"],
+  header [role="listbox"],
+  header [data-radix-menu-content],
+  header [data-radix-popper-content-wrapper],
+  nav [role="menu"],
+  nav [data-radix-menu-content] {
+    pointer-events: auto !important;
+    z-index: 9999 !important;
   }
 
   /* Ensure overlays don't block navigation */
@@ -104,12 +130,47 @@
     pointer-events: none !important;
   }
 
-  /* Navigation dropdowns should be clickable */
-  header [role="menu"],
-  header [data-radix-menu-content],
-  nav [role="menu"],
-  nav [data-radix-menu-content] {
+  /* Background effects should never capture clicks */
+  [class*="particle"],
+  [class*="-z-10"],
+  [class*="-z-20"],
+  .grid-pattern,
+  .dot-pattern,
+  .hex-pattern,
+  .noise,
+  .scanlines::after,
+  canvas[class*="particle"],
+  canvas[class*="background"] {
+    pointer-events: none !important;
+  }
+
+  /* Mobile menu must be clickable when open */
+  header + div[class*="fixed"][class*="inset-x-0"] {
+    z-index: 9997 !important;
     pointer-events: auto !important;
+  }
+
+  /* Fix AnimatePresence exit states - prevent ghost clicks */
+  [data-motion-pop-id][style*="pointer-events: none"],
+  [data-exit="true"] {
+    pointer-events: none !important;
+  }
+
+  /* Ensure main content stays below header */
+  main {
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Fix for any element with z-50 that might interfere */
+  .fixed[class*="z-50"]:not(header):not(header *) {
+    z-index: 50 !important;
+  }
+
+  /* Ensure body allows click-through to children */
+  body {
+    overflow-x: hidden;
+    position: relative;
   }
 
   /* Custom Scrollbar */
