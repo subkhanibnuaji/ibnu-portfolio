@@ -38,7 +38,8 @@ export async function POST(req: NextRequest) {
       return apiError(formatZodErrors(validation.errors), 400)
     }
 
-    const { ip, duration, reason, permanent } = validation.data
+    const { ip, reason, permanent } = validation.data
+    const duration = validation.data.duration ?? 60 * 60 * 1000
 
     blockIP(ip, permanent ? Infinity : duration, reason, permanent)
 

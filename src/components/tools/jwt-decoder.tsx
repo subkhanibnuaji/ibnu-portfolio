@@ -138,9 +138,9 @@ export function JWTDecoder() {
               <p className={`text-lg font-bold ${isExpired ? 'text-red-500' : 'text-green-500'}`}>
                 {isExpired ? 'Expired' : 'Valid'}
               </p>
-              {decoded.payload.exp && (
+              {!!decoded.payload.exp && (
                 <p className="text-sm text-muted-foreground mt-1">
-                  {getTimeRemaining(decoded.payload.exp as number)}
+                  {getTimeRemaining(Number(decoded.payload.exp))}
                 </p>
               )}
             </div>
@@ -150,21 +150,21 @@ export function JWTDecoder() {
                 <Shield className="w-5 h-5 text-primary" />
                 <span className="font-medium">Algorithm</span>
               </div>
-              <p className="text-lg font-bold">{decoded.header.alg as string || 'Unknown'}</p>
+              <p className="text-lg font-bold">{String(decoded.header.alg || 'Unknown')}</p>
               <p className="text-sm text-muted-foreground mt-1">
-                Type: {decoded.header.typ as string || 'JWT'}
+                Type: {String(decoded.header.typ || 'JWT')}
               </p>
             </div>
 
-            {decoded.payload.sub && (
+            {!!decoded.payload.sub && (
               <div className="p-4 rounded-xl border border-border bg-card">
                 <div className="flex items-center gap-2 mb-2">
                   <User className="w-5 h-5 text-primary" />
                   <span className="font-medium">Subject</span>
                 </div>
-                <p className="text-lg font-bold truncate">{decoded.payload.sub as string}</p>
-                {decoded.payload.name && (
-                  <p className="text-sm text-muted-foreground mt-1">{decoded.payload.name as string}</p>
+                <p className="text-lg font-bold truncate">{String(decoded.payload.sub)}</p>
+                {!!decoded.payload.name && (
+                  <p className="text-sm text-muted-foreground mt-1">{String(decoded.payload.name)}</p>
                 )}
               </div>
             )}
@@ -205,34 +205,34 @@ export function JWTDecoder() {
             <div className="mt-4 space-y-2">
               <h4 className="font-medium text-sm text-muted-foreground">Decoded Claims</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {decoded.payload.iat && (
+                {!!decoded.payload.iat && (
                   <div className="p-3 rounded-lg bg-muted/50">
                     <p className="text-xs text-muted-foreground">Issued At (iat)</p>
-                    <p className="font-mono text-sm">{formatDate(decoded.payload.iat as number)}</p>
+                    <p className="font-mono text-sm">{formatDate(Number(decoded.payload.iat))}</p>
                   </div>
                 )}
-                {decoded.payload.exp && (
+                {!!decoded.payload.exp && (
                   <div className="p-3 rounded-lg bg-muted/50">
                     <p className="text-xs text-muted-foreground">Expires (exp)</p>
-                    <p className="font-mono text-sm">{formatDate(decoded.payload.exp as number)}</p>
+                    <p className="font-mono text-sm">{formatDate(Number(decoded.payload.exp))}</p>
                   </div>
                 )}
-                {decoded.payload.nbf && (
+                {!!decoded.payload.nbf && (
                   <div className="p-3 rounded-lg bg-muted/50">
                     <p className="text-xs text-muted-foreground">Not Before (nbf)</p>
-                    <p className="font-mono text-sm">{formatDate(decoded.payload.nbf as number)}</p>
+                    <p className="font-mono text-sm">{formatDate(Number(decoded.payload.nbf))}</p>
                   </div>
                 )}
-                {decoded.payload.iss && (
+                {!!decoded.payload.iss && (
                   <div className="p-3 rounded-lg bg-muted/50">
                     <p className="text-xs text-muted-foreground">Issuer (iss)</p>
-                    <p className="font-mono text-sm truncate">{decoded.payload.iss as string}</p>
+                    <p className="font-mono text-sm truncate">{String(decoded.payload.iss)}</p>
                   </div>
                 )}
-                {decoded.payload.aud && (
+                {!!decoded.payload.aud && (
                   <div className="p-3 rounded-lg bg-muted/50">
                     <p className="text-xs text-muted-foreground">Audience (aud)</p>
-                    <p className="font-mono text-sm truncate">{decoded.payload.aud as string}</p>
+                    <p className="font-mono text-sm truncate">{String(decoded.payload.aud)}</p>
                   </div>
                 )}
               </div>
