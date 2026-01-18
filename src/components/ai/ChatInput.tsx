@@ -17,13 +17,18 @@ import { cn } from '@/lib/utils';
 // ============================================
 
 export interface ChatInputProps {
-  onSend: (message: string) => void;
+  onSend?: (message: string) => void;
+  onSubmit?: (e?: FormEvent) => void;
+  value?: string;
+  onChange?: (value: string) => void;
   isLoading?: boolean;
   disabled?: boolean;
   placeholder?: string;
   showAttachment?: boolean;
   onAttach?: () => void;
   className?: string;
+  initialValue?: string;
+  onValueChange?: (value: string) => void;
 }
 
 // ============================================
@@ -32,15 +37,35 @@ export interface ChatInputProps {
 
 export function ChatInput({
   onSend,
+  onSubmit,
+  value: controlledValue,
+  onChange: controlledOnChange,
   isLoading = false,
   disabled = false,
   placeholder = 'Type your message...',
   showAttachment = false,
   onAttach,
   className,
+  initialValue = '',
+  onValueChange,
 }: ChatInputProps) {
-  const [input, setInput] = useState('');
+  const [internalInput, setInternalInput] = useState(initialValue || '');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Support both controlled and uncontrolled modes
+  const isControlled = controlledValue !== undefined;
+  const input = isControlled ? controlledValue : internalInput;
+  const setInput = isControlled
+    ? (val: string) => controlledOnChange?.(val)
+    : setInternalInput;
+
+  // Sync with external initialValue changes
+  useEffect(() => {
+    if (initialValue && initialValue !== internalInput && !isControlled) {
+      setInternalInput(initialValue);
+      onValueChange?.('');
+    }
+  }, [initialValue, isControlled, internalInput, onValueChange]);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -60,8 +85,15 @@ export function ChatInput({
     e?.preventDefault();
     if (!input.trim() || isLoading || disabled) return;
 
-    onSend(input.trim());
-    setInput('');
+    // Support both onSubmit and onSend
+    if (onSubmit) {
+      onSubmit(e);
+    } else if (onSend) {
+      onSend(input.trim());
+      if (!isControlled) {
+        setInternalInput('');
+      }
+    }
 
     // Reset textarea height
     if (textareaRef.current) {
@@ -159,14 +191,16 @@ export function ChatInput({
 // ============================================
 
 export interface StopButtonProps {
-  onStop: () => void;
+  onStop?: () => void;
+  onClick?: () => void; // Alias for onStop
   className?: string;
 }
 
-export function StopButton({ onStop, className }: StopButtonProps) {
+export function StopButton({ onStop, onClick, className }: StopButtonProps) {
+  const handleClick = onStop || onClick;
   return (
     <button
-      onClick={onStop}
+      onClick={handleClick}
       className={cn(
         'ai-stop-btn flex items-center gap-2 px-4 py-2 rounded-lg',
         'bg-red-500/20 hover:bg-red-500/30 text-red-400',

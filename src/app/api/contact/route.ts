@@ -1,86 +1,183 @@
+/**
+ * Contact Form API
+ * Handles contact form submissions with validation, rate limiting, and notifications
+ */
+
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { auth } from '@/lib/auth'
 import { sendContactNotification } from '@/lib/email'
+import { contactSchema, validateInput, formatZodErrors } from '@/lib/validations'
+import {
+  checkRateLimit,
+  rateLimitResponse,
+  apiError,
+  apiSuccess,
+  logAuditEvent,
+  getClientIp,
+} from '@/lib/security'
 
-// POST submit contact form
+// =============================================================================
+// POST - Submit contact form
+// =============================================================================
+
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json()
-    const { name, email, subject, message } = body
-
-    if (!name || !email || !message) {
-      return NextResponse.json(
-        { error: 'Name, email, and message are required' },
-        { status: 400 }
-      )
+    // Rate limiting - 3 requests per minute
+    const rateLimit = await checkRateLimit(req, 'contact')
+    if (!rateLimit.allowed) {
+      logAuditEvent(req, 'contact_rate_limited', false)
+      return rateLimitResponse(rateLimit.resetIn)
     }
 
-    // Save to database (will fail gracefully if DB not connected)
-    let submissionId = null
+    // Parse and validate input
+    const body = await req.json()
+    const validation = validateInput(contactSchema, body)
+
+    if (!validation.success) {
+      logAuditEvent(req, 'contact_validation_failed', false, undefined, {
+        errors: formatZodErrors(validation.errors),
+      })
+      return apiError(formatZodErrors(validation.errors), 400)
+    }
+
+    const { name = '', email = '', subject = '', message = '' } = validation.data || {}
+
+    // Get request metadata
+    const userAgent = req.headers.get('user-agent') || undefined
+
+    // Save to database
+    let submissionId: string | null = null
     try {
       const submission = await prisma.contactSubmission.create({
         data: {
           name,
           email,
-          subject: subject || 'General Inquiry',
+          subject,
           message,
-          ip: req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip'),
-          userAgent: req.headers.get('user-agent'),
+          userAgent,
+          status: 'NEW',
+          priority: determinePriority(subject || 'General Inquiry', message),
         },
       })
       submissionId = submission.id
     } catch (dbError) {
-      console.log('Database not connected, skipping save:', dbError)
+      console.error('Database error saving contact:', dbError)
+      // Continue anyway - still send email notification
     }
 
-    // Send email notifications (will fail gracefully if Resend not configured)
-    const emailResult = await sendContactNotification({
-      name,
-      email,
-      subject: subject || 'General Inquiry',
-      message,
+    // Send email notification
+    let emailSent = false
+    try {
+      const emailResult = await sendContactNotification({
+        name,
+        email,
+        subject: subject || 'General Inquiry',
+        message,
+      })
+      emailSent = emailResult.success
+    } catch (emailError) {
+      console.error('Email notification failed:', emailError)
+    }
+
+    logAuditEvent(req, 'contact_submitted', true, undefined, {
+      submissionId,
+      emailSent,
     })
 
-    if (!emailResult.success) {
-      console.log('Email not sent:', emailResult.error)
-    }
-
-    return NextResponse.json(
+    return apiSuccess(
       {
         message: 'Message sent successfully',
         id: submissionId,
-        emailSent: emailResult.success
+        emailSent,
       },
-      { status: 201 }
+      201
     )
   } catch (error) {
-    console.error('Error submitting contact form:', error)
-    return NextResponse.json(
-      { error: 'Failed to submit message' },
-      { status: 500 }
-    )
+    console.error('Contact form error:', error)
+    logAuditEvent(req, 'contact_error', false, undefined, {
+      error: error instanceof Error ? error.message : 'Unknown error',
+    })
+    return apiError('Failed to submit message', 500)
   }
 }
 
-// GET all contact submissions (admin only)
-export async function GET() {
+// =============================================================================
+// GET - Fetch contact submissions (admin only)
+// =============================================================================
+
+export async function GET(req: NextRequest) {
   try {
+    // Auth check
     const session = await auth()
     if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'SUPER_ADMIN')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      logAuditEvent(req, 'contact_list_unauthorized', false)
+      return apiError('Unauthorized', 401)
     }
 
-    const submissions = await prisma.contactSubmission.findMany({
-      orderBy: { createdAt: 'desc' },
-    })
+    // Rate limiting for admin
+    const rateLimit = await checkRateLimit(req, 'admin')
+    if (!rateLimit.allowed) {
+      return rateLimitResponse(rateLimit.resetIn)
+    }
 
-    return NextResponse.json(submissions)
+    // Parse query params
+    const { searchParams } = new URL(req.url)
+    const page = Math.max(1, parseInt(searchParams.get('page') || '1'))
+    const limit = Math.min(100, Math.max(1, parseInt(searchParams.get('limit') || '20')))
+    const status = searchParams.get('status')
+    const priority = searchParams.get('priority')
+
+    // Build filter
+    const where: Record<string, unknown> = {}
+    if (status) where.status = status
+    if (priority) where.priority = priority
+
+    // Fetch submissions with pagination
+    const [submissions, total] = await Promise.all([
+      prisma.contactSubmission.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.contactSubmission.count({ where }),
+    ])
+
+    logAuditEvent(req, 'contact_list_fetched', true, session.user.id)
+
+    return apiSuccess({
+      submissions,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    })
   } catch (error) {
     console.error('Error fetching contact submissions:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch submissions' },
-      { status: 500 }
-    )
+    return apiError('Failed to fetch submissions', 500)
   }
+}
+
+// =============================================================================
+// HELPERS
+// =============================================================================
+
+function determinePriority(subject: string, message: string): 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' {
+  const urgentKeywords = ['urgent', 'asap', 'emergency', 'immediately', 'critical']
+  const highKeywords = ['job', 'opportunity', 'collaboration', 'partnership', 'business']
+
+  const text = `${subject} ${message}`.toLowerCase()
+
+  if (urgentKeywords.some((keyword) => text.includes(keyword))) {
+    return 'URGENT'
+  }
+
+  if (highKeywords.some((keyword) => text.includes(keyword))) {
+    return 'HIGH'
+  }
+
+  return 'MEDIUM'
 }

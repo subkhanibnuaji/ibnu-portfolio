@@ -212,7 +212,7 @@ export function ShareWidget() {
                 {/* Content */}
                 <div className="p-4 space-y-4">
                   {/* Native Share (if available) */}
-                  {typeof navigator !== 'undefined' && navigator.share && (
+                  {typeof navigator !== 'undefined' && 'share' in navigator && (
                     <button
                       onClick={handleNativeShare}
                       className="w-full flex items-center justify-center gap-2 p-3 rounded-xl bg-gradient-to-r from-primary to-purple-600 text-white font-medium hover:opacity-90 transition-opacity"

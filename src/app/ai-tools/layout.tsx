@@ -1,20 +1,20 @@
-'use client'
+import { Metadata } from 'next'
+import { AIToolsLayoutClient } from './layout-client'
 
-import { Navbar } from '@/components/layout/navbar'
-import { Footer } from '@/components/layout/footer'
-import { BackToTop } from '@/components/ui/back-to-top'
+export const metadata: Metadata = {
+  title: 'AI Tools - Ibnu Portfolio',
+  description: 'Explore AI-powered tools - browser-based ML models and LangChain-powered LLM applications.',
+  openGraph: {
+    title: 'AI Tools - Ibnu Portfolio',
+    description: 'Explore AI-powered tools running in your browser and LangChain LLM applications.',
+    type: 'website'
+  }
+}
 
 export default function AIToolsLayout({
   children
 }: {
   children: React.ReactNode
 }) {
-  return (
-    <>
-      <Navbar />
-      {children}
-      <Footer />
-      <BackToTop />
-    </>
-  )
+  return <AIToolsLayoutClient>{children}</AIToolsLayoutClient>
 }

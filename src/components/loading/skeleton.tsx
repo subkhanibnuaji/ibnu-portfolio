@@ -9,9 +9,10 @@ import { motion } from 'framer-motion'
 interface SkeletonProps {
   className?: string
   variant?: 'default' | 'shimmer' | 'pulse' | 'wave'
+  style?: React.CSSProperties
 }
 
-export function Skeleton({ className, variant = 'shimmer' }: SkeletonProps) {
+export function Skeleton({ className, variant = 'shimmer', style }: SkeletonProps) {
   const baseClasses = 'bg-muted rounded'
 
   const variantClasses = {
@@ -22,7 +23,7 @@ export function Skeleton({ className, variant = 'shimmer' }: SkeletonProps) {
   }
 
   return (
-    <div className={cn(baseClasses, variantClasses[variant], className)}>
+    <div className={cn(baseClasses, variantClasses[variant], className)} style={style}>
       {variant === 'wave' && (
         <motion.div
           className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"
