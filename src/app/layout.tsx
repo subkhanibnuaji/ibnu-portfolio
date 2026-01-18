@@ -32,6 +32,8 @@ import { CommandPalette } from '@/components/command/command-palette'
 import { KeyboardShortcuts } from '@/components/shortcuts/keyboard-shortcuts'
 import { AnimatedBackground } from '@/components/backgrounds/animated-background'
 import { CelebrationProvider } from '@/components/celebration/confetti'
+import { SoundProvider } from '@/components/audio/sound-effects'
+import { LightboxProvider } from '@/components/gallery/lightbox'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import '@/styles/globals.css'
@@ -133,7 +135,9 @@ export default function RootLayout({
               enableSystem
               disableTransitionOnChange
             >
-              {children}
+              <SoundProvider>
+                <LightboxProvider>
+                  {children}
               <Toaster richColors position="bottom-right" />
               <ScrollCapabilitiesPopup />
               <WelcomeTour />
@@ -163,6 +167,8 @@ export default function RootLayout({
               <KeyboardShortcuts />
               <AnimatedBackground variant="minimal" />
               <CelebrationProvider />
+                </LightboxProvider>
+              </SoundProvider>
             </ThemeProvider>
           </SessionProvider>
         </CanvasFixProvider>
