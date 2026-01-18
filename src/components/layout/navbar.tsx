@@ -19,6 +19,7 @@ import {
   Sparkles,
   Bitcoin,
   Shield,
+  FlaskConical,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
@@ -65,6 +66,12 @@ const EXPLORE_ITEMS = [
     label: 'Tools',
     icon: Wrench,
     description: '50+ utility tools'
+  },
+  {
+    href: '/research',
+    label: 'Research Lab',
+    icon: FlaskConical,
+    description: 'Quantum, AI, Biotech & more'
   },
   {
     href: '/mobile',
