@@ -5,20 +5,7 @@ import { CanvasFixProvider } from '@/components/providers/canvas-fix-provider'
 import { ThemeProvider } from '@/components/providers/theme-provider'
 import { SessionProvider } from '@/components/providers/session-provider'
 import { Toaster } from '@/components/ui/sonner'
-import { AchievementSystem } from '@/components/gamification/achievement-system'
-import { QuickActionsFAB } from '@/components/ui/quick-actions-fab'
-import { SiteStatsWidget } from '@/components/widgets/site-stats-widget'
-import { PWAInstallPrompt } from '@/components/pwa/install-prompt'
-import { FocusMode } from '@/components/modes/focus-mode'
-import { SmartContextMenu } from '@/components/ui/smart-context-menu'
-import { PersonalizationPanel } from '@/components/personalization/personalization-panel'
-import { BookmarkManager } from '@/components/bookmarks/bookmark-manager'
-import { NavigationProgress } from '@/components/transitions/page-transition'
-import { AccessibilityWidget } from '@/components/accessibility/accessibility-widget'
-import { NetworkStatus } from '@/components/network/network-status'
-import { SiteNavigator } from '@/components/site-navigator'
-import { SkipLink } from '@/components/accessibility/skip-link'
-import { HomePageSchema, AutoBreadcrumbSchema } from '@/components/seo/schema-markup'
+import { ClientComponents } from '@/components/providers/client-components'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import { WebVitalsReporter } from '@/components/monitoring/web-vitals-reporter'
@@ -112,14 +99,7 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${GeistSans.variable} ${GeistMono.variable}`}
     >
-      <body className="min-h-screen bg-background font-sans antialiased">
-        {/* Accessibility: Skip to main content link */}
-        <SkipLink />
-
-        {/* SEO: Structured Data */}
-        <HomePageSchema />
-        <AutoBreadcrumbSchema />
-
+      <body className="min-h-screen bg-background font-sans antialiased" suppressHydrationWarning>
         <CanvasFixProvider>
           <SessionProvider>
             <ThemeProvider
@@ -129,19 +109,8 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               {children}
-              <SiteNavigator />
               <Toaster richColors position="bottom-right" />
-              <AchievementSystem />
-              <QuickActionsFAB />
-              <SiteStatsWidget />
-              <PWAInstallPrompt />
-              <FocusMode />
-              <SmartContextMenu />
-              <PersonalizationPanel />
-              <BookmarkManager />
-              <NavigationProgress />
-              <AccessibilityWidget />
-              <NetworkStatus />
+              <ClientComponents />
             </ThemeProvider>
           </SessionProvider>
         </CanvasFixProvider>

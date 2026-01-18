@@ -114,7 +114,7 @@ export function BeatMaker() {
     gain.gain.exponentialRampToValueAtTime(0.001, now + config.decay)
 
     // Filter for hi-hat/cymbal
-    if (config.highpass) {
+    if ('highpass' in config && config.highpass) {
       const filter = ctx.createBiquadFilter()
       filter.type = 'highpass'
       filter.frequency.value = 5000
@@ -125,7 +125,7 @@ export function BeatMaker() {
     }
 
     // Add noise for snare/clap
-    if (config.noise) {
+    if ('noise' in config && config.noise) {
       const bufferSize = ctx.sampleRate * config.decay
       const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate)
       const data = buffer.getChannelData(0)

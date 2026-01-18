@@ -50,7 +50,7 @@ export function SpaceInvaders() {
   const gameStateRef = useRef(gameState)
   const keysPressed = useRef<Set<string>>(new Set())
   const lastShot = useRef(0)
-  const animationRef = useRef<number>()
+  const animationRef = useRef<number | null>(null)
   const lastInvaderShot = useRef(0)
 
   const CANVAS_WIDTH = 800

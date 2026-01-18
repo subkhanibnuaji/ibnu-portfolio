@@ -138,7 +138,7 @@ export function JWTDecoder() {
               <p className={`text-lg font-bold ${isExpired ? 'text-red-500' : 'text-green-500'}`}>
                 {isExpired ? 'Expired' : 'Valid'}
               </p>
-              {decoded.payload.exp && (
+              {typeof decoded.payload.exp === 'number' && (
                 <p className="text-sm text-muted-foreground mt-1">
                   {getTimeRemaining(decoded.payload.exp as number)}
                 </p>
@@ -156,14 +156,14 @@ export function JWTDecoder() {
               </p>
             </div>
 
-            {decoded.payload.sub && (
+            {typeof decoded.payload.sub === 'string' && (
               <div className="p-4 rounded-xl border border-border bg-card">
                 <div className="flex items-center gap-2 mb-2">
                   <User className="w-5 h-5 text-primary" />
                   <span className="font-medium">Subject</span>
                 </div>
                 <p className="text-lg font-bold truncate">{decoded.payload.sub as string}</p>
-                {decoded.payload.name && (
+                {typeof decoded.payload.name === 'string' && (
                   <p className="text-sm text-muted-foreground mt-1">{decoded.payload.name as string}</p>
                 )}
               </div>
@@ -205,31 +205,31 @@ export function JWTDecoder() {
             <div className="mt-4 space-y-2">
               <h4 className="font-medium text-sm text-muted-foreground">Decoded Claims</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {decoded.payload.iat && (
+                {typeof decoded.payload.iat === 'number' && (
                   <div className="p-3 rounded-lg bg-muted/50">
                     <p className="text-xs text-muted-foreground">Issued At (iat)</p>
                     <p className="font-mono text-sm">{formatDate(decoded.payload.iat as number)}</p>
                   </div>
                 )}
-                {decoded.payload.exp && (
+                {typeof decoded.payload.exp === 'number' && (
                   <div className="p-3 rounded-lg bg-muted/50">
                     <p className="text-xs text-muted-foreground">Expires (exp)</p>
                     <p className="font-mono text-sm">{formatDate(decoded.payload.exp as number)}</p>
                   </div>
                 )}
-                {decoded.payload.nbf && (
+                {typeof decoded.payload.nbf === 'number' && (
                   <div className="p-3 rounded-lg bg-muted/50">
                     <p className="text-xs text-muted-foreground">Not Before (nbf)</p>
                     <p className="font-mono text-sm">{formatDate(decoded.payload.nbf as number)}</p>
                   </div>
                 )}
-                {decoded.payload.iss && (
+                {typeof decoded.payload.iss === 'string' && (
                   <div className="p-3 rounded-lg bg-muted/50">
                     <p className="text-xs text-muted-foreground">Issuer (iss)</p>
                     <p className="font-mono text-sm truncate">{decoded.payload.iss as string}</p>
                   </div>
                 )}
-                {decoded.payload.aud && (
+                {decoded.payload.aud !== undefined && (
                   <div className="p-3 rounded-lg bg-muted/50">
                     <p className="text-xs text-muted-foreground">Audience (aud)</p>
                     <p className="font-mono text-sm truncate">{decoded.payload.aud as string}</p>
