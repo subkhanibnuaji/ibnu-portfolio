@@ -76,6 +76,16 @@ export const withScope = (callback: (scope: unknown) => void) => {
     })
 }
 
+// Security event tracking for CSP and other security violations
+export const trackSecurityEvent = (
+      eventType: string,
+      details: Record<string, unknown>
+    ) => {
+          console.log(`[Sentry Stub] Security Event: ${eventType}`, details)
+          // In production with Sentry enabled, this would send to Sentry
+          captureMessage(`Security: ${eventType}`, 'warning')
+    }
+
 // Export default object for compatibility
 export default {
     init: initSentry,
@@ -87,4 +97,5 @@ export default {
     addBreadcrumb,
     startTransaction,
     withScope,
+        trackSecurityEvent,
 }
