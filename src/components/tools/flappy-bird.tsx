@@ -27,7 +27,7 @@ export function FlappyBird() {
 
   const birdRef = useRef({ y: CANVAS_HEIGHT / 2, velocity: 0 })
   const pipesRef = useRef<Pipe[]>([])
-  const animationRef = useRef<number>()
+  const animationRef = useRef<number>(0)
   const lastPipeRef = useRef(0)
 
   useEffect(() => {
