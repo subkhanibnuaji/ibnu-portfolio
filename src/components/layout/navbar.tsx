@@ -19,6 +19,7 @@ import {
   Sparkles,
   Bitcoin,
   Shield,
+  FlaskConical,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
@@ -65,6 +66,12 @@ const EXPLORE_ITEMS = [
     label: 'Tools',
     icon: Wrench,
     description: '50+ utility tools'
+  },
+  {
+    href: '/research',
+    label: 'Research Lab',
+    icon: FlaskConical,
+    description: 'Quantum, AI, Biotech & more'
   },
   {
     href: '/mobile',
@@ -179,7 +186,7 @@ function NavDropdown({ label, items, isActive, icon: LabelIcon, showHeader, head
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 8, scale: 0.96 }}
             transition={{ duration: 0.15 }}
-            className="absolute top-full left-0 mt-2 w-72 p-2 rounded-xl bg-background/95 backdrop-blur-xl border border-border shadow-xl z-50"
+            className="absolute top-full left-0 mt-2 w-72 p-2 rounded-xl bg-background/95 backdrop-blur-xl border border-border shadow-xl z-[9999] pointer-events-auto"
           >
             {showHeader && headerText && (
               <div className="px-3 py-2 mb-1 border-b border-border">
@@ -248,13 +255,15 @@ export function Navbar() {
     <>
       <header
         className={cn(
-          'fixed top-0 left-0 right-0 z-[52] transition-all duration-300 pointer-events-auto',
+          'fixed top-0 left-0 right-0 z-[9998] transition-all duration-300',
+          'pointer-events-auto isolate',
           isScrolled
             ? 'bg-background/80 dark:bg-background/70 backdrop-blur-xl border-b border-border/50 dark:border-primary/10 py-3 shadow-sm dark:shadow-primary/5'
             : 'bg-transparent py-5'
         )}
+        style={{ pointerEvents: 'auto' }}
       >
-        <nav className="container flex items-center justify-between pointer-events-auto">
+        <nav className="container flex items-center justify-between" style={{ pointerEvents: 'auto' }}>
           {/* Logo */}
           <Link
             href="/"
@@ -308,8 +317,9 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
+                prefetch={true}
                 className={cn(
-                  'px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer',
+                  'px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer pointer-events-auto',
                   pathname === link.href
                     ? 'text-foreground bg-muted'
                     : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
@@ -377,7 +387,7 @@ export function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-16 z-30 p-4 md:hidden"
+            className="fixed inset-x-0 top-16 z-[9997] p-4 md:hidden pointer-events-auto"
           >
             <div className="rounded-2xl bg-background/95 backdrop-blur-xl border border-border p-4 shadow-xl max-h-[80vh] overflow-y-auto">
               <nav className="flex flex-col gap-1">
@@ -560,8 +570,9 @@ export function Navbar() {
                   <Link
                     key={link.href}
                     href={link.href}
+                    prefetch={true}
                     className={cn(
-                      'px-4 py-3 rounded-xl text-sm font-medium transition-colors',
+                      'px-4 py-3 rounded-xl text-sm font-medium transition-colors cursor-pointer pointer-events-auto',
                       pathname === link.href
                         ? 'text-foreground bg-muted'
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'

@@ -107,7 +107,6 @@ export async function POST(req: NextRequest) {
           email: email.toLowerCase(),
           content: escapeHtml(content),
           likes: 0,
-          ip,
           approved: spamScore < 2, // Auto-approve low spam score
         },
       })

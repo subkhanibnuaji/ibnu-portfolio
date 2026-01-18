@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import { HeroSection } from '@/components/sections/hero'
 import { InterestsSection } from '@/components/sections/interests'
 import { ConvergenceSection } from '@/components/sections/convergence'
+import { ResearchPreviewSection } from '@/components/sections/research-preview'
 import { FeaturedProjectSection } from '@/components/sections/featured-project'
 import { AIPlaygroundSection } from '@/components/sections/ai-playground'
 import { AIAgentsSection } from '@/components/sections/ai-agents'
@@ -39,6 +40,7 @@ export default function HomePage() {
         <StatsCounter />
         <InterestsSection />
         <ConvergenceSection />
+        <ResearchPreviewSection />
         <FeaturedProjectSection />
         <AIPlaygroundSection />
         <div id="ai-agents">
