@@ -12,7 +12,8 @@ import {
   DollarSign, Receipt, LayoutGrid, Hash, Shuffle, Grid2X2, Wallet,
   CircleDot, Bomb, ListChecks, Disc, ShoppingCart, User, Zap, Dices, Percent, Monitor,
   Radio, Coins, PiggyBank, Moon, Link2, LetterText, Fingerprint, BadgePercent, Languages, Flame, Atom,
-  Thermometer, GraduationCap, Lightbulb, Pipette, Car, CalendarDays, MapPin, Footprints, Scaling, Dice6, Database
+  Thermometer, GraduationCap, Lightbulb, Pipette, Car, CalendarDays, MapPin, Footprints, Scaling, Dice6, Database,
+  TrendingUp
 } from 'lucide-react'
 
 const TOOLS = [
@@ -940,6 +941,314 @@ const TOOLS = [
     bgColor: 'bg-green-500/10',
     textColor: 'text-green-500',
     category: 'Utility'
+  },
+  // 3D & Interactive
+  {
+    slug: '3d-model-viewer',
+    name: '3D Model Viewer',
+    description: 'Interactive 3D model viewer with rotation, zoom, and preset shapes.',
+    icon: Blocks,
+    bgColor: 'bg-violet-500/10',
+    textColor: 'text-violet-500',
+    category: '3D'
+  },
+  // Advanced Games
+  {
+    slug: 'chess-game',
+    name: 'Chess Game',
+    description: 'Play chess against AI or with a friend in 2-player mode.',
+    icon: Grid3X3,
+    bgColor: 'bg-amber-500/10',
+    textColor: 'text-amber-500',
+    category: 'Game'
+  },
+  {
+    slug: 'flappy-bird',
+    name: 'Flappy Bird',
+    description: 'Classic flappy bird game - tap to fly and avoid the pipes!',
+    icon: Zap,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Game'
+  },
+  {
+    slug: 'typing-race',
+    name: 'Typing Race',
+    description: 'Test your typing speed and accuracy with timed challenges.',
+    icon: Keyboard,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Game'
+  },
+  {
+    slug: 'rock-paper-scissors',
+    name: 'Rock Paper Scissors',
+    description: 'Classic game against the computer with stats tracking.',
+    icon: Dices,
+    bgColor: 'bg-pink-500/10',
+    textColor: 'text-pink-500',
+    category: 'Game'
+  },
+  // Music Production
+  {
+    slug: 'piano',
+    name: 'Virtual Piano',
+    description: 'Play piano with keyboard or mouse, change waveforms, and record.',
+    icon: Music,
+    bgColor: 'bg-indigo-500/10',
+    textColor: 'text-indigo-500',
+    category: 'Music'
+  },
+  {
+    slug: 'beat-maker',
+    name: 'Beat Maker',
+    description: 'Create beats with a step sequencer and preset patterns.',
+    icon: Music,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Music'
+  },
+  // Video/Audio Tools
+  {
+    slug: 'voice-recorder',
+    name: 'Voice Recorder',
+    description: 'Record audio from your microphone with visualization.',
+    icon: Radio,
+    bgColor: 'bg-red-500/10',
+    textColor: 'text-red-500',
+    category: 'Media'
+  },
+  {
+    slug: 'screen-recorder',
+    name: 'Screen Recorder',
+    description: 'Record your screen or camera with audio support.',
+    icon: Monitor,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Media'
+  },
+  // Data Visualization
+  {
+    slug: 'mind-map',
+    name: 'Mind Map',
+    description: 'Create and visualize ideas with an interactive mind map.',
+    icon: Brain,
+    bgColor: 'bg-cyan-500/10',
+    textColor: 'text-cyan-500',
+    category: 'Productivity'
+  },
+  {
+    slug: 'chart-builder',
+    name: 'Chart Builder',
+    description: 'Create bar, line, pie, and doughnut charts from your data.',
+    icon: Target,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Data'
+  },
+  // Social/Communication
+  {
+    slug: 'poll-creator',
+    name: 'Poll Creator',
+    description: 'Create polls, vote, and see results in real-time.',
+    icon: ListChecks,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Social'
+  },
+  // Education
+  {
+    slug: 'quiz-maker',
+    name: 'Quiz Maker',
+    description: 'Create quizzes with multiple choice questions.',
+    icon: BookOpen,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Education'
+  },
+  // Lifestyle
+  {
+    slug: 'recipe-manager',
+    name: 'Recipe Manager',
+    description: 'Save, organize, and manage your favorite recipes.',
+    icon: Sparkles,
+    bgColor: 'bg-orange-500/10',
+    textColor: 'text-orange-500',
+    category: 'Lifestyle'
+  },
+  {
+    slug: 'workout-planner',
+    name: 'Workout Planner',
+    description: 'Plan, track, and execute your workout routines.',
+    icon: Flame,
+    bgColor: 'bg-red-500/10',
+    textColor: 'text-red-500',
+    category: 'Fitness'
+  },
+  {
+    slug: 'budget-tracker',
+    name: 'Budget Tracker',
+    description: 'Track income, expenses, and set budget limits.',
+    icon: Wallet,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Finance'
+  },
+  // Developer Tools
+  {
+    slug: 'code-diff-viewer',
+    name: 'Code Diff Viewer',
+    description: 'Compare code changes with split or unified view.',
+    icon: Code,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Developer'
+  },
+  // Animation & Effects
+  {
+    slug: 'particle-system',
+    name: 'Particle System',
+    description: 'Create beautiful particle effects with customizable physics.',
+    icon: Sparkles,
+    bgColor: 'bg-orange-500/10',
+    textColor: 'text-orange-500',
+    category: 'Creative'
+  },
+  {
+    slug: 'css-animation-generator',
+    name: 'CSS Animation Generator',
+    description: 'Generate CSS keyframe animations with live preview.',
+    icon: Sparkles,
+    bgColor: 'bg-pink-500/10',
+    textColor: 'text-pink-500',
+    category: 'Design'
+  },
+  // More Games
+  {
+    slug: 'wordle-game',
+    name: 'Wordle',
+    description: 'Guess the 5-letter word in 6 tries. Track your stats!',
+    icon: Grid3X3,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Game'
+  },
+  {
+    slug: 'pong-game',
+    name: 'Pong',
+    description: 'Classic Pong game - play against AI or a friend.',
+    icon: Gamepad2,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Game'
+  },
+  {
+    slug: 'space-invaders',
+    name: 'Space Invaders',
+    description: 'Classic arcade shooter - defend Earth from aliens!',
+    icon: Zap,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Game'
+  },
+  // Finance & Crypto
+  {
+    slug: 'crypto-tracker',
+    name: 'Crypto Tracker',
+    description: 'Track cryptocurrency prices and market data in real-time.',
+    icon: Coins,
+    bgColor: 'bg-yellow-500/10',
+    textColor: 'text-yellow-500',
+    category: 'Finance'
+  },
+  {
+    slug: 'investment-calculator',
+    name: 'Investment Calculator',
+    description: 'Calculate compound interest and plan your investments.',
+    icon: TrendingUp,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Finance'
+  },
+  // Security
+  {
+    slug: 'encryption-tool',
+    name: 'Encryption Tool',
+    description: 'Encrypt and decrypt text with various ciphers.',
+    icon: Key,
+    bgColor: 'bg-red-500/10',
+    textColor: 'text-red-500',
+    category: 'Security'
+  },
+  // Collaboration
+  {
+    slug: 'whiteboard',
+    name: 'Whiteboard',
+    description: 'Digital whiteboard for drawing and sketching ideas.',
+    icon: Paintbrush,
+    bgColor: 'bg-cyan-500/10',
+    textColor: 'text-cyan-500',
+    category: 'Creative'
+  },
+  // Text & Language Tools
+  {
+    slug: 'text-to-speech',
+    name: 'Text to Speech',
+    description: 'Convert text to speech with multiple voices and languages.',
+    icon: Radio,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Utility'
+  },
+  // Image Tools
+  {
+    slug: 'avatar-generator',
+    name: 'Avatar Generator',
+    description: 'Create unique avatars with different styles and colors.',
+    icon: User,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Creative'
+  },
+  // Fun Generators
+  {
+    slug: 'story-generator',
+    name: 'Story Generator',
+    description: 'Generate creative short stories in various genres.',
+    icon: BookOpen,
+    bgColor: 'bg-pink-500/10',
+    textColor: 'text-pink-500',
+    category: 'Creative'
+  },
+  // Math Tools
+  {
+    slug: 'matrix-calculator',
+    name: 'Matrix Calculator',
+    description: 'Perform matrix operations: add, multiply, transpose, inverse.',
+    icon: Grid3X3,
+    bgColor: 'bg-cyan-500/10',
+    textColor: 'text-cyan-500',
+    category: 'Math'
+  },
+  // Productivity Tools
+  {
+    slug: 'goal-tracker',
+    name: 'Goal Tracker',
+    description: 'Set goals, track milestones, and visualize progress.',
+    icon: Target,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Productivity'
+  },
+  // Social Tools
+  {
+    slug: 'digital-business-card',
+    name: 'Digital Business Card',
+    description: 'Create beautiful digital business cards with vCard export.',
+    icon: User,
+    bgColor: 'bg-indigo-500/10',
+    textColor: 'text-indigo-500',
+    category: 'Social'
   }
 ]
 
