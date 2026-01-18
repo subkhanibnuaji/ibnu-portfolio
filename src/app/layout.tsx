@@ -28,6 +28,10 @@ import { ReadingProgress, ScrollToTopWithProgress } from '@/components/progress/
 import { CustomCursor, SpotlightEffect } from '@/components/cursor/custom-cursor'
 import { MicroInteractionStyles } from '@/components/micro-interactions'
 import { ToastProvider } from '@/components/toast/custom-toast'
+import { CommandPalette } from '@/components/command/command-palette'
+import { KeyboardShortcuts } from '@/components/shortcuts/keyboard-shortcuts'
+import { AnimatedBackground } from '@/components/backgrounds/animated-background'
+import { CelebrationProvider } from '@/components/celebration/confetti'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import '@/styles/globals.css'
@@ -155,6 +159,10 @@ export default function RootLayout({
               <CustomCursor />
               <SpotlightEffect />
               <MicroInteractionStyles />
+              <CommandPalette />
+              <KeyboardShortcuts />
+              <AnimatedBackground variant="minimal" />
+              <CelebrationProvider />
             </ThemeProvider>
           </SessionProvider>
         </CanvasFixProvider>
