@@ -17,7 +17,15 @@ interface Track {
   sound: 'kick' | 'snare' | 'hihat' | 'clap' | 'tom' | 'rim' | 'cymbal' | 'bass'
 }
 
-const SOUNDS = {
+interface SoundConfig {
+    freq: number
+    decay: number
+    type: OscillatorType
+    noise?: boolean
+    highpass?: boolean
+}
+
+const SOUNDS: Record<string, SoundConfig> = {
   kick: { freq: 150, decay: 0.5, type: 'sine' as OscillatorType },
   snare: { freq: 200, decay: 0.2, type: 'triangle' as OscillatorType, noise: true },
   hihat: { freq: 800, decay: 0.1, type: 'square' as OscillatorType, highpass: true },
