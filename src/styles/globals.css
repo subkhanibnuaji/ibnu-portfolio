@@ -81,10 +81,10 @@
    * of any overlays, modals, or floating elements
    * ======================================================= */
 
-  /* Main header/navbar - Highest priority stacking context */
+  /* Main header/navbar - MAXIMUM z-index to override browser extensions */
   header {
     pointer-events: auto !important;
-    z-index: 9998 !important;
+    z-index: 2147483647 !important;
     isolation: isolate;
     position: fixed !important;
     contain: layout style;
@@ -112,7 +112,7 @@
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* Dropdown menus and popovers - Very high z-index */
+  /* Dropdown menus and popovers - MAXIMUM z-index */
   header [data-state="open"],
   header [role="menu"],
   header [role="listbox"],
@@ -121,7 +121,7 @@
   nav [role="menu"],
   nav [data-radix-menu-content] {
     pointer-events: auto !important;
-    z-index: 9999 !important;
+    z-index: 2147483647 !important;
   }
 
   /* Ensure overlays don't block navigation */
@@ -146,7 +146,7 @@
 
   /* Mobile menu must be clickable when open */
   header + div[class*="fixed"][class*="inset-x-0"] {
-    z-index: 9997 !important;
+    z-index: 2147483646 !important;
     pointer-events: auto !important;
   }
 
