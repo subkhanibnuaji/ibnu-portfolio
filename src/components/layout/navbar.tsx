@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   Menu,
@@ -232,6 +232,22 @@ export function Navbar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false)
   const [mobileSubmenu, setMobileSubmenu] = useState<string | null>(null)
   const pathname = usePathname()
+  const router = useRouter()
+
+  // Fallback navigation handler - ensures navigation works even if Link fails
+  const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    // Don't prevent default - let Link handle it normally first
+    // But if the click doesn't navigate within 100ms, force navigation
+    const startTime = Date.now()
+    const checkNavigation = () => {
+      if (window.location.pathname === href) return // Already navigated
+      if (Date.now() - startTime > 100) {
+        // Link didn't work, force navigation
+        router.push(href)
+      }
+    }
+    setTimeout(checkNavigation, 150)
+  }, [router])
 
   useEffect(() => {
     const handleScroll = () => {
