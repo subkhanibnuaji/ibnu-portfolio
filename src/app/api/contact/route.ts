@@ -41,10 +41,9 @@ export async function POST(req: NextRequest) {
       return apiError(formatZodErrors(validation.errors), 400)
     }
 
-    const { name, email, subject, message } = validation.data
+    const { name = '', email = '', subject = '', message = '' } = validation.data || {}
 
     // Get request metadata
-    const ip = getClientIp(req)
     const userAgent = req.headers.get('user-agent') || undefined
 
     // Save to database
@@ -56,7 +55,6 @@ export async function POST(req: NextRequest) {
           email,
           subject,
           message,
-          ip,
           userAgent,
           status: 'NEW',
           priority: determinePriority(subject || 'General Inquiry', message),
