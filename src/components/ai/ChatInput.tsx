@@ -18,17 +18,17 @@ import { cn } from '@/lib/utils';
 
 export interface ChatInputProps {
   onSend?: (message: string) => void;
-  // Controlled mode props
+  onSubmit?: (e?: FormEvent) => void;
   value?: string;
   onChange?: (value: string) => void;
-  onSubmit?: (e?: FormEvent) => void;
-  // Common props
   isLoading?: boolean;
   disabled?: boolean;
   placeholder?: string;
   showAttachment?: boolean;
   onAttach?: () => void;
   className?: string;
+  initialValue?: string;
+  onValueChange?: (value: string) => void;
 }
 
 // ============================================
@@ -37,17 +37,19 @@ export interface ChatInputProps {
 
 export function ChatInput({
   onSend,
+  onSubmit,
   value: controlledValue,
   onChange: controlledOnChange,
-  onSubmit: controlledOnSubmit,
   isLoading = false,
   disabled = false,
   placeholder = 'Type your message...',
   showAttachment = false,
   onAttach,
   className,
+  initialValue = '',
+  onValueChange,
 }: ChatInputProps) {
-  const [internalInput, setInternalInput] = useState('');
+  const [internalInput, setInternalInput] = useState(initialValue || '');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Support both controlled and uncontrolled modes
@@ -56,6 +58,14 @@ export function ChatInput({
   const setInput = isControlled
     ? (val: string) => controlledOnChange?.(val)
     : setInternalInput;
+
+  // Sync with external initialValue changes
+  useEffect(() => {
+    if (initialValue && initialValue !== internalInput && !isControlled) {
+      setInternalInput(initialValue);
+      onValueChange?.('');
+    }
+  }, [initialValue, isControlled, internalInput, onValueChange]);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -75,12 +85,14 @@ export function ChatInput({
     e?.preventDefault();
     if (!input.trim() || isLoading || disabled) return;
 
-    // Support controlled mode with onSubmit
-    if (controlledOnSubmit) {
-      controlledOnSubmit(e);
+    // Support both onSubmit and onSend
+    if (onSubmit) {
+      onSubmit(e);
     } else if (onSend) {
       onSend(input.trim());
-      setInput('');
+      if (!isControlled) {
+        setInternalInput('');
+      }
     }
 
     // Reset textarea height

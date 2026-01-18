@@ -20,9 +20,39 @@ import {
 } from '@/components/ai';
 import { GROQ_MODELS, AI_DEFAULTS, type GroqModelId } from '@/lib/ai/config';
 import { getToolsList } from '@/lib/ai/agent';
+import { Command, Sparkles, Zap } from 'lucide-react';
 
 // Get tools list at module level
 const availableTools = getToolsList();
+
+// Quick prompts for each tool
+const TOOL_PROMPTS: Record<string, string> = {
+  calculator: 'Calculate: ',
+  current_time: 'What time is it in ',
+  weather: 'Weather in ',
+  convert_unit: 'Convert ',
+  date_calculator: 'How many days until ',
+  shorten_url: 'Shorten this URL: ',
+  generate_image: 'Generate an image of ',
+  generate_qr: 'Create a QR code for ',
+  generate_meme: 'Make a meme about ',
+  generate_pdf: 'Create a PDF about ',
+  generate_ppt: 'Create a presentation about ',
+  generate_lorem: 'Generate lorem ipsum text',
+  generate_password: 'Generate a secure password',
+  generate_colors: 'Generate a color palette for ',
+  generate_hashtags: 'Generate hashtags for ',
+  generate_code: 'Write code to ',
+  emoji_picker: 'Find emojis for ',
+  wikipedia_search: 'Search Wikipedia for ',
+  define_word: 'Define the word: ',
+  random_fact: 'Tell me a random fact about ',
+  quote_of_day: 'Give me a motivational quote',
+  crypto_price: 'Price of ',
+  translate: 'Translate to Indonesian: ',
+  text_analysis: 'Analyze this text: ',
+  tell_joke: 'Tell me a joke about ',
+};
 
 interface ToolExecution {
   tool: string;
@@ -31,6 +61,7 @@ interface ToolExecution {
 }
 
 interface AgentMessage {
+  id: string;
   role: 'user' | 'assistant';
   content: string;
   toolExecutions?: ToolExecution[];
@@ -43,8 +74,29 @@ export default function AgentPage() {
   const [model, setModel] = useState<GroqModelId>(AI_DEFAULTS.model);
   const [error, setError] = useState<string | null>(null);
   const [currentToolExecutions, setCurrentToolExecutions] = useState<ToolExecution[]>([]);
+  const [showToolPicker, setShowToolPicker] = useState(false);
+  const [toolSearch, setToolSearch] = useState('');
+  const [inputValue, setInputValue] = useState('');
   const abortControllerRef = useRef<AbortController | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Filter tools based on search
+  const filteredTools = toolSearch
+    ? availableTools.filter(t =>
+        t.name.toLowerCase().includes(toolSearch.toLowerCase()) ||
+        t.description.toLowerCase().includes(toolSearch.toLowerCase())
+      )
+    : availableTools;
+
+  // Handle tool selection
+  const selectTool = useCallback((toolName: string) => {
+    const prompt = TOOL_PROMPTS[toolName] || `Use ${toolName}: `;
+    setInputValue(prompt);
+    setShowToolPicker(false);
+    setToolSearch('');
+    setTimeout(() => inputRef.current?.focus(), 100);
+  }, []);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -63,11 +115,15 @@ export default function AgentPage() {
   }, []);
 
   const handleSubmit = useCallback(
-    async (e?: React.FormEvent) => {
-      e?.preventDefault();
-      if (!input.trim() || isLoading) return;
+    async (messageOrEvent?: string | React.FormEvent) => {
+      // Handle both string message and form event
+      const message = typeof messageOrEvent === 'string' ? messageOrEvent : input;
+      if (typeof messageOrEvent !== 'string') {
+        messageOrEvent?.preventDefault?.();
+      }
+      if (!message.trim() || isLoading) return;
 
-      const userMessage: AgentMessage = { role: 'user', content: input.trim() };
+      const userMessage: AgentMessage = { id: `user-${Date.now()}`, role: 'user', content: message.trim() };
       const newMessages = [...messages, userMessage];
       setMessages(newMessages);
       setInput('');
@@ -136,6 +192,7 @@ export default function AgentPage() {
                   setMessages([
                     ...newMessages,
                     {
+                      id: `assistant-${Date.now()}`,
                       role: 'assistant',
                       content: assistantContent,
                       toolExecutions: [...toolExecutions],
@@ -156,6 +213,7 @@ export default function AgentPage() {
           setMessages([
             ...newMessages,
             {
+              id: `assistant-final-${Date.now()}`,
               role: 'assistant',
               content: assistantContent,
               toolExecutions,
@@ -181,13 +239,109 @@ export default function AgentPage() {
     setMessages([]);
     setError(null);
     setCurrentToolExecutions([]);
+    setInputValue('');
   }, []);
+
+  // Keyboard shortcut for tool picker
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // "/" to open tool picker
+      if (e.key === '/' && !showToolPicker && document.activeElement?.tagName !== 'INPUT') {
+        e.preventDefault();
+        setShowToolPicker(true);
+      }
+      // Escape to close
+      if (e.key === 'Escape') {
+        setShowToolPicker(false);
+        setToolSearch('');
+      }
+      // Ctrl/Cmd + T to toggle tool picker
+      if ((e.ctrlKey || e.metaKey) && e.key === 't') {
+        e.preventDefault();
+        setShowToolPicker(prev => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showToolPicker]);
 
   return (
     <div className="flex h-[calc(100vh-12rem)] gap-4">
+      {/* Tool Picker Modal */}
+      <AnimatePresence>
+        {showToolPicker && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-start justify-center bg-black/50 pt-20"
+            onClick={() => { setShowToolPicker(false); setToolSearch(''); }}
+          >
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -20, scale: 0.95 }}
+              className="w-full max-w-2xl rounded-xl border border-gray-700 bg-gray-800 shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center gap-3 border-b border-gray-700 p-4">
+                <Command className="h-5 w-5 text-cyan-400" />
+                <input
+                  type="text"
+                  placeholder="Search tools... (type to filter)"
+                  value={toolSearch}
+                  onChange={(e) => setToolSearch(e.target.value)}
+                  className="flex-1 bg-transparent text-white outline-none placeholder:text-gray-500"
+                  autoFocus
+                />
+                <kbd className="rounded bg-gray-700 px-2 py-1 text-xs text-gray-400">ESC</kbd>
+              </div>
+              <div className="max-h-80 overflow-y-auto p-2">
+                <div className="grid grid-cols-2 gap-2">
+                  {filteredTools.map((tool) => (
+                    <button
+                      key={tool.name}
+                      onClick={() => selectTool(tool.name)}
+                      className="flex items-start gap-3 rounded-lg p-3 text-left transition-colors hover:bg-gray-700/70 group"
+                    >
+                      <div className="rounded-lg bg-gradient-to-br from-cyan-500/20 to-purple-500/20 p-2 group-hover:from-cyan-500/30 group-hover:to-purple-500/30">
+                        <Zap className="h-4 w-4 text-cyan-400" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-white truncate">{tool.name}</p>
+                        <p className="text-xs text-gray-500 line-clamp-2">{tool.description}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+                {filteredTools.length === 0 && (
+                  <p className="text-center text-gray-500 py-8">No tools found matching &quot;{toolSearch}&quot;</p>
+                )}
+              </div>
+              <div className="border-t border-gray-700 p-3">
+                <p className="text-xs text-gray-500 text-center">
+                  Press <kbd className="rounded bg-gray-700 px-1.5 py-0.5 text-gray-400">/</kbd> anytime or{' '}
+                  <kbd className="rounded bg-gray-700 px-1.5 py-0.5 text-gray-400">Ctrl+T</kbd> to open
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Sidebar - Available Tools */}
       <div className="w-80 flex-shrink-0 overflow-y-auto rounded-xl border border-gray-700/50 bg-gray-800/30 p-4">
-        <h2 className="mb-4 text-lg font-semibold text-white">Available Tools</h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-white">25 Tools</h2>
+          <button
+            onClick={() => setShowToolPicker(true)}
+            className="rounded-lg bg-cyan-500/20 p-1.5 text-cyan-400 hover:bg-cyan-500/30 transition-colors"
+            title="Quick pick (/ or Ctrl+T)"
+          >
+            <Sparkles className="h-4 w-4" />
+          </button>
+        </div>
         <ToolsList tools={availableTools} />
       </div>
 
@@ -198,7 +352,9 @@ export default function AgentPage() {
           <div>
             <h1 className="text-2xl font-bold text-white">AI Agent</h1>
             <p className="text-sm text-gray-400">
-              AI with tool execution capabilities
+              25 tools at your service
+              <span className="ml-2 text-gray-600">|</span>
+              <span className="ml-2 text-xs text-gray-500">Press / for quick tool picker</span>
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -287,9 +443,9 @@ export default function AgentPage() {
                       </div>
                     )}
                     <ChatMessage
+                      id={message.id}
                       role={message.role}
                       content={message.content}
-                      isLoading={false}
                     />
                   </motion.div>
                 ))}
@@ -346,15 +502,15 @@ export default function AgentPage() {
         <div className="mt-4">
           {isLoading ? (
             <div className="flex items-center justify-center">
-              <StopButton onClick={handleStop} />
+              <StopButton onStop={handleStop} />
             </div>
           ) : (
             <ChatInput
-              value={input}
-              onChange={setInput}
-              onSubmit={handleSubmit}
-              placeholder="Ask the agent to do something..."
+              onSend={handleSubmit}
+              placeholder="Ask the agent to do something... (press / for tools)"
               disabled={isLoading}
+              initialValue={inputValue}
+              onValueChange={setInputValue}
             />
           )}
         </div>

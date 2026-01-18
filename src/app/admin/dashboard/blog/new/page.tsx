@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button'
 import { AdminLayout } from '@/components/admin/admin-layout'
 import Link from 'next/link'
 
-const categories = ['Technology', 'Career', 'Industry', 'Personal', 'Tutorial']
+const categories = ['Crypto', 'DeFi', 'Web3', 'Technology', 'Career', 'Tutorial', 'Personal']
 
 export default function NewBlogPostPage() {
   const router = useRouter()

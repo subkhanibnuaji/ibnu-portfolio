@@ -6,7 +6,7 @@
  * Uses in-memory vector store for simplicity (no external DB needed).
  */
 
-import { AI_FEATURES, AI_ERRORS, type AIDocument } from './config';
+import { AI_FEATURES, AI_ERRORS, RATE_LIMITS, type AIDocument } from './config';
 
 // ============================================
 // DOCUMENT PROCESSING
@@ -55,7 +55,7 @@ export function processDocument(
 ): AIDocument {
   // Validate file type
   const extension = `.${type.split('/').pop()?.toLowerCase()}`;
-  if (!AI_FEATURES.rag.supportedFormats.includes(extension)) {
+  if (!(AI_FEATURES.rag.supportedFormats as readonly string[]).includes(extension)) {
     throw new Error(AI_ERRORS.UNSUPPORTED_FORMAT);
   }
 
@@ -274,7 +274,7 @@ export async function parseFileContent(
   const extension = file.name.split('.').pop()?.toLowerCase();
 
   // Check size
-  if (file.size > AI_FEATURES.rag.maxDocumentSizeMB * 1024 * 1024) {
+  if (file.size > RATE_LIMITS.rag.maxDocumentSizeMB * 1024 * 1024) {
     throw new Error(AI_ERRORS.DOCUMENT_TOO_LARGE);
   }
 

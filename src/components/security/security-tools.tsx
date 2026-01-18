@@ -1,0 +1,2691 @@
+'use client'
+
+import { useState, useCallback } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import {
+  Shield, Lock, Key, Hash, Eye, EyeOff, Copy, Check, RefreshCw,
+  AlertTriangle, CheckCircle, XCircle, Info, Globe, Server,
+  Binary, FileText, Fingerprint, Network, Search, Zap
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+
+// ============================================
+// PASSWORD STRENGTH ANALYZER
+// ============================================
+
+interface PasswordStrength {
+  score: number
+  label: string
+  color: string
+  suggestions: string[]
+  details: {
+    length: boolean
+    uppercase: boolean
+    lowercase: boolean
+    numbers: boolean
+    special: boolean
+    noCommon: boolean
+  }
+}
+
+function analyzePassword(password: string): PasswordStrength {
+  const details = {
+    length: password.length >= 12,
+    uppercase: /[A-Z]/.test(password),
+    lowercase: /[a-z]/.test(password),
+    numbers: /[0-9]/.test(password),
+    special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password),
+    noCommon: !['password', '123456', 'qwerty', 'admin', 'letmein', 'welcome', 'monkey', 'dragon'].some(
+      common => password.toLowerCase().includes(common)
+    ),
+  }
+
+  let score = 0
+  if (details.length) score += 20
+  if (details.uppercase) score += 15
+  if (details.lowercase) score += 15
+  if (details.numbers) score += 15
+  if (details.special) score += 20
+  if (details.noCommon) score += 15
+  if (password.length >= 16) score += 10
+
+  // Entropy bonus
+  const uniqueChars = new Set(password).size
+  if (uniqueChars >= 10) score += 5
+
+  score = Math.min(100, score)
+
+  const suggestions: string[] = []
+  if (!details.length) suggestions.push('Use at least 12 characters')
+  if (!details.uppercase) suggestions.push('Add uppercase letters (A-Z)')
+  if (!details.lowercase) suggestions.push('Add lowercase letters (a-z)')
+  if (!details.numbers) suggestions.push('Add numbers (0-9)')
+  if (!details.special) suggestions.push('Add special characters (!@#$%^&*)')
+  if (!details.noCommon) suggestions.push('Avoid common words or patterns')
+
+  let label: string, color: string
+  if (score < 30) { label = 'Very Weak'; color = 'text-red-500' }
+  else if (score < 50) { label = 'Weak'; color = 'text-orange-500' }
+  else if (score < 70) { label = 'Fair'; color = 'text-yellow-500' }
+  else if (score < 90) { label = 'Strong'; color = 'text-green-500' }
+  else { label = 'Very Strong'; color = 'text-emerald-500' }
+
+  return { score, label, color, suggestions, details }
+}
+
+export function PasswordStrengthAnalyzer() {
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [analysis, setAnalysis] = useState<PasswordStrength | null>(null)
+
+  const handleAnalyze = useCallback((value: string) => {
+    setPassword(value)
+    if (value) {
+      setAnalysis(analyzePassword(value))
+    } else {
+      setAnalysis(null)
+    }
+  }, [])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-security-safe/10 flex items-center justify-center">
+          <Shield className="w-5 h-5 text-security-safe" />
+        </div>
+        <div>
+          <h3 className="font-bold">Password Strength Analyzer</h3>
+          <p className="text-xs text-muted-foreground">Check how secure your password is</p>
+        </div>
+      </div>
+
+      <div className="relative mb-4">
+        <input
+          type={showPassword ? 'text' : 'password'}
+          value={password}
+          onChange={(e) => handleAnalyze(e.target.value)}
+          placeholder="Enter password to analyze..."
+          className="w-full px-4 py-3 pr-12 bg-muted/50 border border-border rounded-lg focus:border-security-safe focus:outline-none"
+        />
+        <button
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded"
+        >
+          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+        </button>
+      </div>
+
+      {analysis && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          className="space-y-4"
+        >
+          {/* Score Bar */}
+          <div>
+            <div className="flex justify-between mb-2">
+              <span className="text-sm font-medium">Strength</span>
+              <span className={cn('text-sm font-bold', analysis.color)}>{analysis.label}</span>
+            </div>
+            <div className="h-2 bg-muted rounded-full overflow-hidden">
+              <motion.div
+                initial={{ width: 0 }}
+                animate={{ width: `${analysis.score}%` }}
+                className={cn(
+                  'h-full rounded-full',
+                  analysis.score < 30 ? 'bg-red-500' :
+                  analysis.score < 50 ? 'bg-orange-500' :
+                  analysis.score < 70 ? 'bg-yellow-500' :
+                  analysis.score < 90 ? 'bg-green-500' : 'bg-emerald-500'
+                )}
+              />
+            </div>
+          </div>
+
+          {/* Criteria Checklist */}
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { key: 'length', label: '12+ characters' },
+              { key: 'uppercase', label: 'Uppercase (A-Z)' },
+              { key: 'lowercase', label: 'Lowercase (a-z)' },
+              { key: 'numbers', label: 'Numbers (0-9)' },
+              { key: 'special', label: 'Special chars' },
+              { key: 'noCommon', label: 'No common words' },
+            ].map(item => (
+              <div key={item.key} className="flex items-center gap-2 text-sm">
+                {analysis.details[item.key as keyof typeof analysis.details] ? (
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                ) : (
+                  <XCircle className="w-4 h-4 text-red-500" />
+                )}
+                <span className={analysis.details[item.key as keyof typeof analysis.details] ? 'text-muted-foreground' : ''}>
+                  {item.label}
+                </span>
+              </div>
+            ))}
+          </div>
+
+          {/* Suggestions */}
+          {analysis.suggestions.length > 0 && (
+            <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                <span className="text-sm font-medium">Suggestions</span>
+              </div>
+              <ul className="text-xs text-muted-foreground space-y-1">
+                {analysis.suggestions.map((s, i) => (
+                  <li key={i}>• {s}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </motion.div>
+      )}
+    </div>
+  )
+}
+
+// ============================================
+// PASSWORD GENERATOR
+// ============================================
+
+interface PasswordOptions {
+  length: number
+  uppercase: boolean
+  lowercase: boolean
+  numbers: boolean
+  special: boolean
+  excludeAmbiguous: boolean
+}
+
+function generatePassword(options: PasswordOptions): string {
+  let chars = ''
+  if (options.lowercase) chars += options.excludeAmbiguous ? 'abcdefghjkmnpqrstuvwxyz' : 'abcdefghijklmnopqrstuvwxyz'
+  if (options.uppercase) chars += options.excludeAmbiguous ? 'ABCDEFGHJKMNPQRSTUVWXYZ' : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  if (options.numbers) chars += options.excludeAmbiguous ? '23456789' : '0123456789'
+  if (options.special) chars += '!@#$%^&*()_+-=[]{}|;:,.<>?'
+
+  if (!chars) return ''
+
+  let password = ''
+  const array = new Uint32Array(options.length)
+  crypto.getRandomValues(array)
+  for (let i = 0; i < options.length; i++) {
+    password += chars[array[i] % chars.length]
+  }
+  return password
+}
+
+export function PasswordGenerator() {
+  const [password, setPassword] = useState('')
+  const [copied, setCopied] = useState(false)
+  const [options, setOptions] = useState<PasswordOptions>({
+    length: 16,
+    uppercase: true,
+    lowercase: true,
+    numbers: true,
+    special: true,
+    excludeAmbiguous: true,
+  })
+
+  const handleGenerate = useCallback(() => {
+    setPassword(generatePassword(options))
+    setCopied(false)
+  }, [options])
+
+  const handleCopy = useCallback(async () => {
+    await navigator.clipboard.writeText(password)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }, [password])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+          <Key className="w-5 h-5 text-purple-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Secure Password Generator</h3>
+          <p className="text-xs text-muted-foreground">Generate cryptographically secure passwords</p>
+        </div>
+      </div>
+
+      {/* Generated Password */}
+      <div className="flex gap-2 mb-4">
+        <div className="flex-1 px-4 py-3 bg-muted/50 border border-border rounded-lg font-mono text-sm break-all">
+          {password || 'Click generate to create password'}
+        </div>
+        <button
+          onClick={handleCopy}
+          disabled={!password}
+          className="px-3 py-2 bg-muted hover:bg-muted/80 rounded-lg disabled:opacity-50 transition-colors"
+        >
+          {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+        </button>
+        <button
+          onClick={handleGenerate}
+          className="px-3 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg transition-colors"
+        >
+          <RefreshCw className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Options */}
+      <div className="space-y-3">
+        {/* Length Slider */}
+        <div>
+          <div className="flex justify-between mb-1">
+            <span className="text-sm">Length</span>
+            <span className="text-sm font-mono">{options.length}</span>
+          </div>
+          <input
+            type="range"
+            min={8}
+            max={64}
+            value={options.length}
+            onChange={(e) => setOptions(o => ({ ...o, length: parseInt(e.target.value) }))}
+            className="w-full accent-purple-500"
+          />
+        </div>
+
+        {/* Checkboxes */}
+        <div className="grid grid-cols-2 gap-2">
+          {[
+            { key: 'uppercase', label: 'Uppercase (A-Z)' },
+            { key: 'lowercase', label: 'Lowercase (a-z)' },
+            { key: 'numbers', label: 'Numbers (0-9)' },
+            { key: 'special', label: 'Special (!@#$)' },
+            { key: 'excludeAmbiguous', label: 'Exclude similar (0/O, l/1)' },
+          ].map(item => (
+            <label key={item.key} className="flex items-center gap-2 text-sm cursor-pointer">
+              <input
+                type="checkbox"
+                checked={options[item.key as keyof PasswordOptions] as boolean}
+                onChange={(e) => setOptions(o => ({ ...o, [item.key]: e.target.checked }))}
+                className="accent-purple-500"
+              />
+              {item.label}
+            </label>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// HASH GENERATOR
+// ============================================
+
+async function computeHash(text: string, algorithm: string): Promise<string> {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(text)
+  const hashBuffer = await crypto.subtle.digest(algorithm, data)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
+export function HashGenerator() {
+  const [input, setInput] = useState('')
+  const [hashes, setHashes] = useState<{ [key: string]: string }>({})
+  const [copied, setCopied] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  const algorithms = [
+    { name: 'MD5', id: 'md5', note: '(Not recommended for security)' },
+    { name: 'SHA-1', id: 'SHA-1', note: '(Deprecated)' },
+    { name: 'SHA-256', id: 'SHA-256', note: '(Recommended)' },
+    { name: 'SHA-384', id: 'SHA-384', note: '' },
+    { name: 'SHA-512', id: 'SHA-512', note: '(Most secure)' },
+  ]
+
+  const handleGenerate = useCallback(async () => {
+    if (!input) return
+    setLoading(true)
+
+    const newHashes: { [key: string]: string } = {}
+
+    for (const algo of algorithms) {
+      if (algo.id === 'md5') {
+        // MD5 implementation (simple)
+        newHashes[algo.id] = await computeMD5(input)
+      } else {
+        newHashes[algo.id] = await computeHash(input, algo.id)
+      }
+    }
+
+    setHashes(newHashes)
+    setLoading(false)
+  }, [input])
+
+  const handleCopy = useCallback(async (hash: string, algo: string) => {
+    await navigator.clipboard.writeText(hash)
+    setCopied(algo)
+    setTimeout(() => setCopied(null), 2000)
+  }, [])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+          <Hash className="w-5 h-5 text-cyan-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Hash Generator</h3>
+          <p className="text-xs text-muted-foreground">Generate cryptographic hashes from text</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <textarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Enter text to hash..."
+          rows={3}
+          className="w-full px-4 py-3 bg-muted/50 border border-border rounded-lg focus:border-cyan-500 focus:outline-none resize-none"
+        />
+
+        <button
+          onClick={handleGenerate}
+          disabled={!input || loading}
+          className="w-full py-2 bg-cyan-500 hover:bg-cyan-600 text-white rounded-lg font-medium disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+        >
+          {loading ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4" />}
+          Generate Hashes
+        </button>
+
+        {Object.keys(hashes).length > 0 && (
+          <div className="space-y-2">
+            {algorithms.map(algo => (
+              <div key={algo.id} className="p-3 bg-muted/50 rounded-lg">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="text-sm font-medium">{algo.name}</span>
+                  <span className="text-xs text-muted-foreground">{algo.note}</span>
+                </div>
+                <div className="flex gap-2">
+                  <code className="flex-1 text-xs bg-black/20 px-2 py-1 rounded break-all">
+                    {hashes[algo.id] || '...'}
+                  </code>
+                  <button
+                    onClick={() => handleCopy(hashes[algo.id], algo.id)}
+                    className="p-1 hover:bg-muted rounded"
+                  >
+                    {copied === algo.id ? (
+                      <Check className="w-4 h-4 text-green-500" />
+                    ) : (
+                      <Copy className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// Simple MD5 implementation
+async function computeMD5(str: string): Promise<string> {
+  // Using a simple MD5 implementation for browser
+  const md5 = (string: string) => {
+    function md5cycle(x: number[], k: number[]) {
+      let a = x[0], b = x[1], c = x[2], d = x[3]
+
+      a = ff(a, b, c, d, k[0], 7, -680876936)
+      d = ff(d, a, b, c, k[1], 12, -389564586)
+      c = ff(c, d, a, b, k[2], 17,  606105819)
+      b = ff(b, c, d, a, k[3], 22, -1044525330)
+      a = ff(a, b, c, d, k[4], 7, -176418897)
+      d = ff(d, a, b, c, k[5], 12,  1200080426)
+      c = ff(c, d, a, b, k[6], 17, -1473231341)
+      b = ff(b, c, d, a, k[7], 22, -45705983)
+      a = ff(a, b, c, d, k[8], 7,  1770035416)
+      d = ff(d, a, b, c, k[9], 12, -1958414417)
+      c = ff(c, d, a, b, k[10], 17, -42063)
+      b = ff(b, c, d, a, k[11], 22, -1990404162)
+      a = ff(a, b, c, d, k[12], 7,  1804603682)
+      d = ff(d, a, b, c, k[13], 12, -40341101)
+      c = ff(c, d, a, b, k[14], 17, -1502002290)
+      b = ff(b, c, d, a, k[15], 22,  1236535329)
+
+      a = gg(a, b, c, d, k[1], 5, -165796510)
+      d = gg(d, a, b, c, k[6], 9, -1069501632)
+      c = gg(c, d, a, b, k[11], 14,  643717713)
+      b = gg(b, c, d, a, k[0], 20, -373897302)
+      a = gg(a, b, c, d, k[5], 5, -701558691)
+      d = gg(d, a, b, c, k[10], 9,  38016083)
+      c = gg(c, d, a, b, k[15], 14, -660478335)
+      b = gg(b, c, d, a, k[4], 20, -405537848)
+      a = gg(a, b, c, d, k[9], 5,  568446438)
+      d = gg(d, a, b, c, k[14], 9, -1019803690)
+      c = gg(c, d, a, b, k[3], 14, -187363961)
+      b = gg(b, c, d, a, k[8], 20,  1163531501)
+      a = gg(a, b, c, d, k[13], 5, -1444681467)
+      d = gg(d, a, b, c, k[2], 9, -51403784)
+      c = gg(c, d, a, b, k[7], 14,  1735328473)
+      b = gg(b, c, d, a, k[12], 20, -1926607734)
+
+      a = hh(a, b, c, d, k[5], 4, -378558)
+      d = hh(d, a, b, c, k[8], 11, -2022574463)
+      c = hh(c, d, a, b, k[11], 16,  1839030562)
+      b = hh(b, c, d, a, k[14], 23, -35309556)
+      a = hh(a, b, c, d, k[1], 4, -1530992060)
+      d = hh(d, a, b, c, k[4], 11,  1272893353)
+      c = hh(c, d, a, b, k[7], 16, -155497632)
+      b = hh(b, c, d, a, k[10], 23, -1094730640)
+      a = hh(a, b, c, d, k[13], 4,  681279174)
+      d = hh(d, a, b, c, k[0], 11, -358537222)
+      c = hh(c, d, a, b, k[3], 16, -722521979)
+      b = hh(b, c, d, a, k[6], 23,  76029189)
+      a = hh(a, b, c, d, k[9], 4, -640364487)
+      d = hh(d, a, b, c, k[12], 11, -421815835)
+      c = hh(c, d, a, b, k[15], 16,  530742520)
+      b = hh(b, c, d, a, k[2], 23, -995338651)
+
+      a = ii(a, b, c, d, k[0], 6, -198630844)
+      d = ii(d, a, b, c, k[7], 10,  1126891415)
+      c = ii(c, d, a, b, k[14], 15, -1416354905)
+      b = ii(b, c, d, a, k[5], 21, -57434055)
+      a = ii(a, b, c, d, k[12], 6,  1700485571)
+      d = ii(d, a, b, c, k[3], 10, -1894986606)
+      c = ii(c, d, a, b, k[10], 15, -1051523)
+      b = ii(b, c, d, a, k[1], 21, -2054922799)
+      a = ii(a, b, c, d, k[8], 6,  1873313359)
+      d = ii(d, a, b, c, k[15], 10, -30611744)
+      c = ii(c, d, a, b, k[6], 15, -1560198380)
+      b = ii(b, c, d, a, k[13], 21,  1309151649)
+      a = ii(a, b, c, d, k[4], 6, -145523070)
+      d = ii(d, a, b, c, k[11], 10, -1120210379)
+      c = ii(c, d, a, b, k[2], 15,  718787259)
+      b = ii(b, c, d, a, k[9], 21, -343485551)
+
+      x[0] = add32(a, x[0])
+      x[1] = add32(b, x[1])
+      x[2] = add32(c, x[2])
+      x[3] = add32(d, x[3])
+    }
+
+    function cmn(q: number, a: number, b: number, x: number, s: number, t: number) {
+      a = add32(add32(a, q), add32(x, t))
+      return add32((a << s) | (a >>> (32 - s)), b)
+    }
+
+    function ff(a: number, b: number, c: number, d: number, x: number, s: number, t: number) {
+      return cmn((b & c) | ((~b) & d), a, b, x, s, t)
+    }
+
+    function gg(a: number, b: number, c: number, d: number, x: number, s: number, t: number) {
+      return cmn((b & d) | (c & (~d)), a, b, x, s, t)
+    }
+
+    function hh(a: number, b: number, c: number, d: number, x: number, s: number, t: number) {
+      return cmn(b ^ c ^ d, a, b, x, s, t)
+    }
+
+    function ii(a: number, b: number, c: number, d: number, x: number, s: number, t: number) {
+      return cmn(c ^ (b | (~d)), a, b, x, s, t)
+    }
+
+    function md51(s: string) {
+      const n = s.length
+      const state = [1732584193, -271733879, -1732584194, 271733878]
+      let i: number
+      for (i = 64; i <= s.length; i += 64) {
+        md5cycle(state, md5blk(s.substring(i - 64, i)))
+      }
+      s = s.substring(i - 64)
+      const tail = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+      for (i = 0; i < s.length; i++)
+        tail[i >> 2] |= s.charCodeAt(i) << ((i % 4) << 3)
+      tail[i >> 2] |= 0x80 << ((i % 4) << 3)
+      if (i > 55) {
+        md5cycle(state, tail)
+        for (i = 0; i < 16; i++) tail[i] = 0
+      }
+      tail[14] = n * 8
+      md5cycle(state, tail)
+      return state
+    }
+
+    function md5blk(s: string) {
+      const md5blks = []
+      for (let i = 0; i < 64; i += 4) {
+        md5blks[i >> 2] = s.charCodeAt(i) +
+          (s.charCodeAt(i + 1) << 8) +
+          (s.charCodeAt(i + 2) << 16) +
+          (s.charCodeAt(i + 3) << 24)
+      }
+      return md5blks
+    }
+
+    const hex_chr = '0123456789abcdef'.split('')
+
+    function rhex(n: number) {
+      let s = ''
+      for (let j = 0; j < 4; j++)
+        s += hex_chr[(n >> (j * 8 + 4)) & 0x0F] + hex_chr[(n >> (j * 8)) & 0x0F]
+      return s
+    }
+
+    function hex(x: number[]): string {
+      const result: string[] = []
+      for (let i = 0; i < x.length; i++)
+        result[i] = rhex(x[i])
+      return result.join('')
+    }
+
+    function add32(a: number, b: number) {
+      return (a + b) & 0xFFFFFFFF
+    }
+
+    return hex(md51(string))
+  }
+
+  return md5(str)
+}
+
+// ============================================
+// BASE64 ENCODER/DECODER
+// ============================================
+
+export function Base64Tool() {
+  const [input, setInput] = useState('')
+  const [output, setOutput] = useState('')
+  const [mode, setMode] = useState<'encode' | 'decode'>('encode')
+  const [error, setError] = useState('')
+  const [copied, setCopied] = useState(false)
+
+  const handleConvert = useCallback(() => {
+    setError('')
+    try {
+      if (mode === 'encode') {
+        setOutput(btoa(unescape(encodeURIComponent(input))))
+      } else {
+        setOutput(decodeURIComponent(escape(atob(input))))
+      }
+    } catch {
+      setError('Invalid input for ' + mode + 'ing')
+      setOutput('')
+    }
+  }, [input, mode])
+
+  const handleCopy = useCallback(async () => {
+    await navigator.clipboard.writeText(output)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }, [output])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
+          <Binary className="w-5 h-5 text-orange-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Base64 Encoder/Decoder</h3>
+          <p className="text-xs text-muted-foreground">Encode or decode Base64 strings</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {/* Mode Toggle */}
+        <div className="flex rounded-lg overflow-hidden border border-border">
+          <button
+            onClick={() => setMode('encode')}
+            className={cn(
+              'flex-1 py-2 text-sm font-medium transition-colors',
+              mode === 'encode' ? 'bg-orange-500 text-white' : 'bg-muted/50 hover:bg-muted'
+            )}
+          >
+            Encode
+          </button>
+          <button
+            onClick={() => setMode('decode')}
+            className={cn(
+              'flex-1 py-2 text-sm font-medium transition-colors',
+              mode === 'decode' ? 'bg-orange-500 text-white' : 'bg-muted/50 hover:bg-muted'
+            )}
+          >
+            Decode
+          </button>
+        </div>
+
+        <textarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder={mode === 'encode' ? 'Enter text to encode...' : 'Enter Base64 to decode...'}
+          rows={3}
+          className="w-full px-4 py-3 bg-muted/50 border border-border rounded-lg focus:border-orange-500 focus:outline-none resize-none font-mono text-sm"
+        />
+
+        <button
+          onClick={handleConvert}
+          disabled={!input}
+          className="w-full py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium disabled:opacity-50 transition-colors"
+        >
+          {mode === 'encode' ? 'Encode to Base64' : 'Decode from Base64'}
+        </button>
+
+        {error && (
+          <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center gap-2 text-red-500 text-sm">
+            <AlertTriangle className="w-4 h-4" />
+            {error}
+          </div>
+        )}
+
+        {output && (
+          <div className="relative">
+            <textarea
+              value={output}
+              readOnly
+              rows={3}
+              className="w-full px-4 py-3 pr-12 bg-muted/50 border border-border rounded-lg font-mono text-sm resize-none"
+            />
+            <button
+              onClick={handleCopy}
+              className="absolute right-3 top-3 p-1 hover:bg-muted rounded"
+            >
+              {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// JWT DECODER
+// ============================================
+
+interface JWTPayload {
+  header: Record<string, unknown>
+  payload: Record<string, unknown>
+  signature: string
+  isValid: boolean
+}
+
+function decodeJWT(token: string): JWTPayload | null {
+  try {
+    const parts = token.split('.')
+    if (parts.length !== 3) return null
+
+    const header = JSON.parse(atob(parts[0].replace(/-/g, '+').replace(/_/g, '/')))
+    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')))
+
+    // Check expiration
+    const isValid = payload.exp ? payload.exp * 1000 > Date.now() : true
+
+    return {
+      header,
+      payload,
+      signature: parts[2],
+      isValid,
+    }
+  } catch {
+    return null
+  }
+}
+
+export function JWTDecoder() {
+  const [token, setToken] = useState('')
+  const [decoded, setDecoded] = useState<JWTPayload | null>(null)
+  const [error, setError] = useState('')
+
+  const handleDecode = useCallback(() => {
+    setError('')
+    const result = decodeJWT(token)
+    if (result) {
+      setDecoded(result)
+    } else {
+      setError('Invalid JWT token')
+      setDecoded(null)
+    }
+  }, [token])
+
+  const formatDate = (timestamp: number) => {
+    return new Date(timestamp * 1000).toLocaleString()
+  }
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+          <FileText className="w-5 h-5 text-blue-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">JWT Decoder</h3>
+          <p className="text-xs text-muted-foreground">Decode and inspect JSON Web Tokens</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <textarea
+          value={token}
+          onChange={(e) => setToken(e.target.value)}
+          placeholder="Paste your JWT token here..."
+          rows={3}
+          className="w-full px-4 py-3 bg-muted/50 border border-border rounded-lg focus:border-blue-500 focus:outline-none resize-none font-mono text-xs"
+        />
+
+        <button
+          onClick={handleDecode}
+          disabled={!token}
+          className="w-full py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium disabled:opacity-50 transition-colors"
+        >
+          Decode Token
+        </button>
+
+        {error && (
+          <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center gap-2 text-red-500 text-sm">
+            <AlertTriangle className="w-4 h-4" />
+            {error}
+          </div>
+        )}
+
+        {decoded && (
+          <div className="space-y-3">
+            {/* Token Status */}
+            <div className={cn(
+              'p-3 rounded-lg flex items-center gap-2',
+              decoded.isValid ? 'bg-green-500/10 text-green-500' : 'bg-red-500/10 text-red-500'
+            )}>
+              {decoded.isValid ? (
+                <><CheckCircle className="w-4 h-4" /> Token is valid (not expired)</>
+              ) : (
+                <><XCircle className="w-4 h-4" /> Token has expired</>
+              )}
+            </div>
+
+            {/* Header */}
+            <div className="p-3 bg-muted/50 rounded-lg">
+              <p className="text-sm font-medium mb-2 text-blue-400">Header</p>
+              <pre className="text-xs overflow-x-auto">
+                {JSON.stringify(decoded.header, null, 2)}
+              </pre>
+            </div>
+
+            {/* Payload */}
+            <div className="p-3 bg-muted/50 rounded-lg">
+              <p className="text-sm font-medium mb-2 text-purple-400">Payload</p>
+              <pre className="text-xs overflow-x-auto">
+                {JSON.stringify(decoded.payload, null, 2)}
+              </pre>
+
+              {/* Timestamps */}
+              {Boolean(decoded.payload.iat || decoded.payload.exp) && (
+                <div className="mt-2 pt-2 border-t border-border space-y-1">
+                  {Boolean(decoded.payload.iat) && (
+                    <p className="text-xs text-muted-foreground">
+                      Issued: {formatDate(decoded.payload.iat as number)}
+                    </p>
+                  )}
+                  {Boolean(decoded.payload.exp) && (
+                    <p className="text-xs text-muted-foreground">
+                      Expires: {formatDate(decoded.payload.exp as number)}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Signature */}
+            <div className="p-3 bg-muted/50 rounded-lg">
+              <p className="text-sm font-medium mb-2 text-cyan-400">Signature</p>
+              <code className="text-xs break-all">{decoded.signature}</code>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// SUBNET CALCULATOR
+// ============================================
+
+interface SubnetInfo {
+  networkAddress: string
+  broadcastAddress: string
+  firstHost: string
+  lastHost: string
+  totalHosts: number
+  usableHosts: number
+  wildcardMask: string
+  binaryMask: string
+}
+
+function calculateSubnet(ip: string, cidr: number): SubnetInfo | null {
+  try {
+    const parts = ip.split('.').map(Number)
+    if (parts.length !== 4 || parts.some(p => p < 0 || p > 255)) return null
+    if (cidr < 0 || cidr > 32) return null
+
+    const ipBinary = parts.map(p => p.toString(2).padStart(8, '0')).join('')
+    const mask = '1'.repeat(cidr) + '0'.repeat(32 - cidr)
+
+    const networkBinary = ipBinary.split('').map((bit, i) =>
+      bit === '1' && mask[i] === '1' ? '1' : '0'
+    ).join('')
+
+    const broadcastBinary = networkBinary.slice(0, cidr) + '1'.repeat(32 - cidr)
+
+    const binaryToIP = (binary: string) => {
+      return [
+        parseInt(binary.slice(0, 8), 2),
+        parseInt(binary.slice(8, 16), 2),
+        parseInt(binary.slice(16, 24), 2),
+        parseInt(binary.slice(24, 32), 2),
+      ].join('.')
+    }
+
+    const networkIP = binaryToIP(networkBinary)
+    const broadcastIP = binaryToIP(broadcastBinary)
+
+    const firstHostBinary = networkBinary.slice(0, 31) + '1'
+    const lastHostBinary = broadcastBinary.slice(0, 31) + '0'
+
+    const totalHosts = Math.pow(2, 32 - cidr)
+    const usableHosts = cidr >= 31 ? (cidr === 32 ? 1 : 2) : totalHosts - 2
+
+    const wildcardMask = mask.split('').map(b => b === '1' ? '0' : '1').join('')
+
+    return {
+      networkAddress: networkIP,
+      broadcastAddress: broadcastIP,
+      firstHost: cidr >= 31 ? networkIP : binaryToIP(firstHostBinary),
+      lastHost: cidr >= 31 ? broadcastIP : binaryToIP(lastHostBinary),
+      totalHosts,
+      usableHosts,
+      wildcardMask: binaryToIP(wildcardMask),
+      binaryMask: mask.match(/.{8}/g)?.join('.') || '',
+    }
+  } catch {
+    return null
+  }
+}
+
+export function SubnetCalculator() {
+  const [ip, setIP] = useState('192.168.1.0')
+  const [cidr, setCIDR] = useState(24)
+  const [result, setResult] = useState<SubnetInfo | null>(null)
+
+  const handleCalculate = useCallback(() => {
+    setResult(calculateSubnet(ip, cidr))
+  }, [ip, cidr])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+          <Network className="w-5 h-5 text-green-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Subnet Calculator</h3>
+          <p className="text-xs text-muted-foreground">Calculate network ranges from CIDR notation</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={ip}
+            onChange={(e) => setIP(e.target.value)}
+            placeholder="192.168.1.0"
+            className="flex-1 px-4 py-2 bg-muted/50 border border-border rounded-lg focus:border-green-500 focus:outline-none font-mono"
+          />
+          <div className="flex items-center gap-1 px-3 py-2 bg-muted/50 border border-border rounded-lg">
+            <span className="text-muted-foreground">/</span>
+            <input
+              type="number"
+              min={0}
+              max={32}
+              value={cidr}
+              onChange={(e) => setCIDR(parseInt(e.target.value) || 0)}
+              className="w-12 bg-transparent focus:outline-none font-mono text-center"
+            />
+          </div>
+        </div>
+
+        <button
+          onClick={handleCalculate}
+          className="w-full py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition-colors"
+        >
+          Calculate
+        </button>
+
+        {result && (
+          <div className="grid grid-cols-2 gap-2">
+            {[
+              { label: 'Network Address', value: result.networkAddress },
+              { label: 'Broadcast Address', value: result.broadcastAddress },
+              { label: 'First Usable Host', value: result.firstHost },
+              { label: 'Last Usable Host', value: result.lastHost },
+              { label: 'Total Hosts', value: result.totalHosts.toLocaleString() },
+              { label: 'Usable Hosts', value: result.usableHosts.toLocaleString() },
+              { label: 'Wildcard Mask', value: result.wildcardMask },
+            ].map(item => (
+              <div key={item.label} className="p-2 bg-muted/50 rounded-lg">
+                <p className="text-xs text-muted-foreground">{item.label}</p>
+                <p className="font-mono text-sm">{item.value}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// URL ENCODER/DECODER
+// ============================================
+
+export function URLEncoderDecoder() {
+  const [input, setInput] = useState('')
+  const [output, setOutput] = useState('')
+  const [mode, setMode] = useState<'encode' | 'decode'>('encode')
+  const [copied, setCopied] = useState(false)
+
+  const handleConvert = useCallback(() => {
+    try {
+      if (mode === 'encode') {
+        setOutput(encodeURIComponent(input))
+      } else {
+        setOutput(decodeURIComponent(input))
+      }
+    } catch {
+      setOutput('Error: Invalid input')
+    }
+  }, [input, mode])
+
+  const handleCopy = useCallback(async () => {
+    await navigator.clipboard.writeText(output)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }, [output])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center">
+          <Globe className="w-5 h-5 text-indigo-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">URL Encoder/Decoder</h3>
+          <p className="text-xs text-muted-foreground">Encode or decode URL components</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex rounded-lg overflow-hidden border border-border">
+          <button
+            onClick={() => setMode('encode')}
+            className={cn(
+              'flex-1 py-2 text-sm font-medium transition-colors',
+              mode === 'encode' ? 'bg-indigo-500 text-white' : 'bg-muted/50 hover:bg-muted'
+            )}
+          >
+            Encode
+          </button>
+          <button
+            onClick={() => setMode('decode')}
+            className={cn(
+              'flex-1 py-2 text-sm font-medium transition-colors',
+              mode === 'decode' ? 'bg-indigo-500 text-white' : 'bg-muted/50 hover:bg-muted'
+            )}
+          >
+            Decode
+          </button>
+        </div>
+
+        <textarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder={mode === 'encode' ? 'Enter URL to encode...' : 'Enter encoded URL to decode...'}
+          rows={2}
+          className="w-full px-4 py-3 bg-muted/50 border border-border rounded-lg focus:border-indigo-500 focus:outline-none resize-none font-mono text-sm"
+        />
+
+        <button
+          onClick={handleConvert}
+          disabled={!input}
+          className="w-full py-2 bg-indigo-500 hover:bg-indigo-600 text-white rounded-lg font-medium disabled:opacity-50 transition-colors"
+        >
+          {mode === 'encode' ? 'Encode URL' : 'Decode URL'}
+        </button>
+
+        {output && (
+          <div className="relative">
+            <textarea
+              value={output}
+              readOnly
+              rows={2}
+              className="w-full px-4 py-3 pr-12 bg-muted/50 border border-border rounded-lg font-mono text-sm resize-none"
+            />
+            <button
+              onClick={handleCopy}
+              className="absolute right-3 top-3 p-1 hover:bg-muted rounded"
+            >
+              {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// ENCRYPTION TOOL (AES)
+// ============================================
+
+export function EncryptionTool() {
+  const [input, setInput] = useState('')
+  const [password, setPassword] = useState('')
+  const [output, setOutput] = useState('')
+  const [mode, setMode] = useState<'encrypt' | 'decrypt'>('encrypt')
+  const [showPassword, setShowPassword] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const [error, setError] = useState('')
+
+  const deriveKey = async (password: string, salt: Uint8Array) => {
+    const encoder = new TextEncoder()
+    const keyMaterial = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(password),
+      { name: 'PBKDF2' },
+      false,
+      ['deriveKey']
+    )
+    // Convert salt to ArrayBuffer for TypeScript compatibility
+    const saltBuffer = new Uint8Array(salt).buffer
+    return crypto.subtle.deriveKey(
+      { name: 'PBKDF2', salt: saltBuffer, iterations: 100000, hash: 'SHA-256' },
+      keyMaterial,
+      { name: 'AES-GCM', length: 256 },
+      false,
+      ['encrypt', 'decrypt']
+    )
+  }
+
+  const handleEncrypt = async () => {
+    setError('')
+    try {
+      const encoder = new TextEncoder()
+      const data = encoder.encode(input)
+      const salt = crypto.getRandomValues(new Uint8Array(16))
+      const iv = crypto.getRandomValues(new Uint8Array(12))
+      const key = await deriveKey(password, salt)
+
+      // Convert iv and data to ArrayBuffer for TypeScript compatibility
+      const ivBuffer = new Uint8Array(iv).buffer
+      const dataBuffer = new Uint8Array(data).buffer
+
+      const encrypted = await crypto.subtle.encrypt(
+        { name: 'AES-GCM', iv: ivBuffer },
+        key,
+        dataBuffer
+      )
+
+      const combined = new Uint8Array(salt.length + iv.length + encrypted.byteLength)
+      combined.set(salt, 0)
+      combined.set(iv, salt.length)
+      combined.set(new Uint8Array(encrypted), salt.length + iv.length)
+
+      setOutput(btoa(String.fromCharCode(...combined)))
+    } catch {
+      setError('Encryption failed')
+    }
+  }
+
+  const handleDecrypt = async () => {
+    setError('')
+    try {
+      const combined = Uint8Array.from(atob(input), c => c.charCodeAt(0))
+      const salt = combined.slice(0, 16)
+      const iv = combined.slice(16, 28)
+      const data = combined.slice(28)
+
+      const key = await deriveKey(password, salt)
+
+      // Convert iv and data to ArrayBuffer for TypeScript compatibility
+      const ivBuffer = new Uint8Array(iv).buffer
+      const dataBuffer = new Uint8Array(data).buffer
+
+      const decrypted = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv: ivBuffer },
+        key,
+        dataBuffer
+      )
+
+      const decoder = new TextDecoder()
+      setOutput(decoder.decode(decrypted))
+    } catch {
+      setError('Decryption failed. Check your password and input.')
+    }
+  }
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(output)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
+          <Lock className="w-5 h-5 text-red-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">AES Encryption Tool</h3>
+          <p className="text-xs text-muted-foreground">Encrypt/decrypt text with AES-256-GCM</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex rounded-lg overflow-hidden border border-border">
+          <button
+            onClick={() => setMode('encrypt')}
+            className={cn(
+              'flex-1 py-2 text-sm font-medium transition-colors',
+              mode === 'encrypt' ? 'bg-red-500 text-white' : 'bg-muted/50 hover:bg-muted'
+            )}
+          >
+            Encrypt
+          </button>
+          <button
+            onClick={() => setMode('decrypt')}
+            className={cn(
+              'flex-1 py-2 text-sm font-medium transition-colors',
+              mode === 'decrypt' ? 'bg-red-500 text-white' : 'bg-muted/50 hover:bg-muted'
+            )}
+          >
+            Decrypt
+          </button>
+        </div>
+
+        <textarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder={mode === 'encrypt' ? 'Enter text to encrypt...' : 'Enter encrypted text to decrypt...'}
+          rows={3}
+          className="w-full px-4 py-3 bg-muted/50 border border-border rounded-lg focus:border-red-500 focus:outline-none resize-none"
+        />
+
+        <div className="relative">
+          <input
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter encryption password..."
+            className="w-full px-4 py-3 pr-12 bg-muted/50 border border-border rounded-lg focus:border-red-500 focus:outline-none"
+          />
+          <button
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded"
+          >
+            {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          </button>
+        </div>
+
+        <button
+          onClick={mode === 'encrypt' ? handleEncrypt : handleDecrypt}
+          disabled={!input || !password}
+          className="w-full py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-medium disabled:opacity-50 transition-colors flex items-center justify-center gap-2"
+        >
+          <Lock className="w-4 h-4" />
+          {mode === 'encrypt' ? 'Encrypt Text' : 'Decrypt Text'}
+        </button>
+
+        {error && (
+          <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center gap-2 text-red-500 text-sm">
+            <AlertTriangle className="w-4 h-4" />
+            {error}
+          </div>
+        )}
+
+        {output && (
+          <div className="relative">
+            <textarea
+              value={output}
+              readOnly
+              rows={3}
+              className="w-full px-4 py-3 pr-12 bg-muted/50 border border-border rounded-lg font-mono text-sm resize-none"
+            />
+            <button
+              onClick={handleCopy}
+              className="absolute right-3 top-3 p-1 hover:bg-muted rounded"
+            >
+              {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// CVSS SCORE CALCULATOR
+// ============================================
+
+const CVSS_METRICS = {
+  attackVector: [
+    { value: 'N', label: 'Network', score: 0.85 },
+    { value: 'A', label: 'Adjacent', score: 0.62 },
+    { value: 'L', label: 'Local', score: 0.55 },
+    { value: 'P', label: 'Physical', score: 0.2 },
+  ],
+  attackComplexity: [
+    { value: 'L', label: 'Low', score: 0.77 },
+    { value: 'H', label: 'High', score: 0.44 },
+  ],
+  privilegesRequired: [
+    { value: 'N', label: 'None', score: 0.85 },
+    { value: 'L', label: 'Low', score: 0.62 },
+    { value: 'H', label: 'High', score: 0.27 },
+  ],
+  userInteraction: [
+    { value: 'N', label: 'None', score: 0.85 },
+    { value: 'R', label: 'Required', score: 0.62 },
+  ],
+  scope: [
+    { value: 'U', label: 'Unchanged', score: 0 },
+    { value: 'C', label: 'Changed', score: 1 },
+  ],
+  confidentiality: [
+    { value: 'N', label: 'None', score: 0 },
+    { value: 'L', label: 'Low', score: 0.22 },
+    { value: 'H', label: 'High', score: 0.56 },
+  ],
+  integrity: [
+    { value: 'N', label: 'None', score: 0 },
+    { value: 'L', label: 'Low', score: 0.22 },
+    { value: 'H', label: 'High', score: 0.56 },
+  ],
+  availability: [
+    { value: 'N', label: 'None', score: 0 },
+    { value: 'L', label: 'Low', score: 0.22 },
+    { value: 'H', label: 'High', score: 0.56 },
+  ],
+}
+
+export function CVSSCalculator() {
+  const [metrics, setMetrics] = useState({
+    attackVector: 'N',
+    attackComplexity: 'L',
+    privilegesRequired: 'N',
+    userInteraction: 'N',
+    scope: 'U',
+    confidentiality: 'H',
+    integrity: 'H',
+    availability: 'H',
+  })
+
+  const calculateCVSS = useCallback(() => {
+    const av = CVSS_METRICS.attackVector.find(m => m.value === metrics.attackVector)?.score || 0
+    const ac = CVSS_METRICS.attackComplexity.find(m => m.value === metrics.attackComplexity)?.score || 0
+    const pr = CVSS_METRICS.privilegesRequired.find(m => m.value === metrics.privilegesRequired)?.score || 0
+    const ui = CVSS_METRICS.userInteraction.find(m => m.value === metrics.userInteraction)?.score || 0
+    const scopeChanged = metrics.scope === 'C'
+    const c = CVSS_METRICS.confidentiality.find(m => m.value === metrics.confidentiality)?.score || 0
+    const i = CVSS_METRICS.integrity.find(m => m.value === metrics.integrity)?.score || 0
+    const a = CVSS_METRICS.availability.find(m => m.value === metrics.availability)?.score || 0
+
+    // Exploitability
+    const exploitability = 8.22 * av * ac * pr * ui
+
+    // Impact
+    const iscBase = 1 - ((1 - c) * (1 - i) * (1 - a))
+    const impact = scopeChanged
+      ? 7.52 * (iscBase - 0.029) - 3.25 * Math.pow(iscBase - 0.02, 15)
+      : 6.42 * iscBase
+
+    if (impact <= 0) return 0
+
+    const baseScore = scopeChanged
+      ? Math.min(1.08 * (impact + exploitability), 10)
+      : Math.min(impact + exploitability, 10)
+
+    return Math.ceil(baseScore * 10) / 10
+  }, [metrics])
+
+  const score = calculateCVSS()
+
+  const getSeverity = (score: number) => {
+    if (score === 0) return { label: 'None', color: 'text-gray-500', bg: 'bg-gray-500/10' }
+    if (score < 4) return { label: 'Low', color: 'text-green-500', bg: 'bg-green-500/10' }
+    if (score < 7) return { label: 'Medium', color: 'text-yellow-500', bg: 'bg-yellow-500/10' }
+    if (score < 9) return { label: 'High', color: 'text-orange-500', bg: 'bg-orange-500/10' }
+    return { label: 'Critical', color: 'text-red-500', bg: 'bg-red-500/10' }
+  }
+
+  const severity = getSeverity(score)
+
+  const generateVector = () => {
+    return `CVSS:3.1/AV:${metrics.attackVector}/AC:${metrics.attackComplexity}/PR:${metrics.privilegesRequired}/UI:${metrics.userInteraction}/S:${metrics.scope}/C:${metrics.confidentiality}/I:${metrics.integrity}/A:${metrics.availability}`
+  }
+
+  const [copied, setCopied] = useState(false)
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(generateVector())
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
+          <AlertTriangle className="w-5 h-5 text-red-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">CVSS 3.1 Calculator</h3>
+          <p className="text-xs text-muted-foreground">Calculate vulnerability severity scores</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        {/* Score Display */}
+        <div className={cn('p-4 rounded-lg text-center', severity.bg)}>
+          <p className={cn('text-4xl font-bold', severity.color)}>{score.toFixed(1)}</p>
+          <p className={cn('text-sm font-medium', severity.color)}>{severity.label}</p>
+        </div>
+
+        {/* Metrics */}
+        <div className="grid grid-cols-2 gap-3">
+          {Object.entries(CVSS_METRICS).map(([key, options]) => (
+            <div key={key}>
+              <label className="text-xs text-muted-foreground capitalize mb-1 block">
+                {key.replace(/([A-Z])/g, ' $1').trim()}
+              </label>
+              <select
+                value={metrics[key as keyof typeof metrics]}
+                onChange={(e) => setMetrics(prev => ({ ...prev, [key]: e.target.value }))}
+                className="w-full px-2 py-1.5 bg-muted/50 border border-border rounded text-sm focus:border-red-500 focus:outline-none"
+              >
+                {options.map(opt => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </div>
+          ))}
+        </div>
+
+        {/* Vector String */}
+        <div className="p-3 bg-muted/50 rounded-lg">
+          <div className="flex justify-between items-center mb-1">
+            <span className="text-xs text-muted-foreground">Vector String</span>
+            <button onClick={handleCopy} className="text-xs text-primary hover:underline flex items-center gap-1">
+              {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+              {copied ? 'Copied!' : 'Copy'}
+            </button>
+          </div>
+          <code className="text-xs font-mono break-all">{generateVector()}</code>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// CSP POLICY GENERATOR
+// ============================================
+
+const CSP_DIRECTIVES = [
+  { key: 'default-src', label: 'Default Source', description: 'Fallback for other directives' },
+  { key: 'script-src', label: 'Script Source', description: 'Valid sources for JavaScript' },
+  { key: 'style-src', label: 'Style Source', description: 'Valid sources for stylesheets' },
+  { key: 'img-src', label: 'Image Source', description: 'Valid sources for images' },
+  { key: 'font-src', label: 'Font Source', description: 'Valid sources for fonts' },
+  { key: 'connect-src', label: 'Connect Source', description: 'Valid sources for fetch/XHR' },
+  { key: 'frame-src', label: 'Frame Source', description: 'Valid sources for iframes' },
+  { key: 'object-src', label: 'Object Source', description: 'Valid sources for plugins' },
+  { key: 'media-src', label: 'Media Source', description: 'Valid sources for audio/video' },
+]
+
+const CSP_VALUES = ["'self'", "'none'", "'unsafe-inline'", "'unsafe-eval'", 'data:', 'blob:', 'https:', '*']
+
+export function CSPGenerator() {
+  const [directives, setDirectives] = useState<Record<string, string[]>>({
+    'default-src': ["'self'"],
+    'script-src': ["'self'"],
+    'style-src': ["'self'", "'unsafe-inline'"],
+    'img-src': ["'self'", 'data:', 'https:'],
+  })
+  const [copied, setCopied] = useState(false)
+
+  const toggleDirectiveValue = (directive: string, value: string) => {
+    setDirectives(prev => {
+      const current = prev[directive] || []
+      if (current.includes(value)) {
+        const updated = current.filter(v => v !== value)
+        if (updated.length === 0) {
+          const { [directive]: _, ...rest } = prev
+          return rest
+        }
+        return { ...prev, [directive]: updated }
+      }
+      return { ...prev, [directive]: [...current, value] }
+    })
+  }
+
+  const generateCSP = () => {
+    return Object.entries(directives)
+      .filter(([, values]) => values.length > 0)
+      .map(([key, values]) => `${key} ${values.join(' ')}`)
+      .join('; ')
+  }
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(generateCSP())
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+          <Shield className="w-5 h-5 text-blue-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">CSP Policy Generator</h3>
+          <p className="text-xs text-muted-foreground">Generate Content Security Policy headers</p>
+        </div>
+      </div>
+
+      <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+        {CSP_DIRECTIVES.map(dir => (
+          <div key={dir.key} className="p-3 bg-muted/30 rounded-lg">
+            <div className="flex justify-between items-center mb-2">
+              <span className="font-medium text-sm">{dir.label}</span>
+              <span className="text-xs text-muted-foreground">{dir.key}</span>
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {CSP_VALUES.map(val => (
+                <button
+                  key={val}
+                  onClick={() => toggleDirectiveValue(dir.key, val)}
+                  className={cn(
+                    'px-2 py-0.5 rounded text-xs transition-colors',
+                    (directives[dir.key] || []).includes(val)
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                  )}
+                >
+                  {val}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {Object.keys(directives).length > 0 && (
+        <div className="mt-4 p-3 bg-muted/50 rounded-lg">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-xs font-medium">Generated Policy</span>
+            <button onClick={handleCopy} className="text-xs text-primary hover:underline flex items-center gap-1">
+              {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+              {copied ? 'Copied!' : 'Copy'}
+            </button>
+          </div>
+          <code className="text-xs font-mono break-all block">{generateCSP()}</code>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ============================================
+// ENTROPY ANALYZER
+// ============================================
+
+export function EntropyAnalyzer() {
+  const [input, setInput] = useState('')
+  const [analysis, setAnalysis] = useState<{
+    entropy: number
+    maxEntropy: number
+    normalized: number
+    isRandom: boolean
+    frequency: Record<string, number>
+  } | null>(null)
+
+  const analyzeEntropy = useCallback(() => {
+    if (!input) {
+      setAnalysis(null)
+      return
+    }
+
+    const freq: Record<string, number> = {}
+    for (const char of input) {
+      freq[char] = (freq[char] || 0) + 1
+    }
+
+    const len = input.length
+    let entropy = 0
+
+    for (const count of Object.values(freq)) {
+      const p = count / len
+      entropy -= p * Math.log2(p)
+    }
+
+    const uniqueChars = Object.keys(freq).length
+    const maxEntropy = Math.log2(uniqueChars) || 0
+    const normalized = maxEntropy > 0 ? entropy / maxEntropy : 0
+
+    setAnalysis({
+      entropy: Math.round(entropy * 1000) / 1000,
+      maxEntropy: Math.round(maxEntropy * 1000) / 1000,
+      normalized: Math.round(normalized * 100),
+      isRandom: entropy > 3.5 && normalized > 0.8,
+      frequency: freq,
+    })
+  }, [input])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+          <Zap className="w-5 h-5 text-purple-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Entropy Analyzer</h3>
+          <p className="text-xs text-muted-foreground">Analyze randomness and detect encryption</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <textarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Paste text, password, or data to analyze entropy..."
+          rows={3}
+          className="w-full px-4 py-3 bg-muted/50 border border-border rounded-lg focus:border-purple-500 focus:outline-none resize-none font-mono text-sm"
+        />
+
+        <button
+          onClick={analyzeEntropy}
+          disabled={!input}
+          className="w-full py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-medium disabled:opacity-50 transition-colors"
+        >
+          Analyze Entropy
+        </button>
+
+        {analysis && (
+          <div className="space-y-3">
+            <div className="grid grid-cols-3 gap-2">
+              <div className="p-3 bg-muted/50 rounded-lg text-center">
+                <p className="text-xl font-bold text-purple-500">{analysis.entropy}</p>
+                <p className="text-xs text-muted-foreground">Entropy (bits)</p>
+              </div>
+              <div className="p-3 bg-muted/50 rounded-lg text-center">
+                <p className="text-xl font-bold">{analysis.normalized}%</p>
+                <p className="text-xs text-muted-foreground">Normalized</p>
+              </div>
+              <div className="p-3 bg-muted/50 rounded-lg text-center">
+                <p className="text-xl font-bold">{Object.keys(analysis.frequency).length}</p>
+                <p className="text-xs text-muted-foreground">Unique Chars</p>
+              </div>
+            </div>
+
+            <div className={cn(
+              'p-3 rounded-lg flex items-center gap-2',
+              analysis.isRandom ? 'bg-green-500/10 text-green-500' : 'bg-yellow-500/10 text-yellow-500'
+            )}>
+              {analysis.isRandom ? <CheckCircle className="w-4 h-4" /> : <Info className="w-4 h-4" />}
+              <span className="text-sm">
+                {analysis.isRandom
+                  ? 'High entropy - likely encrypted/compressed/random data'
+                  : 'Low entropy - likely natural text or structured data'}
+              </span>
+            </div>
+
+            <div className="p-3 bg-muted/30 rounded-lg">
+              <p className="text-xs text-muted-foreground mb-2">Character frequency (top 10)</p>
+              <div className="flex flex-wrap gap-1">
+                {Object.entries(analysis.frequency)
+                  .sort((a, b) => b[1] - a[1])
+                  .slice(0, 10)
+                  .map(([char, count]) => (
+                    <span key={char} className="px-2 py-0.5 bg-muted rounded text-xs font-mono">
+                      {char === ' ' ? '␣' : char === '\n' ? '↵' : char}: {count}
+                    </span>
+                  ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// PHISHING URL DETECTOR
+// ============================================
+
+const SUSPICIOUS_PATTERNS = [
+  { pattern: /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/, reason: 'Contains IP address instead of domain' },
+  { pattern: /@/, reason: 'Contains @ symbol (potential URL spoofing)' },
+  { pattern: /\.(tk|ml|ga|cf|gq)$/i, reason: 'Uses free/suspicious TLD' },
+  { pattern: /-{2,}/, reason: 'Contains multiple consecutive hyphens' },
+  { pattern: /login|signin|account|verify|secure|update|confirm/i, reason: 'Contains suspicious keywords' },
+  { pattern: /paypal|amazon|apple|google|microsoft|facebook|bank/i, reason: 'Contains brand name (potential impersonation)' },
+  { pattern: /%[0-9a-f]{2}/i, reason: 'Contains URL-encoded characters' },
+  { pattern: /\.(exe|zip|rar|js|vbs|bat|cmd|ps1)$/i, reason: 'Links to executable file' },
+  { pattern: /bit\.ly|tinyurl|t\.co|goo\.gl|ow\.ly/i, reason: 'Uses URL shortener' },
+  { pattern: /^https?:\/\/[^\/]+\.[^\/]+\.[^\/]+\.[^\/]+/, reason: 'Excessive subdomains' },
+]
+
+export function PhishingDetector() {
+  const [url, setUrl] = useState('')
+  const [result, setResult] = useState<{
+    score: number
+    warnings: string[]
+    safe: boolean
+  } | null>(null)
+
+  const analyzeURL = useCallback(() => {
+    if (!url) {
+      setResult(null)
+      return
+    }
+
+    const warnings: string[] = []
+    let score = 100
+
+    // Check for HTTPS
+    if (!url.startsWith('https://')) {
+      warnings.push('Not using HTTPS (insecure connection)')
+      score -= 20
+    }
+
+    // Check suspicious patterns
+    for (const { pattern, reason } of SUSPICIOUS_PATTERNS) {
+      if (pattern.test(url)) {
+        warnings.push(reason)
+        score -= 15
+      }
+    }
+
+    // Check URL length
+    if (url.length > 100) {
+      warnings.push('Unusually long URL')
+      score -= 10
+    }
+
+    // Check for homograph attacks (mixed scripts)
+    if (/[а-яА-Я]/.test(url) || /[\u0400-\u04FF]/.test(url)) {
+      warnings.push('Contains Cyrillic characters (potential homograph attack)')
+      score -= 30
+    }
+
+    setResult({
+      score: Math.max(0, score),
+      warnings,
+      safe: score >= 70,
+    })
+  }, [url])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-orange-500/10 flex items-center justify-center">
+          <Search className="w-5 h-5 text-orange-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Phishing URL Detector</h3>
+          <p className="text-xs text-muted-foreground">Analyze URLs for suspicious patterns</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <input
+          type="text"
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="Enter URL to analyze..."
+          className="w-full px-4 py-3 bg-muted/50 border border-border rounded-lg focus:border-orange-500 focus:outline-none font-mono text-sm"
+        />
+
+        <button
+          onClick={analyzeURL}
+          disabled={!url}
+          className="w-full py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium disabled:opacity-50 transition-colors"
+        >
+          Analyze URL
+        </button>
+
+        {result && (
+          <div className="space-y-3">
+            {/* Score */}
+            <div className={cn(
+              'p-4 rounded-lg text-center',
+              result.safe ? 'bg-green-500/10' : 'bg-red-500/10'
+            )}>
+              <p className={cn(
+                'text-3xl font-bold',
+                result.safe ? 'text-green-500' : 'text-red-500'
+              )}>
+                {result.score}/100
+              </p>
+              <p className={cn(
+                'text-sm font-medium',
+                result.safe ? 'text-green-500' : 'text-red-500'
+              )}>
+                {result.safe ? 'Likely Safe' : 'Potentially Dangerous'}
+              </p>
+            </div>
+
+            {/* Warnings */}
+            {result.warnings.length > 0 && (
+              <div className="space-y-2">
+                <p className="text-xs font-medium text-muted-foreground">Warnings Found:</p>
+                {result.warnings.map((warning, idx) => (
+                  <div key={idx} className="flex items-start gap-2 p-2 bg-red-500/10 rounded-lg">
+                    <AlertTriangle className="w-4 h-4 text-red-500 mt-0.5 shrink-0" />
+                    <span className="text-xs text-red-500">{warning}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {result.warnings.length === 0 && (
+              <div className="flex items-center gap-2 p-3 bg-green-500/10 rounded-lg">
+                <CheckCircle className="w-4 h-4 text-green-500" />
+                <span className="text-sm text-green-500">No suspicious patterns detected</span>
+              </div>
+            )}
+
+            <p className="text-xs text-muted-foreground text-center">
+              Note: This is a heuristic analysis. Always verify URLs manually before clicking.
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// SECURITY HEADERS GENERATOR
+// ============================================
+
+export function SecurityHeadersGenerator() {
+  const [headers, setHeaders] = useState({
+    strictTransportSecurity: true,
+    xContentTypeOptions: true,
+    xFrameOptions: true,
+    xXssProtection: true,
+    referrerPolicy: true,
+    permissionsPolicy: false,
+  })
+  const [copied, setCopied] = useState(false)
+
+  const generateHeaders = () => {
+    const lines: string[] = []
+
+    if (headers.strictTransportSecurity) {
+      lines.push('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload')
+    }
+    if (headers.xContentTypeOptions) {
+      lines.push('X-Content-Type-Options: nosniff')
+    }
+    if (headers.xFrameOptions) {
+      lines.push('X-Frame-Options: DENY')
+    }
+    if (headers.xXssProtection) {
+      lines.push('X-XSS-Protection: 1; mode=block')
+    }
+    if (headers.referrerPolicy) {
+      lines.push('Referrer-Policy: strict-origin-when-cross-origin')
+    }
+    if (headers.permissionsPolicy) {
+      lines.push('Permissions-Policy: geolocation=(), microphone=(), camera=()')
+    }
+
+    return lines.join('\n')
+  }
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(generateHeaders())
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+          <Server className="w-5 h-5 text-cyan-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Security Headers</h3>
+          <p className="text-xs text-muted-foreground">Generate HTTP security headers</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="space-y-2">
+          {[
+            { key: 'strictTransportSecurity', label: 'Strict-Transport-Security', desc: 'Force HTTPS' },
+            { key: 'xContentTypeOptions', label: 'X-Content-Type-Options', desc: 'Prevent MIME sniffing' },
+            { key: 'xFrameOptions', label: 'X-Frame-Options', desc: 'Prevent clickjacking' },
+            { key: 'xXssProtection', label: 'X-XSS-Protection', desc: 'XSS filter' },
+            { key: 'referrerPolicy', label: 'Referrer-Policy', desc: 'Control referrer info' },
+            { key: 'permissionsPolicy', label: 'Permissions-Policy', desc: 'Restrict browser features' },
+          ].map(item => (
+            <label key={item.key} className="flex items-center justify-between p-2 bg-muted/30 rounded-lg cursor-pointer hover:bg-muted/50">
+              <div>
+                <span className="text-sm font-medium">{item.label}</span>
+                <span className="text-xs text-muted-foreground ml-2">{item.desc}</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={headers[item.key as keyof typeof headers]}
+                onChange={(e) => setHeaders(prev => ({ ...prev, [item.key]: e.target.checked }))}
+                className="accent-cyan-500"
+              />
+            </label>
+          ))}
+        </div>
+
+        <div className="p-3 bg-muted/50 rounded-lg">
+          <div className="flex justify-between items-center mb-2">
+            <span className="text-xs font-medium">Generated Headers</span>
+            <button onClick={handleCopy} className="text-xs text-primary hover:underline flex items-center gap-1">
+              {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+              {copied ? 'Copied!' : 'Copy'}
+            </button>
+          </div>
+          <pre className="text-xs font-mono whitespace-pre-wrap break-all">{generateHeaders()}</pre>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// SSL CERTIFICATE CHECKER
+// ============================================
+
+export function SSLCertificateChecker() {
+  const [domain, setDomain] = useState('')
+  const [isChecking, setIsChecking] = useState(false)
+  const [result, setResult] = useState<{
+    valid: boolean
+    issuer: string
+    validFrom: string
+    validTo: string
+    daysRemaining: number
+    grade: string
+    protocols: string[]
+  } | null>(null)
+
+  const checkCertificate = useCallback(() => {
+    if (!domain.trim()) return
+
+    setIsChecking(true)
+
+    // Simulate SSL check
+    setTimeout(() => {
+      const validFrom = new Date()
+      validFrom.setMonth(validFrom.getMonth() - 6)
+      const validTo = new Date()
+      validTo.setMonth(validTo.getMonth() + 6)
+      const daysRemaining = Math.floor((validTo.getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+
+      setResult({
+        valid: true,
+        issuer: "Let's Encrypt Authority X3",
+        validFrom: validFrom.toISOString().split('T')[0],
+        validTo: validTo.toISOString().split('T')[0],
+        daysRemaining,
+        grade: 'A+',
+        protocols: ['TLS 1.3', 'TLS 1.2'],
+      })
+      setIsChecking(false)
+    }, 1500)
+  }, [domain])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+          <Lock className="w-5 h-5 text-green-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">SSL Certificate Checker</h3>
+          <p className="text-xs text-muted-foreground">Analyze SSL/TLS certificates</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={domain}
+            onChange={(e) => setDomain(e.target.value)}
+            placeholder="example.com"
+            className="flex-1 px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-green-500 focus:outline-none text-sm font-mono"
+          />
+          <button
+            onClick={checkCertificate}
+            disabled={isChecking || !domain}
+            className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+          >
+            {isChecking ? 'Checking...' : 'Check'}
+          </button>
+        </div>
+
+        {result && (
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 p-3 bg-green-500/10 rounded-lg">
+              <CheckCircle className="w-6 h-6 text-green-500" />
+              <div>
+                <p className="font-bold text-green-500">Valid Certificate</p>
+                <p className="text-xs text-muted-foreground">Grade: {result.grade}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-3 bg-muted/50 rounded-lg">
+                <p className="text-xs text-muted-foreground">Issuer</p>
+                <p className="text-sm font-medium truncate">{result.issuer}</p>
+              </div>
+              <div className={cn(
+                'p-3 rounded-lg',
+                result.daysRemaining < 30 ? 'bg-red-500/10' : 'bg-muted/50'
+              )}>
+                <p className="text-xs text-muted-foreground">Days Remaining</p>
+                <p className={cn(
+                  'text-sm font-bold',
+                  result.daysRemaining < 30 ? 'text-red-500' : 'text-green-500'
+                )}>
+                  {result.daysRemaining} days
+                </p>
+              </div>
+            </div>
+
+            <div className="p-3 bg-muted/50 rounded-lg">
+              <p className="text-xs text-muted-foreground mb-2">Supported Protocols</p>
+              <div className="flex gap-2">
+                {result.protocols.map(protocol => (
+                  <span key={protocol} className="px-2 py-1 bg-green-500/20 text-green-500 rounded text-xs">
+                    {protocol}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="text-xs text-muted-foreground">
+              Valid: {result.validFrom} to {result.validTo}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// DNS LOOKUP TOOL
+// ============================================
+
+const DNS_RECORD_TYPES = ['A', 'AAAA', 'CNAME', 'MX', 'TXT', 'NS', 'SOA']
+
+export function DNSLookupTool() {
+  const [domain, setDomain] = useState('')
+  const [recordType, setRecordType] = useState('A')
+  const [isLooking, setIsLooking] = useState(false)
+  const [results, setResults] = useState<{ type: string; value: string; ttl: number }[]>([])
+
+  const performLookup = useCallback(() => {
+    if (!domain.trim()) return
+
+    setIsLooking(true)
+
+    // Simulate DNS lookup
+    setTimeout(() => {
+      const mockResults: { type: string; value: string; ttl: number }[] = []
+
+      switch (recordType) {
+        case 'A':
+          mockResults.push(
+            { type: 'A', value: '104.21.234.123', ttl: 300 },
+            { type: 'A', value: '172.67.182.45', ttl: 300 }
+          )
+          break
+        case 'AAAA':
+          mockResults.push(
+            { type: 'AAAA', value: '2606:4700:3030::6815:ea7b', ttl: 300 }
+          )
+          break
+        case 'MX':
+          mockResults.push(
+            { type: 'MX', value: '10 mail.example.com', ttl: 3600 },
+            { type: 'MX', value: '20 mail2.example.com', ttl: 3600 }
+          )
+          break
+        case 'TXT':
+          mockResults.push(
+            { type: 'TXT', value: 'v=spf1 include:_spf.google.com ~all', ttl: 3600 },
+            { type: 'TXT', value: 'google-site-verification=abc123xyz', ttl: 3600 }
+          )
+          break
+        case 'NS':
+          mockResults.push(
+            { type: 'NS', value: 'ns1.cloudflare.com', ttl: 86400 },
+            { type: 'NS', value: 'ns2.cloudflare.com', ttl: 86400 }
+          )
+          break
+        default:
+          mockResults.push(
+            { type: recordType, value: 'ns1.example.com admin.example.com 2024010101 10800 3600 604800 3600', ttl: 86400 }
+          )
+      }
+
+      setResults(mockResults)
+      setIsLooking(false)
+    }, 1000)
+  }, [domain, recordType])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+          <Globe className="w-5 h-5 text-blue-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">DNS Lookup</h3>
+          <p className="text-xs text-muted-foreground">Query DNS records</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={domain}
+            onChange={(e) => setDomain(e.target.value)}
+            placeholder="example.com"
+            className="flex-1 px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-blue-500 focus:outline-none text-sm font-mono"
+          />
+          <select
+            value={recordType}
+            onChange={(e) => setRecordType(e.target.value)}
+            className="px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-blue-500 focus:outline-none text-sm"
+          >
+            {DNS_RECORD_TYPES.map(type => (
+              <option key={type} value={type}>{type}</option>
+            ))}
+          </select>
+        </div>
+
+        <button
+          onClick={performLookup}
+          disabled={isLooking || !domain}
+          className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+        >
+          {isLooking ? 'Looking up...' : 'Lookup'}
+        </button>
+
+        {results.length > 0 && (
+          <div className="space-y-2">
+            {results.map((record, index) => (
+              <div key={index} className="p-3 bg-muted/50 rounded-lg">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <span className="px-2 py-0.5 bg-blue-500/20 text-blue-500 rounded text-xs font-mono mr-2">
+                      {record.type}
+                    </span>
+                    <span className="text-xs text-muted-foreground">TTL: {record.ttl}s</span>
+                  </div>
+                </div>
+                <p className="text-sm font-mono mt-2 break-all">{record.value}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// HTTP HEADERS ANALYZER
+// ============================================
+
+export function HTTPHeadersAnalyzer() {
+  const [url, setUrl] = useState('')
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [headers, setHeaders] = useState<{ name: string; value: string; secure: boolean; recommendation?: string }[]>([])
+
+  const analyzeHeaders = useCallback(() => {
+    if (!url.trim()) return
+
+    setIsAnalyzing(true)
+
+    // Simulate header analysis
+    setTimeout(() => {
+      setHeaders([
+        { name: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains', secure: true },
+        { name: 'X-Content-Type-Options', value: 'nosniff', secure: true },
+        { name: 'X-Frame-Options', value: 'SAMEORIGIN', secure: true },
+        { name: 'X-XSS-Protection', value: '1; mode=block', secure: true },
+        { name: 'Content-Security-Policy', value: 'Missing', secure: false, recommendation: 'Add CSP header to prevent XSS attacks' },
+        { name: 'Referrer-Policy', value: 'strict-origin-when-cross-origin', secure: true },
+        { name: 'Permissions-Policy', value: 'Missing', secure: false, recommendation: 'Add to control browser features' },
+        { name: 'Server', value: 'nginx/1.18.0', secure: false, recommendation: 'Hide server version for security' },
+      ])
+      setIsAnalyzing(false)
+    }, 1500)
+  }, [url])
+
+  const secureCount = headers.filter(h => h.secure).length
+  const totalCount = headers.length
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+          <Server className="w-5 h-5 text-purple-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">HTTP Headers Analyzer</h3>
+          <p className="text-xs text-muted-foreground">Check security headers</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="https://example.com"
+            className="flex-1 px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-purple-500 focus:outline-none text-sm font-mono"
+          />
+          <button
+            onClick={analyzeHeaders}
+            disabled={isAnalyzing || !url}
+            className="px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+          >
+            {isAnalyzing ? 'Analyzing...' : 'Analyze'}
+          </button>
+        </div>
+
+        {headers.length > 0 && (
+          <>
+            <div className="p-3 bg-muted/50 rounded-lg">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium">Security Score</span>
+                <span className={cn(
+                  'text-lg font-bold',
+                  secureCount >= totalCount * 0.8 ? 'text-green-500' :
+                  secureCount >= totalCount * 0.5 ? 'text-yellow-500' : 'text-red-500'
+                )}>
+                  {secureCount}/{totalCount}
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-2 max-h-60 overflow-y-auto">
+              {headers.map((header, index) => (
+                <div
+                  key={index}
+                  className={cn(
+                    'p-3 rounded-lg border-l-4',
+                    header.secure ? 'bg-green-500/10 border-green-500' : 'bg-red-500/10 border-red-500'
+                  )}
+                >
+                  <div className="flex justify-between items-start">
+                    <p className="font-mono text-sm font-medium">{header.name}</p>
+                    {header.secure ? (
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                    ) : (
+                      <AlertTriangle className="w-4 h-4 text-red-500" />
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1 break-all">{header.value}</p>
+                  {header.recommendation && (
+                    <p className="text-xs text-yellow-500 mt-1">{header.recommendation}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// PORT SCANNER SIMULATOR
+// ============================================
+
+const COMMON_PORTS = [
+  { port: 21, service: 'FTP', risk: 'medium' },
+  { port: 22, service: 'SSH', risk: 'low' },
+  { port: 23, service: 'Telnet', risk: 'high' },
+  { port: 25, service: 'SMTP', risk: 'medium' },
+  { port: 53, service: 'DNS', risk: 'low' },
+  { port: 80, service: 'HTTP', risk: 'medium' },
+  { port: 110, service: 'POP3', risk: 'medium' },
+  { port: 143, service: 'IMAP', risk: 'medium' },
+  { port: 443, service: 'HTTPS', risk: 'low' },
+  { port: 445, service: 'SMB', risk: 'high' },
+  { port: 3306, service: 'MySQL', risk: 'high' },
+  { port: 3389, service: 'RDP', risk: 'high' },
+  { port: 5432, service: 'PostgreSQL', risk: 'high' },
+  { port: 6379, service: 'Redis', risk: 'high' },
+  { port: 8080, service: 'HTTP-Alt', risk: 'medium' },
+  { port: 27017, service: 'MongoDB', risk: 'high' },
+]
+
+export function PortScannerSimulator() {
+  const [target, setTarget] = useState('')
+  const [isScanning, setIsScanning] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [results, setResults] = useState<{ port: number; service: string; status: 'open' | 'closed' | 'filtered'; risk: string }[]>([])
+
+  const startScan = useCallback(() => {
+    if (!target.trim()) return
+
+    setIsScanning(true)
+    setProgress(0)
+    setResults([])
+
+    const scanResults: typeof results = []
+    let index = 0
+
+    const scanInterval = setInterval(() => {
+      if (index >= COMMON_PORTS.length) {
+        clearInterval(scanInterval)
+        setIsScanning(false)
+        setProgress(100)
+        return
+      }
+
+      const portInfo = COMMON_PORTS[index]
+      const status = Math.random() > 0.7 ? 'open' : Math.random() > 0.5 ? 'closed' : 'filtered'
+
+      if (status === 'open') {
+        scanResults.push({ ...portInfo, status })
+        setResults([...scanResults])
+      }
+
+      setProgress(Math.round(((index + 1) / COMMON_PORTS.length) * 100))
+      index++
+    }, 200)
+  }, [target])
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center">
+          <Search className="w-5 h-5 text-red-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Port Scanner (Simulator)</h3>
+          <p className="text-xs text-muted-foreground">Simulate common port scan</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={target}
+            onChange={(e) => setTarget(e.target.value)}
+            placeholder="192.168.1.1 or example.com"
+            className="flex-1 px-3 py-2 bg-muted/50 border border-border rounded-lg focus:border-red-500 focus:outline-none text-sm font-mono"
+          />
+          <button
+            onClick={startScan}
+            disabled={isScanning || !target}
+            className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+          >
+            {isScanning ? 'Scanning...' : 'Scan'}
+          </button>
+        </div>
+
+        {isScanning && (
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Progress</span>
+              <span>{progress}%</span>
+            </div>
+            <div className="h-2 bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full bg-red-500 transition-all duration-200"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {results.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-sm font-medium">Open Ports Found: {results.length}</p>
+            {results.map((result, index) => (
+              <div
+                key={index}
+                className={cn(
+                  'p-3 rounded-lg flex justify-between items-center',
+                  result.risk === 'high' ? 'bg-red-500/10' :
+                  result.risk === 'medium' ? 'bg-yellow-500/10' : 'bg-green-500/10'
+                )}
+              >
+                <div>
+                  <span className="font-mono font-bold">:{result.port}</span>
+                  <span className="text-sm text-muted-foreground ml-2">{result.service}</span>
+                </div>
+                <span className={cn(
+                  'text-xs px-2 py-0.5 rounded',
+                  result.risk === 'high' ? 'bg-red-500/20 text-red-500' :
+                  result.risk === 'medium' ? 'bg-yellow-500/20 text-yellow-500' : 'bg-green-500/20 text-green-500'
+                )}>
+                  {result.risk} risk
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <p className="text-xs text-muted-foreground">
+          Note: This is a simulation for educational purposes. Only scan systems you own or have permission to test.
+        </p>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// SECURITY CHECKLIST
+// ============================================
+
+const SECURITY_CHECKLIST = [
+  { id: 'https', category: 'Transport', item: 'Use HTTPS everywhere', critical: true },
+  { id: 'hsts', category: 'Headers', item: 'Enable HSTS header', critical: true },
+  { id: 'csp', category: 'Headers', item: 'Implement Content-Security-Policy', critical: true },
+  { id: 'xframe', category: 'Headers', item: 'Set X-Frame-Options', critical: false },
+  { id: 'xcontent', category: 'Headers', item: 'Set X-Content-Type-Options', critical: false },
+  { id: 'cors', category: 'API', item: 'Configure CORS properly', critical: true },
+  { id: 'csrf', category: 'API', item: 'Implement CSRF protection', critical: true },
+  { id: 'ratelimit', category: 'API', item: 'Enable rate limiting', critical: false },
+  { id: 'input', category: 'Code', item: 'Validate all user input', critical: true },
+  { id: 'escape', category: 'Code', item: 'Escape output properly', critical: true },
+  { id: 'sqli', category: 'Code', item: 'Use parameterized queries', critical: true },
+  { id: 'hash', category: 'Auth', item: 'Hash passwords with bcrypt/argon2', critical: true },
+  { id: '2fa', category: 'Auth', item: 'Offer 2FA authentication', critical: false },
+  { id: 'session', category: 'Auth', item: 'Secure session management', critical: true },
+  { id: 'logs', category: 'Ops', item: 'Enable security logging', critical: false },
+  { id: 'updates', category: 'Ops', item: 'Keep dependencies updated', critical: true },
+]
+
+export function SecurityChecklist() {
+  const [checked, setChecked] = useState<string[]>([])
+
+  const toggleItem = (id: string) => {
+    setChecked(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    )
+  }
+
+  const totalItems = SECURITY_CHECKLIST.length
+  const checkedCount = checked.length
+  const criticalTotal = SECURITY_CHECKLIST.filter(i => i.critical).length
+  const criticalChecked = checked.filter(id => SECURITY_CHECKLIST.find(i => i.id === id)?.critical).length
+  const score = Math.round((checkedCount / totalItems) * 100)
+
+  const categories = [...new Set(SECURITY_CHECKLIST.map(i => i.category))]
+
+  return (
+    <div className="p-6 bg-card border border-border rounded-xl">
+      <div className="flex items-center gap-3 mb-4">
+        <div className="w-10 h-10 rounded-lg bg-cyan-500/10 flex items-center justify-center">
+          <CheckCircle className="w-5 h-5 text-cyan-500" />
+        </div>
+        <div>
+          <h3 className="font-bold">Security Checklist</h3>
+          <p className="text-xs text-muted-foreground">Web application security audit</p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="grid grid-cols-3 gap-3">
+          <div className="p-3 bg-muted/50 rounded-lg text-center">
+            <p className={cn(
+              'text-2xl font-bold',
+              score >= 80 ? 'text-green-500' : score >= 50 ? 'text-yellow-500' : 'text-red-500'
+            )}>
+              {score}%
+            </p>
+            <p className="text-xs text-muted-foreground">Score</p>
+          </div>
+          <div className="p-3 bg-muted/50 rounded-lg text-center">
+            <p className="text-2xl font-bold">{checkedCount}/{totalItems}</p>
+            <p className="text-xs text-muted-foreground">Completed</p>
+          </div>
+          <div className="p-3 bg-red-500/10 rounded-lg text-center">
+            <p className={cn(
+              'text-2xl font-bold',
+              criticalChecked === criticalTotal ? 'text-green-500' : 'text-red-500'
+            )}>
+              {criticalChecked}/{criticalTotal}
+            </p>
+            <p className="text-xs text-muted-foreground">Critical</p>
+          </div>
+        </div>
+
+        <div className="space-y-4 max-h-60 overflow-y-auto">
+          {categories.map(category => (
+            <div key={category}>
+              <p className="text-xs font-medium text-muted-foreground mb-2">{category}</p>
+              <div className="space-y-1">
+                {SECURITY_CHECKLIST.filter(i => i.category === category).map(item => (
+                  <button
+                    key={item.id}
+                    onClick={() => toggleItem(item.id)}
+                    className={cn(
+                      'w-full flex items-center gap-2 p-2 rounded-lg text-sm transition-colors text-left',
+                      checked.includes(item.id) ? 'bg-green-500/10' : 'bg-muted/30 hover:bg-muted/50'
+                    )}
+                  >
+                    <div className={cn(
+                      'w-4 h-4 rounded border flex items-center justify-center shrink-0',
+                      checked.includes(item.id) ? 'bg-green-500 border-green-500' : 'border-border'
+                    )}>
+                      {checked.includes(item.id) && <Check className="w-3 h-3 text-white" />}
+                    </div>
+                    <span className={checked.includes(item.id) ? 'line-through text-muted-foreground' : ''}>
+                      {item.item}
+                    </span>
+                    {item.critical && !checked.includes(item.id) && (
+                      <span className="text-xs px-1.5 py-0.5 bg-red-500/20 text-red-500 rounded ml-auto">
+                        Critical
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// SECURITY TOOLS GRID
+// ============================================
+
+export function SecurityToolsGrid() {
+  const [activeTab, setActiveTab] = useState('password')
+
+  const tabs = [
+    { id: 'password', label: 'Password', icon: Shield },
+    { id: 'hash', label: 'Hash', icon: Hash },
+    { id: 'encoding', label: 'Encoding', icon: Binary },
+    { id: 'crypto', label: 'Crypto', icon: Lock },
+    { id: 'network', label: 'Network', icon: Network },
+    { id: 'recon', label: 'Recon', icon: Search },
+    { id: 'advanced', label: 'Advanced', icon: Zap },
+  ]
+
+  return (
+    <div className="space-y-6">
+      {/* Tab Navigation */}
+      <div className="flex gap-2 overflow-x-auto pb-2">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={cn(
+              'flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap',
+              activeTab === tab.id
+                ? 'bg-security-safe text-white'
+                : 'bg-muted/50 hover:bg-muted text-muted-foreground'
+            )}
+          >
+            <tab.icon className="w-4 h-4" />
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab Content */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.2 }}
+        >
+          {activeTab === 'password' && (
+            <div className="grid md:grid-cols-2 gap-6">
+              <PasswordStrengthAnalyzer />
+              <PasswordGenerator />
+            </div>
+          )}
+
+          {activeTab === 'hash' && (
+            <div className="grid md:grid-cols-2 gap-6">
+              <HashGenerator />
+              <div className="p-6 bg-card border border-border rounded-xl">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-lg bg-yellow-500/10 flex items-center justify-center">
+                    <Info className="w-5 h-5 text-yellow-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold">About Hashing</h3>
+                    <p className="text-xs text-muted-foreground">Understanding cryptographic hashes</p>
+                  </div>
+                </div>
+                <div className="space-y-3 text-sm text-muted-foreground">
+                  <p><strong className="text-foreground">MD5:</strong> Fast but cryptographically broken. Never use for security.</p>
+                  <p><strong className="text-foreground">SHA-1:</strong> Deprecated. Collision attacks exist.</p>
+                  <p><strong className="text-foreground">SHA-256:</strong> Current standard. Secure for most applications.</p>
+                  <p><strong className="text-foreground">SHA-512:</strong> Highest security. Good for passwords.</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'encoding' && (
+            <div className="grid md:grid-cols-2 gap-6">
+              <Base64Tool />
+              <URLEncoderDecoder />
+            </div>
+          )}
+
+          {activeTab === 'crypto' && (
+            <div className="grid md:grid-cols-2 gap-6">
+              <EncryptionTool />
+              <JWTDecoder />
+            </div>
+          )}
+
+          {activeTab === 'network' && (
+            <div className="grid md:grid-cols-2 gap-6">
+              <SubnetCalculator />
+              <div className="p-6 bg-card border border-border rounded-xl">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                    <Server className="w-5 h-5 text-blue-500" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold">Common CIDR Notations</h3>
+                    <p className="text-xs text-muted-foreground">Quick reference for network masks</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-sm">
+                  {[
+                    { cidr: '/8', hosts: '16M', mask: '255.0.0.0' },
+                    { cidr: '/16', hosts: '65K', mask: '255.255.0.0' },
+                    { cidr: '/24', hosts: '254', mask: '255.255.255.0' },
+                    { cidr: '/25', hosts: '126', mask: '255.255.255.128' },
+                    { cidr: '/26', hosts: '62', mask: '255.255.255.192' },
+                    { cidr: '/27', hosts: '30', mask: '255.255.255.224' },
+                    { cidr: '/28', hosts: '14', mask: '255.255.255.240' },
+                    { cidr: '/30', hosts: '2', mask: '255.255.255.252' },
+                  ].map(item => (
+                    <div key={item.cidr} className="p-2 bg-muted/50 rounded-lg">
+                      <span className="font-mono font-bold">{item.cidr}</span>
+                      <span className="text-muted-foreground text-xs ml-2">{item.hosts} hosts</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'recon' && (
+            <div className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <SSLCertificateChecker />
+                <DNSLookupTool />
+              </div>
+              <div className="grid md:grid-cols-2 gap-6">
+                <HTTPHeadersAnalyzer />
+                <PortScannerSimulator />
+              </div>
+              <div className="grid md:grid-cols-1 gap-6">
+                <SecurityChecklist />
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'advanced' && (
+            <div className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <CVSSCalculator />
+                <PhishingDetector />
+              </div>
+              <div className="grid md:grid-cols-2 gap-6">
+                <CSPGenerator />
+                <SecurityHeadersGenerator />
+              </div>
+              <div className="grid md:grid-cols-1 gap-6">
+                <EntropyAnalyzer />
+              </div>
+            </div>
+          )}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  )
+}

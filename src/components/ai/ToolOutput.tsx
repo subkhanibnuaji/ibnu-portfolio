@@ -8,6 +8,7 @@
  */
 
 import { useState } from 'react';
+import Image from 'next/image';
 import {
   Wrench,
   Calculator,
@@ -19,6 +20,28 @@ import {
   CheckCircle,
   XCircle,
   Loader2,
+  ImageIcon,
+  Languages,
+  Laugh,
+  Code,
+  Download,
+  QrCode,
+  Smile,
+  FileDown,
+  Presentation,
+  Type,
+  BookOpen,
+  Library,
+  Bitcoin,
+  Lightbulb,
+  Key,
+  Ruler,
+  Palette,
+  Hash,
+  Quote,
+  Link2,
+  Calendar,
+  SmilePlus,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { AIToolCall } from '@/lib/ai/config';
@@ -41,11 +64,76 @@ export interface ToolOutputProps {
 
 // Tool icons
 const TOOL_ICONS: Record<string, React.ElementType> = {
+  // Utility
   calculator: Calculator,
   current_time: Clock,
   weather: Cloud,
+  convert_unit: Ruler,
+  date_calculator: Calendar,
+  shorten_url: Link2,
+
+  // Generation
+  generate_image: ImageIcon,
+  generate_qr: QrCode,
+  generate_meme: Smile,
+  generate_pdf: FileDown,
+  generate_ppt: Presentation,
+  generate_lorem: Type,
+  generate_password: Key,
+  generate_colors: Palette,
+  generate_hashtags: Hash,
+  generate_code: Code,
+  emoji_picker: SmilePlus,
+
+  // Knowledge
+  wikipedia_search: Library,
+  define_word: BookOpen,
+  random_fact: Lightbulb,
+  quote_of_day: Quote,
+
+  // Finance
+  crypto_price: Bitcoin,
+
+  // Text
+  translate: Languages,
   text_analysis: FileText,
+
+  // Fun
+  tell_joke: Laugh,
 };
+
+// Parse special results (images, QR codes, PDFs, PPTs)
+type ResultType = 'text' | 'image' | 'qr' | 'pdf' | 'ppt';
+
+function parseSpecialResult(result: string): { type: ResultType; content: string; meta?: string; data?: unknown } {
+  if (result.startsWith('IMAGE_GENERATED:')) {
+    const parts = result.replace('IMAGE_GENERATED:', '').split('|');
+    return { type: 'image', content: parts[0], meta: parts[1] };
+  }
+  if (result.startsWith('QR_GENERATED:')) {
+    const parts = result.replace('QR_GENERATED:', '').split('|');
+    return { type: 'qr', content: parts[0], meta: parts[1] };
+  }
+  if (result.startsWith('PDF_GENERATE:')) {
+    const jsonData = result.replace('PDF_GENERATE:', '');
+    try {
+      const data = JSON.parse(jsonData);
+      return { type: 'pdf', content: '', data };
+    } catch {
+      return { type: 'text', content: result };
+    }
+  }
+  if (result.startsWith('PPT_GENERATE:')) {
+    const jsonData = result.replace('PPT_GENERATE:', '');
+    try {
+      const data = JSON.parse(jsonData);
+      return { type: 'ppt', content: '', data };
+    } catch {
+      return { type: 'text', content: result };
+    }
+  }
+  return { type: 'text', content: result };
+}
 
 // ============================================
 // COMPONENT
@@ -56,11 +144,13 @@ export function ToolOutput({ tool, input, result, isLoading, toolCall, status, c
 
   // Normalize props - support both interfaces
   const toolName = toolCall?.name || tool || 'unknown';
-  const toolArgs: Record<string, unknown> = toolCall?.arguments || input || {};
-  const toolResult = toolCall?.result || result;
+  const toolArgs: Record<string, unknown> = toolCall?.arguments ?? input ?? {};
+  const toolResult = toolCall?.result ?? result;
+  const hasToolArgs = Object.keys(toolArgs).length > 0;
+  const hasToolResult = toolResult !== undefined && toolResult !== null;
   const toolError = toolCall?.error;
+  const hasToolError = !!toolError;
   const computedStatus = status || (isLoading ? 'running' : (toolResult ? 'success' : 'running'));
-  const hasArgs = Object.keys(toolArgs).length > 0;
 
   const Icon = TOOL_ICONS[toolName] || Wrench;
 
@@ -129,7 +219,7 @@ export function ToolOutput({ tool, input, result, isLoading, toolCall, status, c
       {isExpanded ? (
         <div className="px-4 pb-3 space-y-2">
           {/* Arguments */}
-          {hasArgs ? (
+          {hasToolArgs ? (
             <div>
               <p className="text-xs text-muted-foreground mb-1">Input:</p>
               <pre className="text-xs bg-black/20 rounded p-2 overflow-x-auto">
@@ -139,19 +229,52 @@ export function ToolOutput({ tool, input, result, isLoading, toolCall, status, c
           ) : null}
 
           {/* Result */}
-          {toolResult ? (
+          {hasToolResult ? (
             <div>
               <p className="text-xs text-muted-foreground mb-1">Output:</p>
-              <pre className="text-xs bg-black/20 rounded p-2 overflow-x-auto whitespace-pre-wrap">
-                {typeof toolResult === 'string'
-                  ? toolResult
-                  : JSON.stringify(toolResult, null, 2)}
-              </pre>
+              {(() => {
+                const resultStr = typeof toolResult === 'string' ? toolResult : JSON.stringify(toolResult, null, 2);
+                const parsed = parseSpecialResult(resultStr);
+
+                if (parsed.type === 'image') {
+                  return (
+                    <div className="space-y-2">
+                      <div className="relative rounded-lg overflow-hidden bg-black/20 aspect-square max-w-[300px]">
+                        <Image
+                          src={parsed.content}
+                          alt={parsed.meta || 'Generated image'}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
+                      </div>
+                      {parsed.meta && (
+                        <p className="text-xs text-muted-foreground italic">&quot;{parsed.meta}&quot;</p>
+                      )}
+                      <a
+                        href={parsed.content}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-xs text-blue-400 hover:underline"
+                      >
+                        <Download className="h-3 w-3" />
+                        Open full image
+                      </a>
+                    </div>
+                  );
+                }
+
+                return (
+                  <pre className="text-xs bg-black/20 rounded p-2 overflow-x-auto whitespace-pre-wrap">
+                    {resultStr}
+                  </pre>
+                );
+              })()}
             </div>
           ) : null}
 
           {/* Error */}
-          {toolError ? (
+          {hasToolError ? (
             <div>
               <p className="text-xs text-red-400 mb-1">Error:</p>
               <pre className="text-xs bg-red-500/10 text-red-300 rounded p-2">
