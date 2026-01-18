@@ -38,7 +38,7 @@ export function PongGame() {
 
   const gameStateRef = useRef(gameState)
   const keysPressed = useRef<Set<string>>(new Set())
-  const animationRef = useRef<number>()
+  const animationRef = useRef<number | null>(null)
 
   // Game constants
   const CANVAS_WIDTH = 800

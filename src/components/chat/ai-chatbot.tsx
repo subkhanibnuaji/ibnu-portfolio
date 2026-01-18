@@ -976,47 +976,6 @@ export function AIChatbot() {
     }
   }, [])
 
-  // Handle navigation
-  const handleNavigate = useCallback((href: string) => {
-    setIsOpen(false)
-    router.push(href)
-  }, [router])
-
-  // Handle special actions
-  const handleAction = useCallback((action: string) => {
-    setShowQuickPicker(false)
-
-    switch (action) {
-      case 'terminal':
-        setIsOpen(false)
-        // Trigger terminal
-        const terminalEvent = new KeyboardEvent('keydown', { key: 't' })
-        document.dispatchEvent(terminalEvent)
-        break
-      case 'command':
-        setIsOpen(false)
-        // Trigger command palette
-        const cmdEvent = new KeyboardEvent('keydown', { key: 'k', metaKey: true })
-        document.dispatchEvent(cmdEvent)
-        break
-      case 'shortcuts':
-        setIsOpen(false)
-        // Trigger shortcuts dialog
-        const shortcutEvent = new KeyboardEvent('keydown', { key: '?' })
-        document.dispatchEvent(shortcutEvent)
-        break
-      case 'search':
-        setIsOpen(false)
-        const searchEvent = new KeyboardEvent('keydown', { key: 'k', metaKey: true })
-        document.dispatchEvent(searchEvent)
-        break
-      case 'ai-mode':
-        setShowQuickPicker(false)
-        switchMode('ai')
-        break
-    }
-  }, [])
-
   // Send message with AI mode (using Groq API)
   const sendAIMessage = async (content: string) => {
     const userMessage: Message = {

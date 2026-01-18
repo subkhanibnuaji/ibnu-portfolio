@@ -105,7 +105,7 @@ const PRESETS: Record<string, Partial<ParticleConfig>> = {
 export function ParticleSystem() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const particlesRef = useRef<Particle[]>([])
-  const animationRef = useRef<number>()
+  const animationRef = useRef<number | null>(null)
   const [isPlaying, setIsPlaying] = useState(true)
   const [showSettings, setShowSettings] = useState(false)
   const [config, setConfig] = useState<ParticleConfig>({

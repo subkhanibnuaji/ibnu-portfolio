@@ -24,11 +24,11 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  accounts      Account[]
-  sessions      Session[]
-  chatSessions  ChatSession[]
-  pageViews     PageView[]
-  comments      Comment[]
+  accounts     Account[]
+  sessions     Session[]
+  chatSessions ChatSession[]
+  pageViews    PageView[]
+  comments     Comment[]
 
   @@map("users")
 }
@@ -81,18 +81,18 @@ enum Role {
 // ==================== PORTFOLIO CONTENT ====================
 
 model Profile {
-  id          String   @id @default(cuid())
-  name        String
-  title       String
-  tagline     String
-  bio         String   @db.Text
-  email       String
-  location    String
-  avatarUrl   String?
-  resumeUrl   String?
-  isPublic    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  name      String
+  title     String
+  tagline   String
+  bio       String   @db.Text
+  email     String
+  location  String
+  avatarUrl String?
+  resumeUrl String?
+  isPublic  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   socialLinks SocialLink[]
 
@@ -100,36 +100,36 @@ model Profile {
 }
 
 model SocialLink {
-  id        String   @id @default(cuid())
-  platform  String   // github, linkedin, twitter, tiktok, etc
+  id        String  @id @default(cuid())
+  platform  String // github, linkedin, twitter, tiktok, etc
   url       String
   username  String?
   profileId String
-  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@map("social_links")
 }
 
 model Project {
-  id           String   @id @default(cuid())
-  slug         String   @unique
+  id           String        @id @default(cuid())
+  slug         String        @unique
   title        String
-  description  String   @db.Text
-  longDesc     String?  @db.Text
-  category     String   // government, web3, enterprise, etc
+  description  String        @db.Text
+  longDesc     String?       @db.Text
+  category     String // government, web3, enterprise, etc
   status       ProjectStatus @default(IN_PROGRESS)
-  featured     Boolean  @default(false)
+  featured     Boolean       @default(false)
   imageUrl     String?
   liveUrl      String?
   githubUrl    String?
   technologies String[] // Array of tech names
   features     String[] // Array of feature descriptions
-  impact       String?  @db.Text
-  order        Int      @default(0)
+  impact       String?       @db.Text
+  order        Int           @default(0)
   startDate    DateTime?
   endDate      DateTime?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
   @@map("projects")
 }
@@ -145,9 +145,9 @@ enum ProjectStatus {
 model Skill {
   id          String   @id @default(cuid())
   name        String
-  category    String   // programming, frameworks, ai-ml, blockchain, etc
+  category    String // programming, frameworks, ai-ml, blockchain, etc
   proficiency Int      @default(50) // 0-100
-  icon        String?  // icon name or URL
+  icon        String? // icon name or URL
   order       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -160,9 +160,9 @@ model Experience {
   company     String
   position    String
   location    String?
-  type        String    // full-time, contract, freelance, founder
+  type        String // full-time, contract, freelance, founder
   description String    @db.Text
-  highlights  String[]  // Array of achievement bullets
+  highlights  String[] // Array of achievement bullets
   startDate   DateTime
   endDate     DateTime?
   isCurrent   Boolean   @default(false)
@@ -192,36 +192,36 @@ model Education {
 }
 
 model Certification {
-  id           String   @id @default(cuid())
-  name         String
-  issuer       String
-  issuerLogo   String?
-  category     String   // university, tech, consulting, finance, etc
-  credentialId String?
+  id            String    @id @default(cuid())
+  name          String
+  issuer        String
+  issuerLogo    String?
+  category      String // university, tech, consulting, finance, etc
+  credentialId  String?
   credentialUrl String?
-  issueDate    DateTime
-  expiryDate   DateTime?
-  order        Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  issueDate     DateTime
+  expiryDate    DateTime?
+  order         Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
 
   @@map("certifications")
 }
 
 model Organization {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
   role        String
   memberId    String?
-  description String?  @db.Text
+  description String?   @db.Text
   logoUrl     String?
   websiteUrl  String?
   startDate   DateTime
   endDate     DateTime?
-  isCurrent   Boolean  @default(true)
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isCurrent   Boolean   @default(true)
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@map("organizations")
 }
@@ -243,28 +243,28 @@ model Award {
 
 model ChatSession {
   id        String   @id @default(cuid())
-visitorId String?  // For anonymous visitors
-  userId    String?  // For authenticated users
+  visitorId String? // For anonymous visitors
+  userId    String? // For authenticated users
   user      User?    @relation(fields: [userId], references: [id])
   title     String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  messages  ChatMessage[]
+  messages ChatMessage[]
 
   @@map("chat_sessions")
 }
 
 model ChatMessage {
-  id          String      @id @default(cuid())
-  sessionId   String
-  session     ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  role        MessageRole
-  content     String      @db.Text
-  tokens      Int?        // Token count for billing
-  model       String?     // Model used (claude-3, gpt-4, etc)
-  latencyMs   Int?        // Response latency
-  createdAt   DateTime    @default(now())
+  id        String      @id @default(cuid())
+  sessionId String
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  role      MessageRole
+  content   String      @db.Text
+  tokens    Int? // Token count for billing
+  model     String? // Model used (claude-3, gpt-4, etc)
+  latencyMs Int? // Response latency
+  createdAt DateTime    @default(now())
 
   @@map("chat_messages")
 }
@@ -278,33 +278,33 @@ enum MessageRole {
 // ==================== BLOG & CONTENT ====================
 
 model BlogPost {
-  id          String   @id @default(cuid())
-  slug        String   @unique
+  id          String    @id @default(cuid())
+  slug        String    @unique
   title       String
-  excerpt     String?  @db.Text
-  content     String   @db.Text // MDX content
+  excerpt     String?   @db.Text
+  content     String    @db.Text // MDX content
   coverImage  String?
-  category    String?  // Simple category field
-  published   Boolean  @default(false)
-  featured    Boolean  @default(false)
-  views       Int      @default(0)
-  readingTime Int?     // Minutes
+  category    String? // Simple category field
+  published   Boolean   @default(false)
+  featured    Boolean   @default(false)
+  views       Int       @default(0)
+  readingTime Int? // Minutes
   publishedAt DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  categories  BlogCategory[]
-  tags        BlogTag[]
-  comments    Comment[]
+  categories BlogCategory[]
+  tags       BlogTag[]
+  comments   Comment[]
 
   @@map("blog_posts")
 }
 
 model BlogCategory {
-  id        String     @id @default(cuid())
-  name      String     @unique
-  slug      String     @unique
-  posts     BlogPost[]
+  id    String     @id @default(cuid())
+  name  String     @unique
+  slug  String     @unique
+  posts BlogPost[]
 
   @@map("blog_categories")
 }
@@ -319,24 +319,24 @@ model BlogTag {
 }
 
 model Comment {
-  id          String   @id @default(cuid())
-  content     String   @db.Text
-  postId      String
-  postSlug    String?
-  post        BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  userId      String?
-  user        User?    @relation(fields: [userId], references: [id])
-  name        String?  // For anonymous comments
-  email       String?
-  ip          String?  // IP address for spam detection
-  likes       Int      @default(0)
-  approved    Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  content   String   @db.Text
+  postId    String
+  postSlug  String?
+  post      BlogPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id])
+  name      String? // For anonymous comments
+  email     String?
+  ip        String? // IP address for spam detection
+  likes     Int      @default(0)
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  parentId  String?
-  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
-  replies   Comment[] @relation("CommentReplies")
+  parentId String?
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies  Comment[] @relation("CommentReplies")
 
   @@map("comments")
 }
@@ -351,14 +351,14 @@ model PageView {
   ip        String?
   country   String?
   city      String?
-  device    String?  // desktop, mobile, tablet
+  device    String? // desktop, mobile, tablet
   browser   String?
   os        String?
   userId    String?
   user      User?    @relation(fields: [userId], references: [id])
-  visitorId String?  // Anonymous visitor tracking
+  visitorId String? // Anonymous visitor tracking
   sessionId String?
-  duration  Int?     // Time on page in seconds
+  duration  Int? // Time on page in seconds
   createdAt DateTime @default(now())
 
   @@index([path])
@@ -368,7 +368,7 @@ model PageView {
 
 model AnalyticsEvent {
   id        String   @id @default(cuid())
-  name      String   // click, scroll, form_submit, etc
+  name      String // click, scroll, form_submit, etc
   category  String?
   label     String?
   value     Float?
@@ -385,19 +385,19 @@ model AnalyticsEvent {
 // ==================== CONTACT & NEWSLETTER ====================
 
 model ContactSubmission {
-  id        String   @id @default(cuid())
+  id        String        @id @default(cuid())
   name      String
   email     String
   subject   String?
-  message   String   @db.Text
-  category  String?  // inquiry, collaboration, job, etc
-  priority  Priority @default(MEDIUM)
+  message   String        @db.Text
+  category  String? // inquiry, collaboration, job, etc
+  priority  Priority      @default(MEDIUM)
   status    ContactStatus @default(NEW)
   ip        String?
   userAgent String?
   repliedAt DateTime?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 
   @@map("contact_submissions")
 }
@@ -418,15 +418,15 @@ enum ContactStatus {
 }
 
 model NewsletterSubscriber {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  name         String?
-  status       SubscriberStatus @default(ACTIVE)
-  source       String?  // where they subscribed from
-  confirmedAt  DateTime?
+  id             String           @id @default(cuid())
+  email          String           @unique
+  name           String?
+  status         SubscriberStatus @default(ACTIVE)
+  source         String? // where they subscribed from
+  confirmedAt    DateTime?
   unsubscribedAt DateTime?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
 
   @@map("newsletter_subscribers")
 }
@@ -441,10 +441,10 @@ enum SubscriberStatus {
 
 model CryptoAsset {
   id          String   @id @default(cuid())
-  symbol      String   // BTC, ETH, SOL, etc
+  symbol      String // BTC, ETH, SOL, etc
   name        String
-  category    String   // btc, altcoin, memecoin, defi
-  allocation  Float    // Percentage 0-100
+  category    String // btc, altcoin, memecoin, defi
+  allocation  Float // Percentage 0-100
   avgBuyPrice Float?
   quantity    Float?
   notes       String?  @db.Text
@@ -456,24 +456,24 @@ model CryptoAsset {
 }
 
 model TradingJournal {
-  id          String   @id @default(cuid())
-  symbol      String
-  type        TradeType
-  side        TradeSide
-  entryPrice  Float
-  exitPrice   Float?
-  quantity    Float
-  pnl         Float?
-  pnlPercent  Float?
-  fees        Float?
-  exchange    String?  // binance, bybit, okx, etc
-  thesis      String?  @db.Text
-  lessons     String?  @db.Text
-  screenshot  String?
-  entryDate   DateTime
-  exitDate    DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         String    @id @default(cuid())
+  symbol     String
+  type       TradeType
+  side       TradeSide
+  entryPrice Float
+  exitPrice  Float?
+  quantity   Float
+  pnl        Float?
+  pnlPercent Float?
+  fees       Float?
+  exchange   String? // binance, bybit, okx, etc
+  thesis     String?   @db.Text
+  lessons    String?   @db.Text
+  screenshot String?
+  entryDate  DateTime
+  exitDate   DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   @@map("trading_journal")
 }
@@ -493,18 +493,18 @@ enum TradeSide {
 // ==================== TESTIMONIALS ====================
 
 model Testimonial {
-  id          String   @id @default(cuid())
-  name        String
-  role        String
-  company     String?
-  content     String   @db.Text
-  avatarUrl   String?
-  rating      Int?     @default(5) // 1-5
-  featured    Boolean  @default(false)
-  approved    Boolean  @default(false)
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  name      String
+  role      String
+  company   String?
+  content   String   @db.Text
+  avatarUrl String?
+  rating    Int?     @default(5) // 1-5
+  featured  Boolean  @default(false)
+  approved  Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("testimonials")
 }
@@ -525,16 +525,16 @@ model Setting {
 // ==================== API KEYS ====================
 
 model ApiKey {
-  id          String   @id @default(cuid())
+  id          String    @id @default(cuid())
   name        String
-  key         String   @unique
+  key         String    @unique
   hashedKey   String
   lastUsedAt  DateTime?
   expiresAt   DateTime?
   permissions String[] // Array of permissions
-  rateLimit   Int      @default(1000) // Requests per hour
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  rateLimit   Int       @default(1000) // Requests per hour
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@map("api_keys")
 }

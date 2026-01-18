@@ -116,7 +116,7 @@ export function IPLookup() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => lookupIP()}
-            disabled={loading || (ipInput && !isValidIP(ipInput))}
+            disabled={loading || (!!ipInput && !isValidIP(ipInput))}
             className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium flex items-center gap-2 disabled:opacity-50"
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}

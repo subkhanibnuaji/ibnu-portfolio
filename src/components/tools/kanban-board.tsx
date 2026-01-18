@@ -36,7 +36,7 @@ export function KanbanBoard() {
   const [draggedTask, setDraggedTask] = useState<{ task: Task; sourceColumn: string } | null>(null)
   const [editingTask, setEditingTask] = useState<Task | null>(null)
   const [showAddTask, setShowAddTask] = useState<string | null>(null)
-  const [newTask, setNewTask] = useState({ title: '', description: '', priority: 'medium' as const, dueDate: '', tags: '' })
+  const [newTask, setNewTask] = useState<{ title: string; description: string; priority: 'low' | 'medium' | 'high'; dueDate: string; tags: string }>({ title: '', description: '', priority: 'medium', dueDate: '', tags: '' })
 
   // Load from localStorage
   useEffect(() => {
