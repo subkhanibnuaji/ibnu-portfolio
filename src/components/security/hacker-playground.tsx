@@ -2753,10 +2753,520 @@ function CryptoDemo({ isActive }: { isActive: boolean }) {
 }
 
 // ============================================
+// SOCIAL ENGINEERING / PHISHING SIMULATION
+// ============================================
+
+function PhishingSimulation({ isActive }: { isActive: boolean }) {
+  const [currentPhish, setCurrentPhish] = useState(0)
+  const [detected, setDetected] = useState<number[]>([])
+  const [score, setScore] = useState(0)
+  const [showAnalysis, setShowAnalysis] = useState(false)
+
+  const phishingExamples = [
+    {
+      type: 'email',
+      from: 'security@amaz0n-support.com',
+      subject: 'Your account has been compromised!',
+      body: 'Dear Customer, We detected unusual activity. Click here to verify your account immediately or it will be suspended.',
+      redFlags: ['Misspelled domain (amaz0n)', 'Urgency tactics', 'Generic greeting', 'Suspicious link'],
+      isPhish: true,
+    },
+    {
+      type: 'email',
+      from: 'noreply@github.com',
+      subject: 'Your repository has a new pull request',
+      body: 'Hey there! @contributor opened a pull request in your repository. Review the changes at github.com/...',
+      redFlags: [],
+      isPhish: false,
+    },
+    {
+      type: 'sms',
+      from: '+1-555-0123',
+      subject: 'SMS Message',
+      body: 'URGENT: Your bank account is locked! Visit bit.ly/unlock-now to restore access. Reply STOP to opt out.',
+      redFlags: ['Unknown number', 'Shortened URL', 'Urgency', 'Bank impersonation'],
+      isPhish: true,
+    },
+    {
+      type: 'email',
+      from: 'ceo@company-corp.net',
+      subject: 'Wire Transfer Needed ASAP',
+      body: 'Hi, I need you to process an urgent wire transfer of $50,000. I am in a meeting, so just do it quickly. CEO',
+      redFlags: ['External domain', 'Unusual request', 'Urgency', 'No verification', 'CEO fraud'],
+      isPhish: true,
+    },
+    {
+      type: 'email',
+      from: 'it-support@microsoft.com',
+      subject: 'Microsoft 365 Password Expiry',
+      body: 'Your password will expire in 24 hours. Click here to update: http://m1crosoft-login.com/verify',
+      redFlags: ['Fake Microsoft domain', 'Password urgency', 'Suspicious URL'],
+      isPhish: true,
+    },
+  ]
+
+  const handleAnswer = (isPhishAnswer: boolean) => {
+    const example = phishingExamples[currentPhish]
+    const correct = isPhishAnswer === example.isPhish
+
+    if (correct) {
+      setScore(prev => prev + 10)
+      setDetected(prev => [...prev, currentPhish])
+    }
+
+    setShowAnalysis(true)
+    setTimeout(() => {
+      setShowAnalysis(false)
+      setCurrentPhish((currentPhish + 1) % phishingExamples.length)
+    }, 3000)
+  }
+
+  const example = phishingExamples[currentPhish]
+
+  return (
+    <div className="space-y-4 font-mono text-xs h-full overflow-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-pink-400">
+          <AlertTriangle className="w-4 h-4" />
+          <span className="font-bold">PHISHING AWARENESS</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Trophy className="w-4 h-4 text-yellow-500" />
+          <span className="text-yellow-400 font-bold">{score} pts</span>
+        </div>
+      </div>
+
+      {/* Progress */}
+      <div className="flex gap-1">
+        {phishingExamples.map((_, i) => (
+          <div
+            key={i}
+            className={cn(
+              "h-2 flex-1 rounded-full",
+              detected.includes(i) ? "bg-green-500" :
+              i === currentPhish ? "bg-pink-500" : "bg-zinc-800"
+            )}
+          />
+        ))}
+      </div>
+
+      {/* Email/SMS Preview */}
+      <div className="p-4 bg-white/5 rounded-lg border border-zinc-700">
+        <div className="flex items-center gap-2 mb-3">
+          <div className={cn(
+            "px-2 py-0.5 rounded text-[10px] font-bold",
+            example.type === 'email' ? "bg-blue-500/20 text-blue-400" : "bg-green-500/20 text-green-400"
+          )}>
+            {example.type.toUpperCase()}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground">From:</span>
+            <span className="text-cyan-400">{example.from}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-muted-foreground">Subject:</span>
+            <span className="text-white font-bold">{example.subject}</span>
+          </div>
+          <div className="mt-3 p-3 bg-black/50 rounded text-gray-300 leading-relaxed">
+            {example.body}
+          </div>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      {!showAnalysis ? (
+        <div className="flex gap-3">
+          <button
+            onClick={() => handleAnswer(true)}
+            className="flex-1 py-3 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 font-bold hover:bg-red-500/30 transition-colors"
+          >
+            🚨 PHISHING
+          </button>
+          <button
+            onClick={() => handleAnswer(false)}
+            className="flex-1 py-3 bg-green-500/20 border border-green-500/30 rounded-lg text-green-400 font-bold hover:bg-green-500/30 transition-colors"
+          >
+            ✓ LEGITIMATE
+          </button>
+        </div>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={cn(
+            "p-4 rounded-lg border",
+            example.isPhish ? "bg-red-500/20 border-red-500/30" : "bg-green-500/20 border-green-500/30"
+          )}
+        >
+          <div className="font-bold mb-2">
+            {example.isPhish ? '🚨 This is a PHISHING attempt!' : '✓ This is LEGITIMATE'}
+          </div>
+          {example.isPhish && example.redFlags.length > 0 && (
+            <div className="space-y-1">
+              <div className="text-[10px] text-muted-foreground">Red Flags:</div>
+              {example.redFlags.map((flag, i) => (
+                <div key={i} className="flex items-center gap-1 text-[10px] text-red-400">
+                  <X className="w-3 h-3" /> {flag}
+                </div>
+              ))}
+            </div>
+          )}
+        </motion.div>
+      )}
+
+      {/* Tips */}
+      <div className="p-3 bg-zinc-900/50 border border-zinc-800 rounded text-[10px] text-muted-foreground">
+        <div className="font-bold text-white mb-1">Tips to spot phishing:</div>
+        <ul className="space-y-0.5 list-disc list-inside">
+          <li>Check sender email domain carefully</li>
+          <li>Hover over links before clicking</li>
+          <li>Be wary of urgent requests</li>
+          <li>Verify requests through official channels</li>
+        </ul>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
+// MALWARE ANALYSIS VISUALIZATION
+// ============================================
+
+function MalwareAnalysis({ isActive }: { isActive: boolean }) {
+  const [analyzing, setAnalyzing] = useState(true)
+  const [progress, setProgress] = useState(0)
+  const [results, setResults] = useState<{ category: string; finding: string; severity: string }[]>([])
+  const [verdict, setVerdict] = useState<'clean' | 'suspicious' | 'malicious' | null>(null)
+
+  const analysisSteps = [
+    'Extracting file metadata...',
+    'Computing file hashes (MD5, SHA256)...',
+    'Scanning with signature database...',
+    'Analyzing PE headers...',
+    'Checking for packers/crypters...',
+    'Extracting strings...',
+    'Analyzing imports/exports...',
+    'Behavioral analysis...',
+    'Network activity simulation...',
+    'Generating report...',
+  ]
+
+  const [currentStep, setCurrentStep] = useState(0)
+
+  const malwareIndicators = [
+    { category: 'File Info', finding: 'PE32 executable, packed with UPX', severity: 'medium' },
+    { category: 'Strings', finding: 'Contains suspicious URLs: evil-c2.com', severity: 'high' },
+    { category: 'Imports', finding: 'VirtualAllocEx, WriteProcessMemory (injection)', severity: 'high' },
+    { category: 'Behavior', finding: 'Attempts to disable Windows Defender', severity: 'critical' },
+    { category: 'Network', finding: 'Connects to known C2 server: 185.xx.xx.xx', severity: 'critical' },
+    { category: 'Registry', finding: 'Adds persistence via Run key', severity: 'high' },
+    { category: 'Evasion', finding: 'Anti-VM/Anti-debug techniques detected', severity: 'medium' },
+  ]
+
+  useEffect(() => {
+    if (!isActive) return
+
+    setProgress(0)
+    setCurrentStep(0)
+    setResults([])
+    setVerdict(null)
+    setAnalyzing(true)
+
+    let step = 0
+    const interval = setInterval(() => {
+      if (step < analysisSteps.length) {
+        setCurrentStep(step)
+        setProgress(((step + 1) / analysisSteps.length) * 100)
+
+        // Add random findings
+        if (step > 2 && Math.random() > 0.4) {
+          const indicator = malwareIndicators[Math.floor(Math.random() * malwareIndicators.length)]
+          setResults(prev => {
+            if (!prev.find(r => r.finding === indicator.finding)) {
+              return [...prev, indicator]
+            }
+            return prev
+          })
+        }
+
+        step++
+      } else {
+        setAnalyzing(false)
+        setVerdict('malicious')
+        clearInterval(interval)
+
+        // Reset after delay
+        setTimeout(() => {
+          setProgress(0)
+          setCurrentStep(0)
+          setResults([])
+          setVerdict(null)
+          setAnalyzing(true)
+        }, 5000)
+      }
+    }, 800)
+
+    return () => clearInterval(interval)
+  }, [isActive])
+
+  return (
+    <div className="space-y-4 font-mono text-xs h-full overflow-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-red-400">
+          <Bug className="w-4 h-4" />
+          <span className="font-bold">MALWARE SANDBOX</span>
+        </div>
+        <div className="text-[10px] text-muted-foreground">
+          VirusTotal Style Analysis
+        </div>
+      </div>
+
+      {/* File Info */}
+      <div className="p-3 bg-zinc-900/50 rounded border border-zinc-800">
+        <div className="flex items-center gap-2 mb-2">
+          <File className="w-4 h-4 text-red-400" />
+          <span className="text-white">suspicious_file.exe</span>
+        </div>
+        <div className="grid grid-cols-2 gap-2 text-[10px]">
+          <div><span className="text-muted-foreground">Size:</span> 1.2 MB</div>
+          <div><span className="text-muted-foreground">Type:</span> PE32</div>
+          <div className="col-span-2">
+            <span className="text-muted-foreground">SHA256:</span>
+            <span className="text-cyan-400 ml-1">a3f2b4c5...</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Progress */}
+      <div>
+        <div className="flex justify-between mb-1 text-[10px]">
+          <span className="text-muted-foreground">
+            {analyzing ? analysisSteps[currentStep] : 'Analysis Complete'}
+          </span>
+          <span className="text-cyan-400">{progress.toFixed(0)}%</span>
+        </div>
+        <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+          <motion.div
+            className="h-full bg-gradient-to-r from-cyan-500 to-red-500"
+            animate={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Findings */}
+      <div className="space-y-1 max-h-40 overflow-auto">
+        <AnimatePresence>
+          {results.map((result, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className={cn(
+                "p-2 rounded text-[10px] border-l-2",
+                result.severity === 'critical' && "bg-red-500/10 border-red-500",
+                result.severity === 'high' && "bg-orange-500/10 border-orange-500",
+                result.severity === 'medium' && "bg-yellow-500/10 border-yellow-500",
+              )}
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">[{result.category}]</span>
+                <span className={cn(
+                  "px-1 rounded",
+                  result.severity === 'critical' && "bg-red-500/20 text-red-400",
+                  result.severity === 'high' && "bg-orange-500/20 text-orange-400",
+                  result.severity === 'medium' && "bg-yellow-500/20 text-yellow-400",
+                )}>
+                  {result.severity.toUpperCase()}
+                </span>
+              </div>
+              <div className="text-white mt-1">{result.finding}</div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+
+      {/* Verdict */}
+      {verdict && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="p-4 bg-red-500/20 border border-red-500 rounded-lg text-center"
+        >
+          <Skull className="w-8 h-8 text-red-500 mx-auto mb-2" />
+          <div className="text-xl font-bold text-red-400">MALICIOUS</div>
+          <div className="text-[10px] text-muted-foreground mt-1">
+            Detected: Trojan.GenericKD / Backdoor.Agent
+          </div>
+          <div className="mt-2 text-[10px]">
+            <span className="text-red-400">{results.length} indicators</span>
+            <span className="text-muted-foreground"> of compromise found</span>
+          </div>
+        </motion.div>
+      )}
+    </div>
+  )
+}
+
+// ============================================
+// NETWORK TRAFFIC FLOW VISUALIZATION
+// ============================================
+
+function NetworkFlowVisualization({ isActive }: { isActive: boolean }) {
+  const [flows, setFlows] = useState<{
+    id: number
+    src: string
+    dst: string
+    port: number
+    protocol: string
+    bytes: number
+    status: 'active' | 'blocked' | 'suspicious'
+  }[]>([])
+  const [stats, setStats] = useState({ total: 0, blocked: 0, suspicious: 0 })
+
+  const protocols = ['HTTP', 'HTTPS', 'SSH', 'DNS', 'SMTP', 'FTP', 'RDP', 'SMB']
+  const destinations = [
+    'google.com', 'github.com', 'amazonaws.com', 'cloudflare.com',
+    'suspicious-domain.ru', 'malware-c2.cn', 'phishing-site.tk'
+  ]
+
+  useEffect(() => {
+    if (!isActive) return
+
+    const interval = setInterval(() => {
+      const isSuspicious = Math.random() > 0.8
+      const isBlocked = isSuspicious && Math.random() > 0.5
+      const dst = destinations[Math.floor(Math.random() * destinations.length)]
+
+      const newFlow = {
+        id: Date.now() + Math.random(),
+        src: `192.168.1.${Math.floor(Math.random() * 254) + 1}`,
+        dst,
+        port: [80, 443, 22, 53, 25, 21, 3389, 445][Math.floor(Math.random() * 8)],
+        protocol: protocols[Math.floor(Math.random() * protocols.length)],
+        bytes: Math.floor(Math.random() * 100000) + 100,
+        status: isBlocked ? 'blocked' as const : isSuspicious ? 'suspicious' as const : 'active' as const,
+      }
+
+      setFlows(prev => [newFlow, ...prev.slice(0, 8)])
+      setStats(prev => ({
+        total: prev.total + 1,
+        blocked: prev.blocked + (isBlocked ? 1 : 0),
+        suspicious: prev.suspicious + (isSuspicious && !isBlocked ? 1 : 0),
+      }))
+    }, 600)
+
+    return () => clearInterval(interval)
+  }, [isActive])
+
+  const formatBytes = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  }
+
+  return (
+    <div className="space-y-4 font-mono text-xs h-full overflow-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-blue-400">
+          <Wifi className="w-4 h-4" />
+          <span className="font-bold">NETWORK FLOW MONITOR</span>
+        </div>
+        <div className="text-[10px] text-green-400 animate-pulse">● LIVE</div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-2">
+        <div className="p-2 bg-zinc-900/50 rounded border border-blue-500/20 text-center">
+          <div className="text-lg font-bold text-blue-400">{stats.total}</div>
+          <div className="text-[10px] text-muted-foreground">Total Flows</div>
+        </div>
+        <div className="p-2 bg-zinc-900/50 rounded border border-red-500/20 text-center">
+          <div className="text-lg font-bold text-red-400">{stats.blocked}</div>
+          <div className="text-[10px] text-muted-foreground">Blocked</div>
+        </div>
+        <div className="p-2 bg-zinc-900/50 rounded border border-yellow-500/20 text-center">
+          <div className="text-lg font-bold text-yellow-400">{stats.suspicious}</div>
+          <div className="text-[10px] text-muted-foreground">Suspicious</div>
+        </div>
+      </div>
+
+      {/* Flow Table */}
+      <div className="space-y-1">
+        <div className="grid grid-cols-12 gap-1 text-[10px] text-muted-foreground px-2 py-1 bg-zinc-800/50 rounded">
+          <div className="col-span-3">Source</div>
+          <div className="col-span-4">Destination</div>
+          <div className="col-span-2">Proto</div>
+          <div className="col-span-2">Size</div>
+          <div className="col-span-1">St</div>
+        </div>
+
+        <AnimatePresence>
+          {flows.map((flow) => (
+            <motion.div
+              key={flow.id}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className={cn(
+                "grid grid-cols-12 gap-1 text-[10px] px-2 py-1.5 rounded border",
+                flow.status === 'active' && "bg-zinc-900/50 border-zinc-800",
+                flow.status === 'suspicious' && "bg-yellow-500/10 border-yellow-500/30",
+                flow.status === 'blocked' && "bg-red-500/10 border-red-500/30",
+              )}
+            >
+              <div className="col-span-3 text-cyan-400 truncate">{flow.src}</div>
+              <div className="col-span-4 text-white truncate">
+                {flow.dst}:{flow.port}
+              </div>
+              <div className="col-span-2">
+                <span className={cn(
+                  "px-1 rounded",
+                  flow.protocol === 'HTTPS' && "bg-green-500/20 text-green-400",
+                  flow.protocol === 'HTTP' && "bg-blue-500/20 text-blue-400",
+                  flow.protocol === 'SSH' && "bg-purple-500/20 text-purple-400",
+                  flow.protocol === 'DNS' && "bg-cyan-500/20 text-cyan-400",
+                )}>
+                  {flow.protocol}
+                </span>
+              </div>
+              <div className="col-span-2 text-muted-foreground">{formatBytes(flow.bytes)}</div>
+              <div className="col-span-1">
+                {flow.status === 'active' && <Check className="w-3 h-3 text-green-400" />}
+                {flow.status === 'suspicious' && <AlertTriangle className="w-3 h-3 text-yellow-400" />}
+                {flow.status === 'blocked' && <X className="w-3 h-3 text-red-400" />}
+              </div>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+
+      {/* Legend */}
+      <div className="flex items-center gap-4 text-[10px] text-muted-foreground">
+        <div className="flex items-center gap-1">
+          <div className="w-2 h-2 rounded-full bg-green-500" /> Allowed
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="w-2 h-2 rounded-full bg-yellow-500" /> Suspicious
+        </div>
+        <div className="flex items-center gap-1">
+          <div className="w-2 h-2 rounded-full bg-red-500" /> Blocked
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
 // MAIN HACKER PLAYGROUND COMPONENT
 // ============================================
 
-type PlaygroundMode = 'code' | 'scan' | 'terminal' | 'threats' | 'crack' | 'binary' | 'takeover' | 'ctf' | 'firewall' | 'worldmap' | 'siem' | 'crypto'
+type PlaygroundMode = 'code' | 'scan' | 'terminal' | 'threats' | 'crack' | 'binary' | 'takeover' | 'ctf' | 'firewall' | 'worldmap' | 'siem' | 'crypto' | 'phishing' | 'malware' | 'netflow'
 
 export function HackerPlayground() {
   const [isPlaying, setIsPlaying] = useState(true)
@@ -2789,6 +3299,9 @@ export function HackerPlayground() {
       '0': 'worldmap',
       's': 'siem',
       'c': 'crypto',
+      'p': 'phishing',
+      'b': 'malware',
+      'n': 'netflow',
     }
 
     const handleKeyPress = (e: KeyboardEvent) => {
@@ -2826,6 +3339,9 @@ export function HackerPlayground() {
     { id: 'worldmap', label: 'Global Threats', icon: Globe },
     { id: 'siem', label: 'SIEM Logs', icon: Activity },
     { id: 'crypto', label: 'Crypto Lab', icon: Lock },
+    { id: 'phishing', label: 'Phishing Quiz', icon: AlertTriangle },
+    { id: 'malware', label: 'Malware Lab', icon: Bug },
+    { id: 'netflow', label: 'Net Flow', icon: Wifi },
   ]
 
   return (
@@ -2927,6 +3443,9 @@ export function HackerPlayground() {
             {mode === 'worldmap' && 'Global Threat Intelligence'}
             {mode === 'siem' && 'Splunk / Elastic SIEM'}
             {mode === 'crypto' && 'Cryptography Laboratory'}
+            {mode === 'phishing' && 'Phishing Awareness Training'}
+            {mode === 'malware' && 'Sandbox Malware Analysis'}
+            {mode === 'netflow' && 'Network Flow Analyzer'}
           </div>
           <div className="text-xs text-muted-foreground font-mono">
             {mode === 'code' && `${currentScriptIndex + 1}/${hackingScripts.length}`}
@@ -2954,6 +3473,9 @@ export function HackerPlayground() {
           {mode === 'worldmap' && <WorldMapAttacks isActive={isPlaying} />}
           {mode === 'siem' && <SIEMSimulation isActive={isPlaying} />}
           {mode === 'crypto' && <CryptoDemo isActive={isPlaying} />}
+          {mode === 'phishing' && <PhishingSimulation isActive={isPlaying} />}
+          {mode === 'malware' && <MalwareAnalysis isActive={isPlaying} />}
+          {mode === 'netflow' && <NetworkFlowVisualization isActive={isPlaying} />}
         </div>
 
         {/* Status Bar */}
@@ -2976,6 +3498,9 @@ export function HackerPlayground() {
               {mode === 'worldmap' && 'Real-time Threat Intelligence'}
               {mode === 'siem' && 'Log Aggregation & Correlation'}
               {mode === 'crypto' && 'Cipher Algorithms Demo'}
+              {mode === 'phishing' && 'Social Engineering Defense'}
+              {mode === 'malware' && 'Static & Dynamic Analysis'}
+              {mode === 'netflow' && 'NetFlow / sFlow Monitoring'}
             </span>
           </div>
           <div className="flex items-center gap-4 text-muted-foreground">
@@ -3012,7 +3537,7 @@ export function HackerPlayground() {
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 text-xs font-mono">
+            <div className="grid grid-cols-2 md:grid-cols-6 gap-3 text-xs font-mono">
               <div className="space-y-1">
                 <div className="text-muted-foreground">Modes:</div>
                 <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">1</kbd> Live Coding</div>
@@ -3038,9 +3563,15 @@ export function HackerPlayground() {
                 <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">C</kbd> Crypto Lab</div>
               </div>
               <div className="space-y-1">
+                <div className="text-muted-foreground">Advanced:</div>
+                <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">P</kbd> Phishing Quiz</div>
+                <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">B</kbd> Malware Lab</div>
+                <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">N</kbd> Net Flow</div>
+              </div>
+              <div className="space-y-1">
                 <div className="text-muted-foreground">Controls:</div>
                 <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">Space</kbd> Play/Pause</div>
-                <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">M</kbd> Matrix Effect</div>
+                <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">M</kbd> Matrix</div>
                 <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">R</kbd> Reset</div>
               </div>
             </div>
