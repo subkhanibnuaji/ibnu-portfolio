@@ -8,9 +8,71 @@ import {
   Network, Zap, Bug, FileCode, Activity, Radio, Key, Folder,
   File, ChevronRight, Binary, Cpu, HardDrive, MemoryStick,
   Layers, Target, Trophy, Flag, Clock, Hash, Unlock, ShieldOff,
-  ArrowRight, Sparkles, Flame
+  ArrowRight, Sparkles, Flame, MapPin, Crosshair, Maximize2,
+  Minimize2, Volume2, VolumeX, Keyboard
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+
+// ============================================
+// GLITCH TEXT EFFECT COMPONENT
+// ============================================
+
+function GlitchText({ text, className }: { text: string; className?: string }) {
+  return (
+    <span className={cn("relative inline-block", className)}>
+      <span className="relative z-10">{text}</span>
+      <span
+        className="absolute top-0 left-0 -ml-[2px] text-cyan-500 opacity-70 animate-pulse"
+        style={{ clipPath: 'inset(0 0 50% 0)' }}
+        aria-hidden
+      >
+        {text}
+      </span>
+      <span
+        className="absolute top-0 left-0 ml-[2px] text-red-500 opacity-70 animate-pulse"
+        style={{ clipPath: 'inset(50% 0 0 0)', animationDelay: '0.1s' }}
+        aria-hidden
+      >
+        {text}
+      </span>
+    </span>
+  )
+}
+
+// ============================================
+// ASCII ART BANNERS
+// ============================================
+
+const asciiArt = {
+  skull: `
+    ██████  ██   ██ ██    ██ ██      ██
+    ██      ██  ██  ██    ██ ██      ██
+    ███████ █████   ██    ██ ██      ██
+         ██ ██  ██  ██    ██ ██      ██
+    ███████ ██   ██  ██████  ███████ ███████
+  `,
+  hacker: `
+  ╔═══════════════════════════════════════════╗
+  ║  ██╗  ██╗ █████╗  ██████╗██╗  ██╗███████╗ ║
+  ║  ██║  ██║██╔══██╗██╔════╝██║ ██╔╝██╔════╝ ║
+  ║  ███████║███████║██║     █████╔╝ █████╗   ║
+  ║  ██╔══██║██╔══██║██║     ██╔═██╗ ██╔══╝   ║
+  ║  ██║  ██║██║  ██║╚██████╗██║  ██╗███████╗ ║
+  ║  ╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝ ║
+  ╚═══════════════════════════════════════════╝
+  `,
+  access: `
+  ┌─────────────────────────────────────┐
+  │  █████╗  ██████╗ ██████╗███████╗███████╗███████╗
+  │ ██╔══██╗██╔════╝██╔════╝██╔════╝██╔════╝██╔════╝
+  │ ███████║██║     ██║     █████╗  ███████╗███████╗
+  │ ██╔══██║██║     ██║     ██╔══╝  ╚════██║╚════██║
+  │ ██║  ██║╚██████╗╚██████╗███████╗███████║███████║
+  │ ╚═╝  ╚═╝ ╚═════╝ ╚═════╝╚══════╝╚══════╝╚══════╝
+  │         G R A N T E D
+  └─────────────────────────────────────┘
+  `,
+}
 
 // ============================================
 // HACKING CODE SNIPPETS FOR AUTO-TYPING
@@ -1670,16 +1732,270 @@ function FirewallBypassVisualization({ isActive }: { isActive: boolean }) {
 }
 
 // ============================================
+// WORLD MAP ATTACK VISUALIZATION
+// ============================================
+
+interface Attack {
+  id: number
+  from: { x: number; y: number; country: string; city: string }
+  to: { x: number; y: number }
+  type: string
+  severity: 'low' | 'medium' | 'high' | 'critical'
+}
+
+function WorldMapAttacks({ isActive }: { isActive: boolean }) {
+  const [attacks, setAttacks] = useState<Attack[]>([])
+  const [stats, setStats] = useState({ total: 0, blocked: 0, countries: 0 })
+  const [topCountries, setTopCountries] = useState<{ country: string; count: number }[]>([])
+
+  const locations = [
+    { x: 15, y: 35, country: 'Russia', city: 'Moscow' },
+    { x: 85, y: 25, country: 'China', city: 'Beijing' },
+    { x: 75, y: 45, country: 'India', city: 'Mumbai' },
+    { x: 5, y: 55, country: 'Brazil', city: 'São Paulo' },
+    { x: 50, y: 30, country: 'Iran', city: 'Tehran' },
+    { x: 80, y: 60, country: 'Indonesia', city: 'Jakarta' },
+    { x: 55, y: 50, country: 'Nigeria', city: 'Lagos' },
+    { x: 65, y: 35, country: 'Pakistan', city: 'Karachi' },
+    { x: 25, y: 25, country: 'Ukraine', city: 'Kyiv' },
+    { x: 90, y: 35, country: 'North Korea', city: 'Pyongyang' },
+    { x: 30, y: 40, country: 'Turkey', city: 'Istanbul' },
+    { x: 10, y: 40, country: 'Argentina', city: 'Buenos Aires' },
+  ]
+
+  const attackTypes = [
+    'DDoS Attack',
+    'Brute Force',
+    'SQL Injection',
+    'Malware C2',
+    'Phishing',
+    'Ransomware',
+    'Zero-Day Exploit',
+    'APT Campaign',
+  ]
+
+  const severities: ('low' | 'medium' | 'high' | 'critical')[] = ['low', 'medium', 'high', 'critical']
+
+  useEffect(() => {
+    if (!isActive) return
+
+    const countryCounts: Record<string, number> = {}
+
+    const interval = setInterval(() => {
+      const from = locations[Math.floor(Math.random() * locations.length)]
+      const severity = severities[Math.floor(Math.random() * severities.length)]
+
+      const newAttack: Attack = {
+        id: Date.now() + Math.random(),
+        from,
+        to: { x: 45, y: 45 }, // Target (center - your server)
+        type: attackTypes[Math.floor(Math.random() * attackTypes.length)],
+        severity,
+      }
+
+      countryCounts[from.country] = (countryCounts[from.country] || 0) + 1
+
+      setAttacks(prev => [newAttack, ...prev.slice(0, 5)])
+      setStats(prev => ({
+        total: prev.total + 1,
+        blocked: prev.blocked + (Math.random() > 0.3 ? 1 : 0),
+        countries: Object.keys(countryCounts).length,
+      }))
+
+      setTopCountries(
+        Object.entries(countryCounts)
+          .map(([country, count]) => ({ country, count }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 5)
+      )
+    }, 1500)
+
+    return () => clearInterval(interval)
+  }, [isActive])
+
+  return (
+    <div className="space-y-4 font-mono text-xs h-full overflow-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-red-400">
+          <Globe className="w-4 h-4 animate-pulse" />
+          <span className="font-bold">GLOBAL THREAT MAP</span>
+        </div>
+        <div className="flex items-center gap-2 text-[10px]">
+          <span className="text-red-400 animate-pulse">● LIVE</span>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-2">
+        <div className="p-2 bg-zinc-900/50 rounded border border-red-500/20 text-center">
+          <div className="text-lg font-bold text-red-400">{stats.total}</div>
+          <div className="text-[10px] text-muted-foreground">Attacks</div>
+        </div>
+        <div className="p-2 bg-zinc-900/50 rounded border border-green-500/20 text-center">
+          <div className="text-lg font-bold text-green-400">{stats.blocked}</div>
+          <div className="text-[10px] text-muted-foreground">Blocked</div>
+        </div>
+        <div className="p-2 bg-zinc-900/50 rounded border border-cyan-500/20 text-center">
+          <div className="text-lg font-bold text-cyan-400">{stats.countries}</div>
+          <div className="text-[10px] text-muted-foreground">Countries</div>
+        </div>
+      </div>
+
+      {/* World Map Visualization */}
+      <div className="relative h-48 bg-zinc-900/50 rounded-lg border border-zinc-800 overflow-hidden">
+        {/* Grid lines */}
+        <div className="absolute inset-0 opacity-20">
+          {[...Array(10)].map((_, i) => (
+            <div key={`h-${i}`} className="absolute w-full h-px bg-green-500" style={{ top: `${i * 10}%` }} />
+          ))}
+          {[...Array(10)].map((_, i) => (
+            <div key={`v-${i}`} className="absolute h-full w-px bg-green-500" style={{ left: `${i * 10}%` }} />
+          ))}
+        </div>
+
+        {/* Target (your server) */}
+        <motion.div
+          className="absolute w-4 h-4 -ml-2 -mt-2"
+          style={{ left: '45%', top: '45%' }}
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          <div className="w-full h-full rounded-full bg-green-500 opacity-50" />
+          <div className="absolute inset-1 rounded-full bg-green-400" />
+        </motion.div>
+
+        {/* Attack Lines */}
+        <AnimatePresence>
+          {attacks.map((attack) => (
+            <motion.div
+              key={attack.id}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute"
+              style={{
+                left: `${attack.from.x}%`,
+                top: `${attack.from.y}%`,
+              }}
+            >
+              {/* Origin point */}
+              <motion.div
+                className={cn(
+                  "absolute w-2 h-2 -ml-1 -mt-1 rounded-full",
+                  attack.severity === 'critical' && "bg-red-500",
+                  attack.severity === 'high' && "bg-orange-500",
+                  attack.severity === 'medium' && "bg-yellow-500",
+                  attack.severity === 'low' && "bg-blue-500",
+                )}
+                animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
+                transition={{ duration: 1, repeat: Infinity }}
+              />
+
+              {/* Attack line (SVG) */}
+              <svg
+                className="absolute pointer-events-none"
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  left: 0,
+                  top: 0,
+                  overflow: 'visible',
+                }}
+              >
+                <motion.line
+                  x1="0"
+                  y1="0"
+                  x2={`${(attack.to.x - attack.from.x) * 3}px`}
+                  y2={`${(attack.to.y - attack.from.y) * 3}px`}
+                  stroke={
+                    attack.severity === 'critical' ? '#ef4444' :
+                    attack.severity === 'high' ? '#f97316' :
+                    attack.severity === 'medium' ? '#eab308' : '#3b82f6'
+                  }
+                  strokeWidth="1"
+                  strokeDasharray="4 2"
+                  initial={{ pathLength: 0, opacity: 0 }}
+                  animate={{ pathLength: 1, opacity: [0, 1, 0] }}
+                  transition={{ duration: 2 }}
+                />
+              </svg>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+
+        {/* Map Label */}
+        <div className="absolute bottom-2 left-2 text-[10px] text-muted-foreground">
+          Real-time Attack Visualization
+        </div>
+      </div>
+
+      {/* Top Attacking Countries */}
+      <div className="p-3 bg-zinc-900/50 rounded border border-zinc-800">
+        <div className="text-[10px] text-muted-foreground mb-2">Top Threat Origins:</div>
+        <div className="space-y-1">
+          {topCountries.map((c, i) => (
+            <div key={c.country} className="flex items-center justify-between text-[10px]">
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">{i + 1}.</span>
+                <MapPin className="w-3 h-3 text-red-400" />
+                <span className="text-white">{c.country}</span>
+              </div>
+              <span className="text-red-400">{c.count} attacks</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Recent Attack Log */}
+      <div className="space-y-1">
+        <AnimatePresence>
+          {attacks.slice(0, 3).map((attack) => (
+            <motion.div
+              key={attack.id}
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0 }}
+              className={cn(
+                "flex items-center justify-between p-2 rounded text-[10px] border",
+                attack.severity === 'critical' && "bg-red-500/10 border-red-500/30",
+                attack.severity === 'high' && "bg-orange-500/10 border-orange-500/30",
+                attack.severity === 'medium' && "bg-yellow-500/10 border-yellow-500/30",
+                attack.severity === 'low' && "bg-blue-500/10 border-blue-500/30",
+              )}
+            >
+              <div className="flex items-center gap-2">
+                <Crosshair className="w-3 h-3" />
+                <span>{attack.from.city}, {attack.from.country}</span>
+              </div>
+              <span className={cn(
+                attack.severity === 'critical' && "text-red-400",
+                attack.severity === 'high' && "text-orange-400",
+                attack.severity === 'medium' && "text-yellow-400",
+                attack.severity === 'low' && "text-blue-400",
+              )}>
+                {attack.type}
+              </span>
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+    </div>
+  )
+}
+
+// ============================================
 // MAIN HACKER PLAYGROUND COMPONENT
 // ============================================
 
-type PlaygroundMode = 'code' | 'scan' | 'terminal' | 'threats' | 'crack' | 'binary' | 'takeover' | 'ctf' | 'firewall'
+type PlaygroundMode = 'code' | 'scan' | 'terminal' | 'threats' | 'crack' | 'binary' | 'takeover' | 'ctf' | 'firewall' | 'worldmap'
 
 export function HackerPlayground() {
   const [isPlaying, setIsPlaying] = useState(true)
   const [currentScriptIndex, setCurrentScriptIndex] = useState(0)
   const [mode, setMode] = useState<PlaygroundMode>('code')
   const [showMatrix, setShowMatrix] = useState(true)
+  const [showKeyboardHints, setShowKeyboardHints] = useState(false)
 
   const handleNextScript = useCallback(() => {
     setCurrentScriptIndex(prev => (prev + 1) % hackingScripts.length)
@@ -1689,6 +2005,43 @@ export function HackerPlayground() {
     setCurrentScriptIndex(0)
     setIsPlaying(true)
   }
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const modeKeys: Record<string, PlaygroundMode> = {
+      '1': 'code',
+      '2': 'scan',
+      '3': 'terminal',
+      '4': 'threats',
+      '5': 'crack',
+      '6': 'binary',
+      '7': 'takeover',
+      '8': 'ctf',
+      '9': 'firewall',
+      '0': 'worldmap',
+    }
+
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Ignore if typing in input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return
+
+      if (modeKeys[e.key]) {
+        setMode(modeKeys[e.key])
+      } else if (e.key === ' ') {
+        e.preventDefault()
+        setIsPlaying(prev => !prev)
+      } else if (e.key === 'm') {
+        setShowMatrix(prev => !prev)
+      } else if (e.key === 'r') {
+        handleReset()
+      } else if (e.key === '?') {
+        setShowKeyboardHints(prev => !prev)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+    return () => window.removeEventListener('keydown', handleKeyPress)
+  }, [])
 
   const modes: { id: PlaygroundMode; label: string; icon: typeof Terminal }[] = [
     { id: 'code', label: 'Live Coding', icon: FileCode },
@@ -1700,6 +2053,7 @@ export function HackerPlayground() {
     { id: 'takeover', label: 'System Pwn', icon: Skull },
     { id: 'ctf', label: 'CTF Challenge', icon: Flag },
     { id: 'firewall', label: 'Firewall Bypass', icon: ShieldOff },
+    { id: 'worldmap', label: 'Global Threats', icon: Globe },
   ]
 
   return (
@@ -1711,33 +2065,45 @@ export function HackerPlayground() {
             <Skull className="w-5 h-5 text-green-500" />
           </div>
           <div>
-            <h3 className="font-bold text-lg">Ethical Hacker Playground</h3>
+            <h3 className="font-bold text-lg">
+              <GlitchText text="Ethical Hacker Playground" className="text-green-400" />
+            </h3>
             <p className="text-xs text-muted-foreground">Live security demonstration & showcase</p>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <button
+            onClick={() => setShowKeyboardHints(!showKeyboardHints)}
+            className={cn(
+              "p-2 rounded-lg transition-colors",
+              showKeyboardHints ? "bg-cyan-500/20 text-cyan-400" : "bg-muted text-muted-foreground"
+            )}
+            title="Keyboard Shortcuts (?)"
+          >
+            <Keyboard className="w-4 h-4" />
+          </button>
+          <button
             onClick={() => setShowMatrix(!showMatrix)}
             className={cn(
               "p-2 rounded-lg transition-colors",
               showMatrix ? "bg-green-500/20 text-green-400" : "bg-muted text-muted-foreground"
             )}
-            title="Toggle Matrix Effect"
+            title="Toggle Matrix Effect (M)"
           >
             <Eye className="w-4 h-4" />
           </button>
           <button
             onClick={() => setIsPlaying(!isPlaying)}
             className="p-2 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
-            title={isPlaying ? 'Pause' : 'Play'}
+            title={isPlaying ? 'Pause (Space)' : 'Play (Space)'}
           >
             {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
           </button>
           <button
             onClick={handleReset}
             className="p-2 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
-            title="Reset"
+            title="Reset (R)"
           >
             <RotateCcw className="w-4 h-4" />
           </button>
@@ -1786,6 +2152,7 @@ export function HackerPlayground() {
             {mode === 'takeover' && 'Cobalt Strike Beacon'}
             {mode === 'ctf' && 'CTF Platform - Capture The Flag'}
             {mode === 'firewall' && 'Firewall Evasion Framework'}
+            {mode === 'worldmap' && 'Global Threat Intelligence'}
           </div>
           <div className="text-xs text-muted-foreground font-mono">
             {mode === 'code' && `${currentScriptIndex + 1}/${hackingScripts.length}`}
@@ -1810,6 +2177,7 @@ export function HackerPlayground() {
           {mode === 'takeover' && <SystemTakeoverSimulation isActive={isPlaying} />}
           {mode === 'ctf' && <CTFChallenge isActive={isPlaying} />}
           {mode === 'firewall' && <FirewallBypassVisualization isActive={isPlaying} />}
+          {mode === 'worldmap' && <WorldMapAttacks isActive={isPlaying} />}
         </div>
 
         {/* Status Bar */}
@@ -1829,6 +2197,7 @@ export function HackerPlayground() {
               {mode === 'takeover' && 'Post-Exploitation Framework'}
               {mode === 'ctf' && 'Crypto / Web / Forensics'}
               {mode === 'firewall' && 'IDS/IPS Evasion'}
+              {mode === 'worldmap' && 'Real-time Threat Intelligence'}
             </span>
           </div>
           <div className="flex items-center gap-4 text-muted-foreground">
@@ -1843,6 +2212,58 @@ export function HackerPlayground() {
           </div>
         </div>
       </div>
+
+      {/* Keyboard Shortcuts Overlay */}
+      <AnimatePresence>
+        {showKeyboardHints && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            className="mt-4 p-4 bg-zinc-900/90 border border-cyan-500/30 rounded-lg"
+          >
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2 text-cyan-400">
+                <Keyboard className="w-4 h-4" />
+                <span className="font-bold text-sm">Keyboard Shortcuts</span>
+              </div>
+              <button
+                onClick={() => setShowKeyboardHints(false)}
+                className="text-muted-foreground hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs font-mono">
+              <div className="space-y-1">
+                <div className="text-muted-foreground">Modes:</div>
+                <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">1</kbd> Live Coding</div>
+                <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">2</kbd> Network Scan</div>
+                <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">3</kbd> Exploit Run</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-muted-foreground">&nbsp;</div>
+                <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">4</kbd> Threat Feed</div>
+                <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">5</kbd> Hash Crack</div>
+                <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">6</kbd> Packet Capture</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-muted-foreground">&nbsp;</div>
+                <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">7</kbd> System Pwn</div>
+                <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">8</kbd> CTF Challenge</div>
+                <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">9</kbd> Firewall Bypass</div>
+              </div>
+              <div className="space-y-1">
+                <div className="text-muted-foreground">Controls:</div>
+                <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">0</kbd> Global Threats</div>
+                <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">Space</kbd> Play/Pause</div>
+                <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">M</kbd> Matrix Effect</div>
+                <div><kbd className="px-1.5 py-0.5 bg-zinc-800 rounded">R</kbd> Reset</div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Disclaimer */}
       <div className="mt-4 p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-lg">
