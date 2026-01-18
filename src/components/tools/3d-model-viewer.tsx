@@ -121,7 +121,7 @@ export function Model3DViewer() {
   const [lightMode, setLightMode] = useState<'light' | 'dark'>('dark')
   const [isDragging, setIsDragging] = useState(false)
   const [lastMouse, setLastMouse] = useState({ x: 0, y: 0 })
-  const animationRef = useRef<number>()
+  const animationRef = useRef<number>(0)
 
   const project = useCallback((vertex: Vector3, width: number, height: number): { x: number, y: number, z: number } => {
     const scale = zoom * 1.5
