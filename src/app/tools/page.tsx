@@ -1189,6 +1189,66 @@ const TOOLS = [
     bgColor: 'bg-cyan-500/10',
     textColor: 'text-cyan-500',
     category: 'Creative'
+  },
+  // Text & Language Tools
+  {
+    slug: 'text-to-speech',
+    name: 'Text to Speech',
+    description: 'Convert text to speech with multiple voices and languages.',
+    icon: Radio,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Utility'
+  },
+  // Image Tools
+  {
+    slug: 'avatar-generator',
+    name: 'Avatar Generator',
+    description: 'Create unique avatars with different styles and colors.',
+    icon: User,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Creative'
+  },
+  // Fun Generators
+  {
+    slug: 'story-generator',
+    name: 'Story Generator',
+    description: 'Generate creative short stories in various genres.',
+    icon: BookOpen,
+    bgColor: 'bg-pink-500/10',
+    textColor: 'text-pink-500',
+    category: 'Creative'
+  },
+  // Math Tools
+  {
+    slug: 'matrix-calculator',
+    name: 'Matrix Calculator',
+    description: 'Perform matrix operations: add, multiply, transpose, inverse.',
+    icon: Grid3X3,
+    bgColor: 'bg-cyan-500/10',
+    textColor: 'text-cyan-500',
+    category: 'Math'
+  },
+  // Productivity Tools
+  {
+    slug: 'goal-tracker',
+    name: 'Goal Tracker',
+    description: 'Set goals, track milestones, and visualize progress.',
+    icon: Target,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Productivity'
+  },
+  // Social Tools
+  {
+    slug: 'digital-business-card',
+    name: 'Digital Business Card',
+    description: 'Create beautiful digital business cards with vCard export.',
+    icon: User,
+    bgColor: 'bg-indigo-500/10',
+    textColor: 'text-indigo-500',
+    category: 'Social'
   }
 ]
 
