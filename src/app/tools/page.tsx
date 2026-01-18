@@ -13,7 +13,8 @@ import {
   CircleDot, Bomb, ListChecks, Disc, ShoppingCart, User, Zap, Dices, Percent, Monitor,
   Radio, Coins, PiggyBank, Moon, Link2, LetterText, Fingerprint, BadgePercent, Languages, Flame, Atom,
   Thermometer, GraduationCap, Lightbulb, Pipette, Car, CalendarDays, MapPin, Footprints, Scaling, Dice6, Database,
-  TrendingUp
+  TrendingUp, Eye, Contrast, Cookie, Users, FileJson, FileCode, Heart,
+  Gauge, BookText
 } from 'lucide-react'
 
 const TOOLS = [
@@ -1249,6 +1250,129 @@ const TOOLS = [
     bgColor: 'bg-indigo-500/10',
     textColor: 'text-indigo-500',
     category: 'Social'
+  },
+  // Accessibility Tools
+  {
+    slug: 'color-blindness-simulator',
+    name: 'Color Blindness Simulator',
+    description: 'Simulate different types of color vision deficiency.',
+    icon: Eye,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Accessibility'
+  },
+  {
+    slug: 'contrast-checker',
+    name: 'Contrast Checker',
+    description: 'Check color contrast ratios for WCAG accessibility.',
+    icon: Contrast,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Accessibility'
+  },
+  // Fun Tools
+  {
+    slug: 'magic-8-ball',
+    name: 'Magic 8 Ball',
+    description: 'Ask any yes/no question and receive mystical guidance.',
+    icon: Sparkles,
+    bgColor: 'bg-indigo-500/10',
+    textColor: 'text-indigo-500',
+    category: 'Fun'
+  },
+  {
+    slug: 'fortune-cookie',
+    name: 'Fortune Cookie',
+    description: 'Crack open a virtual fortune cookie for wisdom and lucky numbers.',
+    icon: Cookie,
+    bgColor: 'bg-amber-500/10',
+    textColor: 'text-amber-500',
+    category: 'Fun'
+  },
+  {
+    slug: 'name-picker',
+    name: 'Random Name Picker',
+    description: 'Randomly pick names for raffles, teams, or decisions.',
+    icon: Users,
+    bgColor: 'bg-pink-500/10',
+    textColor: 'text-pink-500',
+    category: 'Fun'
+  },
+  // File Conversion Tools
+  {
+    slug: 'json-to-csv',
+    name: 'JSON to CSV Converter',
+    description: 'Convert JSON arrays to CSV format with custom delimiters.',
+    icon: FileJson,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Developer'
+  },
+  {
+    slug: 'markdown-to-html',
+    name: 'Markdown to HTML',
+    description: 'Convert Markdown text to HTML with live preview.',
+    icon: FileCode,
+    bgColor: 'bg-orange-500/10',
+    textColor: 'text-orange-500',
+    category: 'Developer'
+  },
+  // Health Tracking Tools
+  {
+    slug: 'blood-pressure-tracker',
+    name: 'Blood Pressure Tracker',
+    description: 'Track and monitor blood pressure readings over time.',
+    icon: Heart,
+    bgColor: 'bg-red-500/10',
+    textColor: 'text-red-500',
+    category: 'Health'
+  },
+  {
+    slug: 'mood-tracker',
+    name: 'Mood Tracker',
+    description: 'Log your daily mood and track emotional patterns.',
+    icon: Smile,
+    bgColor: 'bg-yellow-500/10',
+    textColor: 'text-yellow-500',
+    category: 'Health'
+  },
+  // Learning Tools
+  {
+    slug: 'typing-tutor',
+    name: 'Typing Tutor',
+    description: 'Improve your typing speed and accuracy with lessons.',
+    icon: Keyboard,
+    bgColor: 'bg-blue-500/10',
+    textColor: 'text-blue-500',
+    category: 'Learning'
+  },
+  {
+    slug: 'speed-reader',
+    name: 'Speed Reader',
+    description: 'Train yourself to read faster using RSVP technique.',
+    icon: BookText,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Learning'
+  },
+  // More Calculators
+  {
+    slug: 'tip-splitter',
+    name: 'Tip Splitter',
+    description: 'Calculate tips and split bills among friends easily.',
+    icon: Receipt,
+    bgColor: 'bg-green-500/10',
+    textColor: 'text-green-500',
+    category: 'Calculator'
+  },
+  {
+    slug: 'time-calculator',
+    name: 'Time Calculator',
+    description: 'Add, subtract time durations and calculate differences.',
+    icon: Clock,
+    bgColor: 'bg-purple-500/10',
+    textColor: 'text-purple-500',
+    category: 'Calculator'
   }
 ]
 
