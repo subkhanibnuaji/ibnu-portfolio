@@ -1,6 +1,10 @@
 /**
  * Sentry.io Integration for Error Monitoring & Performance
  *
+ * This is a stub implementation that works with or without @sentry/nextjs.
+ * If Sentry is installed and configured, it will use the real implementation.
+ * Otherwise, it falls back to console logging.
+ *
  * FREE Tier includes:
  * - 5K errors/month
  * - 10K performance units/month
@@ -14,7 +18,61 @@
  * 4. Run: npx @sentry/wizard@latest -i nextjs
  */
 
-import * as Sentry from '@sentry/nextjs'
+// Type definitions for Sentry-like API
+interface SentryScope {
+  setTag: (key: string, value: string) => void
+  setExtra: (key: string, value: unknown) => void
+}
+
+interface SentrySpan {
+  end: () => void
+}
+
+interface SentryModule {
+  init: (config: unknown) => void
+  withScope: (callback: (scope: SentryScope) => void) => void
+  captureException: (error: Error) => void
+  captureMessage: (message: string, level?: string) => void
+  setUser: (user: { id: string; email?: string; role?: string } | null) => void
+  startInactiveSpan: (options: { name: string; op: string }) => SentrySpan
+  captureConsoleIntegration: (options: { levels: string[] }) => unknown
+}
+
+// Try to load Sentry, fall back to stub if not available
+let Sentry: SentryModule | null = null
+
+try {
+  // Dynamic import to avoid build errors when @sentry/nextjs is not installed
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  Sentry = require('@sentry/nextjs') as SentryModule
+} catch {
+  // Sentry not installed, will use fallback implementation
+  console.log('[Sentry] Package not installed, using fallback logging')
+}
+
+// Stub implementation when Sentry is not available
+const SentryStub: SentryModule = {
+  init: () => {},
+  withScope: (callback) => {
+    const stubScope: SentryScope = {
+      setTag: () => {},
+      setExtra: () => {},
+    }
+    callback(stubScope)
+  },
+  captureException: (error) => {
+    console.error('[Error]', error)
+  },
+  captureMessage: (message, level) => {
+    console.log(`[${level || 'info'}]`, message)
+  },
+  setUser: () => {},
+  startInactiveSpan: () => ({ end: () => {} }),
+  captureConsoleIntegration: () => ({}),
+}
+
+// Use real Sentry or stub
+const SentryAPI = Sentry || SentryStub
 
 // =============================================================================
 // CONFIGURATION
@@ -38,20 +96,25 @@ export function initSentry() {
     return
   }
 
-  Sentry.init({
+  if (!Sentry) {
+    console.warn('[Sentry] Package not installed, using fallback logging')
+    return
+  }
+
+  SentryAPI.init({
     dsn: SENTRY_CONFIG.dsn,
     environment: SENTRY_CONFIG.environment,
     tracesSampleRate: SENTRY_CONFIG.tracesSampleRate,
 
     // Capture unhandled promise rejections
     integrations: [
-      Sentry.captureConsoleIntegration({
+      SentryAPI.captureConsoleIntegration({
         levels: ['error', 'warn'],
       }),
     ],
 
     // Filter out sensitive data
-    beforeSend(event) {
+    beforeSend(event: { request?: { headers?: Record<string, string> }; breadcrumbs?: Array<{ message?: string }> }) {
       // Remove sensitive headers
       if (event.request?.headers) {
         delete event.request.headers['authorization']
@@ -93,12 +156,12 @@ export function captureError(
   error: Error | unknown,
   context?: Record<string, unknown>
 ) {
-  if (!SENTRY_CONFIG.dsn) {
+  if (!SENTRY_CONFIG.dsn && !Sentry) {
     console.error('[Error]', error, context)
     return
   }
 
-  Sentry.withScope((scope) => {
+  SentryAPI.withScope((scope) => {
     if (context) {
       Object.entries(context).forEach(([key, value]) => {
         scope.setExtra(key, value)
@@ -106,9 +169,9 @@ export function captureError(
     }
 
     if (error instanceof Error) {
-      Sentry.captureException(error)
+      SentryAPI.captureException(error)
     } else {
-      Sentry.captureMessage(String(error), 'error')
+      SentryAPI.captureMessage(String(error), 'error')
     }
   })
 }
@@ -118,18 +181,18 @@ export function captureMessage(
   level: 'info' | 'warning' | 'error' = 'info',
   context?: Record<string, unknown>
 ) {
-  if (!SENTRY_CONFIG.dsn) {
+  if (!SENTRY_CONFIG.dsn && !Sentry) {
     console.log(`[${level}]`, message, context)
     return
   }
 
-  Sentry.withScope((scope) => {
+  SentryAPI.withScope((scope) => {
     if (context) {
       Object.entries(context).forEach(([key, value]) => {
         scope.setExtra(key, value)
       })
     }
-    Sentry.captureMessage(message, level)
+    SentryAPI.captureMessage(message, level)
   })
 }
 
@@ -142,9 +205,9 @@ export function setUser(user: {
   email?: string
   role?: string
 }) {
-  if (!SENTRY_CONFIG.dsn) return
+  if (!SENTRY_CONFIG.dsn && !Sentry) return
 
-  Sentry.setUser({
+  SentryAPI.setUser({
     id: user.id,
     // Hash email for privacy
     email: user.email ? hashEmail(user.email) : undefined,
@@ -153,8 +216,8 @@ export function setUser(user: {
 }
 
 export function clearUser() {
-  if (!SENTRY_CONFIG.dsn) return
-  Sentry.setUser(null)
+  if (!SENTRY_CONFIG.dsn && !Sentry) return
+  SentryAPI.setUser(null)
 }
 
 // =============================================================================
@@ -164,10 +227,10 @@ export function clearUser() {
 export function startTransaction(
   name: string,
   operation: string
-): Sentry.Span | undefined {
-  if (!SENTRY_CONFIG.dsn) return undefined
+): SentrySpan | undefined {
+  if (!SENTRY_CONFIG.dsn && !Sentry) return undefined
 
-  return Sentry.startInactiveSpan({
+  return SentryAPI.startInactiveSpan({
     name,
     op: operation,
   })
@@ -204,7 +267,7 @@ export function trackSuspiciousActivity(
   activity: string,
   details?: Record<string, unknown>
 ) {
-  Sentry.withScope((scope) => {
+  SentryAPI.withScope((scope) => {
     scope.setTag('category', 'security')
     scope.setTag('activity_type', activity)
     scope.setExtra('ip', ip)
@@ -213,7 +276,7 @@ export function trackSuspiciousActivity(
         scope.setExtra(key, value)
       })
     }
-    Sentry.captureMessage(`Suspicious Activity: ${activity}`, 'warning')
+    SentryAPI.captureMessage(`Suspicious Activity: ${activity}`, 'warning')
   })
 }
 
@@ -270,7 +333,7 @@ export function logError(
   }
 
   // Also send to Sentry if configured
-  if (SENTRY_CONFIG.dsn) {
+  if (SENTRY_CONFIG.dsn || Sentry) {
     captureError(error, context)
   }
 
