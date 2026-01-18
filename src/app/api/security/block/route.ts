@@ -40,17 +40,20 @@ export async function POST(req: NextRequest) {
 
     const { ip, duration, reason, permanent } = validation.data
 
-    blockIP(ip, permanent ? Infinity : duration, reason, permanent)
+    // Default duration to 1 hour (3600000ms) if not provided
+    const blockDuration = duration ?? 3600000
+
+    blockIP(ip, permanent ? Infinity : blockDuration, reason, permanent)
 
     logAuditEvent(req, 'ip_blocked', true, session.user.id, {
       ip,
-      duration: permanent ? 'permanent' : `${duration / 1000 / 60} minutes`,
+      duration: permanent ? 'permanent' : `${blockDuration / 1000 / 60} minutes`,
       reason,
     })
 
     return apiSuccess({
       message: `IP ${ip} has been blocked`,
-      duration: permanent ? 'permanent' : `${duration / 1000 / 60} minutes`,
+      duration: permanent ? 'permanent' : `${blockDuration / 1000 / 60} minutes`,
     })
   } catch (error) {
     console.error('IP block error:', error)
